@@ -1,0 +1,737 @@
+<title>Chicxs del Pueblo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&family=Piazzolla:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9E2D0;
+    --paper-2:#DED2B4;
+    --card-bg:#F4EEDF;
+    --ink:#241B14;
+    --ink-soft:#5B4A38;
+    --marigold:#F2A93B;
+    --marigold-deep:#B97418;
+    --brick:#C64F32;
+    --teal:#1F6F6B;
+    --line:rgba(36,27,20,.18);
+    --shadow:rgba(36,27,20,.22);
+    --focus:#B97418;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1B1510;
+      --paper-2:#241B14;
+      --card-bg:#241B14;
+      --ink:#EDE6D6;
+      --ink-soft:#C9BBA3;
+      --marigold:#F2B94C;
+      --marigold-deep:#C9860F;
+      --brick:#E2684A;
+      --teal:#49B3AC;
+      --line:rgba(237,230,214,.16);
+      --shadow:rgba(0,0,0,.55);
+      --focus:#F2B94C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B1510;
+    --paper-2:#241B14;
+    --card-bg:#241B14;
+    --ink:#EDE6D6;
+    --ink-soft:#C9BBA3;
+    --marigold:#F2B94C;
+    --marigold-deep:#C9860F;
+    --brick:#E2684A;
+    --teal:#49B3AC;
+    --line:rgba(237,230,214,.16);
+    --shadow:rgba(0,0,0,.55);
+    --focus:#F2B94C;
+  }
+
+  *{box-sizing:border-box;}
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Piazzolla', Georgia, 'Times New Roman', serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Anton', 'Arial Narrow Bold', sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:.01em;
+    text-wrap:balance;
+    line-height:.98;
+  }
+  .eyebrow{
+    font-family:'Archivo', Helvetica, Arial, sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+  }
+  .num{ font-variant-numeric:tabular-nums; font-family:'Archivo', Arial, sans-serif; }
+  a{ color:var(--brick); }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:2px;
+  }
+  ::selection{ background:var(--marigold); color:var(--ink); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 1.5rem; }
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:920px; margin:0 auto; padding:.7rem 1.5rem;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .brandmark{
+    font-family:'Anton',sans-serif; font-size:1rem; letter-spacing:.02em;
+    white-space:nowrap; flex-shrink:0;
+  }
+  .brandmark span{ color:var(--brick); }
+  .chipnav{
+    display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none;
+    padding-bottom:2px; scroll-behavior:smooth; flex:1; min-width:0;
+  }
+  .chipnav::-webkit-scrollbar{ display:none; }
+  .nav-arrow{
+    flex-shrink:0; width:1.6rem; height:1.6rem; border-radius:50%;
+    border:1px solid var(--line); background:var(--card-bg); color:var(--ink-soft);
+    font-family:'Archivo',sans-serif; font-size:.9rem; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .nav-arrow:hover{ color:var(--ink); border-color:var(--ink-soft); }
+  .chip{
+    font-family:'Archivo',sans-serif; font-weight:600; font-size:.72rem;
+    text-transform:uppercase; letter-spacing:.06em;
+    white-space:nowrap; padding:.32rem .7rem; border-radius:999px;
+    border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+    cursor:pointer; text-decoration:none; display:inline-block;
+  }
+  .chip[aria-current="true"]{
+    background:var(--ink); color:var(--paper); border-color:var(--ink);
+  }
+
+  /* anchor targets: clear the sticky header, regardless of nav path */
+  #historia, .era{ scroll-margin-top:4.75rem; }
+
+  /* ---------- hero ---------- */
+  .hero{ padding:3.2rem 0 1.5rem; position:relative; }
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.72rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    background:var(--card-bg); border:1px solid var(--line);
+    padding:.4rem .8rem; border-radius:999px; margin-bottom:1.3rem;
+  }
+  .hero-badge .dot{ width:.5rem; height:.5rem; border-radius:50%; background:var(--brick); flex-shrink:0; }
+  h1.masthead{
+    font-size:clamp(2.6rem, 9vw, 5.6rem);
+    margin:0;
+    position:relative;
+  }
+  h1.masthead .l2{
+    color:var(--marigold);
+    -webkit-text-stroke:2px var(--ink);
+    text-shadow: 5px 4px 0 var(--brick);
+    display:block;
+  }
+  .hero-sub{
+    font-style:italic; font-size:clamp(1.05rem,2.6vw,1.35rem);
+    color:var(--ink-soft); max-width:42ch; margin:1.1rem 0 0;
+  }
+  .hero-art{ width:100%; height:auto; margin-top:1.6rem; display:block; }
+
+  /* ---------- manifiesto ---------- */
+  .manifiesto{
+    padding:1.6rem 0 2.6rem; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    margin:1rem 0 2.6rem;
+  }
+  .manifiesto p{
+    font-size:clamp(1.05rem,2vw,1.28rem);
+    max-width:62ch;
+    position:relative; padding-left:1.4rem;
+    border-left:4px solid var(--teal);
+  }
+
+  /* ---------- section heads ---------- */
+  .section-head{ margin:0 0 1.8rem; }
+  .section-head h2{ font-size:clamp(1.8rem,5vw,2.7rem); margin:.35rem 0 0; }
+  .section-head .eyebrow{ color:var(--brick); }
+
+  section{ padding:2.6rem 0; }
+
+  /* ---------- timeline ---------- */
+  .timeline{ display:grid; grid-template-columns:2.2rem 1fr; gap:1.1rem; }
+  .rail{ position:relative; }
+  .rail-track{
+    position:absolute; left:50%; top:.3rem; bottom:.3rem; width:3px;
+    background:var(--line); transform:translateX(-50%); border-radius:3px;
+  }
+  .rail-fill{
+    position:absolute; left:50%; top:.3rem; width:3px; height:0;
+    background:linear-gradient(var(--brick), var(--marigold));
+    transform:translateX(-50%); border-radius:3px;
+  }
+  .rail-marker{
+    position:absolute; left:50%; top:.3rem; width:1.5rem; height:1.5rem;
+    transform:translate(-50%,-50%); border-radius:50%;
+    background:var(--marigold); border:2px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:.7rem;
+  }
+  .eras{ display:flex; flex-direction:column; gap:2.2rem; }
+  .era{
+    background:var(--card-bg); border:1px solid var(--line); border-radius:.6rem;
+    padding:1.3rem 1.4rem 1.5rem; box-shadow:0 6px 0 var(--shadow);
+    opacity:0; transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .era.in-view{ opacity:1; transform:translateY(0); }
+  .era-top{ display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .era-no{ font-family:'Anton',sans-serif; font-size:1.5rem; color:var(--brick); }
+  .era-years{
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.78rem;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--teal);
+  }
+  .era h3{ font-size:clamp(1.2rem,3vw,1.55rem); margin:.15rem 0 .6rem; text-transform:none; letter-spacing:0; }
+  .era p{ margin:0 0 .7rem; color:var(--ink); }
+  .era p:last-of-type{ margin-bottom:0; }
+  .era-toggle{
+    font-family:'Archivo',sans-serif; font-weight:700; font-size:.74rem;
+    text-transform:uppercase; letter-spacing:.06em;
+    background:none; border:1px solid var(--line); border-radius:999px;
+    padding:.35rem .8rem; cursor:pointer; color:var(--brick); margin-top:.4rem;
+  }
+  .era-quote{
+    display:none; margin:.8rem 0 0; padding:.8rem 1rem;
+    border-left:3px solid var(--marigold-deep); background:var(--paper);
+    font-style:italic; color:var(--ink-soft);
+  }
+  .era-quote.open{ display:block; }
+
+  /* ---------- crecimiento ---------- */
+  .growth{
+    display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap;
+    background:var(--card-bg); border:1px solid var(--line); border-radius:.6rem;
+    padding:2rem 1.6rem; margin-bottom:1.8rem;
+  }
+  .growth-num{ text-align:center; }
+  .growth-num .big{ font-family:'Anton',sans-serif; font-size:clamp(2.6rem,8vw,4rem); line-height:1; }
+  .growth-num .cap{ font-family:'Archivo',sans-serif; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); max-width:16ch; margin:.4rem auto 0; }
+  .growth-num.from .big{ color:var(--ink-soft); }
+  .growth-num.to .big{ color:var(--brick); }
+  .growth-arrow{ flex:1; min-width:60px; height:2px; background:repeating-linear-gradient(to right, var(--teal) 0 10px, transparent 10px 16px); position:relative; }
+  .growth-arrow::after{
+    content:""; position:absolute; right:-2px; top:50%; width:0; height:0;
+    border-top:6px solid transparent; border-bottom:6px solid transparent; border-left:9px solid var(--teal);
+    transform:translateY(-50%);
+  }
+  .growth-caption{ width:100%; font-family:'Archivo',sans-serif; font-size:.8rem; color:var(--ink-soft); text-align:center; }
+
+  /* 6 estadísticas: dos filas parejas de 3, sin ítems sueltos */
+  .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  .stat{ background:var(--paper-2); border-radius:.5rem; padding:1.1rem 1rem; }
+  .stat .big{ font-family:'Anton',sans-serif; font-size:clamp(1.8rem,4vw,2.3rem); color:var(--teal); }
+  .stat .cap{ font-family:'Archivo',sans-serif; font-size:.72rem; letter-spacing:.03em; color:var(--ink-soft); margin-top:.2rem; }
+
+  /* ---------- lemas: ordered, symmetric grid, no per-card tilt ---------- */
+  .lemas{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.3rem; }
+  .placard{
+    perspective:1200px; height:190px; background:none; border:none; padding:0; cursor:pointer;
+    font:inherit; color:inherit; text-align:left; width:100%;
+  }
+  .placard-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .55s cubic-bezier(.2,.8,.2,1);
+    transform-style:preserve-3d;
+  }
+  .placard.flipped .placard-inner{ transform:rotateY(180deg); }
+  .placard-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:.4rem; border:2px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    padding:1.1rem; box-shadow:0 6px 0 var(--shadow);
+  }
+  .placard-front{ background:var(--marigold); color:var(--ink); }
+  .placard:nth-child(2) .placard-front{ background:var(--brick); color:#fff; }
+  .placard:nth-child(3) .placard-front{ background:var(--teal); color:#fff; }
+  .placard:nth-child(4) .placard-front{ background:var(--ink); color:var(--paper); }
+  .placard-front .lema{ font-family:'Anton',sans-serif; font-size:1.35rem; line-height:1.05; }
+  .placard-back{ background:var(--card-bg); transform:rotateY(180deg); flex-direction:column; gap:.4rem; }
+  .placard-back p{ font-size:.85rem; color:var(--ink-soft); margin:0; }
+  .placard-back .when{ font-family:'Archivo',sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--brick); }
+  .placard-hint{ font-family:'Archivo',sans-serif; font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; opacity:.7; margin-top:.5rem; }
+
+  /* ---------- fundadores: 3 arriba, 2 abajo centrados en los huecos ---------- */
+  .founders{ display:grid; grid-template-columns:repeat(6,1fr); gap:1.1rem 1rem; }
+  .founder{
+    background:var(--card-bg);
+    border:1px solid var(--line); border-radius:.5rem; padding:1.1rem;
+  }
+  .founder:nth-child(1){ grid-column:1 / 3; grid-row:1; }
+  .founder:nth-child(2){ grid-column:3 / 5; grid-row:1; }
+  .founder:nth-child(3){ grid-column:5 / 7; grid-row:1; }
+  .founder:nth-child(4){ grid-column:2 / 4; grid-row:2; }
+  .founder:nth-child(5){ grid-column:4 / 6; grid-row:2; }
+  .founder .avatar{ width:3rem; height:3rem; border-radius:50%; overflow:hidden; margin-bottom:.7rem; }
+  .founder .avatar svg{ width:100%; height:100%; display:block; }
+  .founder h4{ font-family:'Archivo',sans-serif; font-size:.95rem; font-weight:700; margin:0 0 .15rem; }
+  .founder .role{ font-size:.78rem; color:var(--ink-soft); }
+
+  /* ---------- footer ---------- */
+  footer{ border-top:1px solid var(--line); padding:2.2rem 0 3rem; }
+  footer p{ font-size:.85rem; color:var(--ink-soft); max-width:62ch; }
+  .sources{ font-family:'Archivo',sans-serif; font-size:.78rem; display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin-top:.8rem; padding:0; list-style:none; }
+  .sources a{ color:var(--teal); }
+
+  @media (max-width:640px){
+    .timeline{ grid-template-columns:1.4rem 1fr; }
+    .founders{ grid-template-columns:1fr; }
+    .founder:nth-child(1), .founder:nth-child(2), .founder:nth-child(3),
+    .founder:nth-child(4), .founder:nth-child(5){ grid-column:1 / -1; grid-row:auto; }
+    .stats{ grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:480px){
+    .lemas{ grid-template-columns:1fr; }
+    .placard{ height:170px; }
+  }
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brandmark">CHICXS <span>DEL PUEBLO</span></div>
+    <button class="nav-arrow" id="navPrev" aria-label="Etapas anteriores" type="button">‹</button>
+    <nav class="chipnav" aria-label="Navegar por etapas">
+      <a class="chip" data-nav href="#era-1">Patronato</a>
+      <a class="chip" data-nav href="#era-2">Casas aisladas</a>
+      <a class="chip" data-nav href="#era-3">Fundación</a>
+      <a class="chip" data-nav href="#era-4">Primeros años</a>
+      <a class="chip" data-nav href="#era-5">Red nacional</a>
+      <a class="chip" data-nav href="#era-6">1999-2001</a>
+      <a class="chip" data-nav href="#era-7">Marchas</a>
+      <a class="chip" data-nav href="#era-8">AUH</a>
+      <a class="chip" data-nav href="#era-9">Pandemia</a>
+      <a class="chip" data-nav href="#era-10">Hoy</a>
+    </nav>
+    <button class="nav-arrow" id="navNext" aria-label="Etapas siguientes" type="button">›</button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section class="hero" id="hero">
+    <div class="hero-badge"><span class="dot"></span> Movimiento Nacional · fundado el 30 de septiembre de 1987</div>
+    <h1 class="masthead">CHICXS<span class="l2">DEL PUEBLO</span></h1>
+    <p class="hero-sub">Del patronato de menores a "son pueblo, sujetos políticos": la historia completa de Lxs Chicxs del Pueblo, de principio a fin.</p>
+    <svg class="hero-art" id="heroArt" viewBox="0 0 800 220" width="800" height="220" role="img" aria-label="Ilustración de un sol sobre una red de casas comunitarias unidas por un hilo, creciendo de cinco puntos a cientos">
+      <title>De cinco casas a una red nacional, bajo el mismo sol</title>
+    </svg>
+  </section>
+
+  <div class="manifiesto">
+    <p>Durante gran parte del siglo XX, el Estado argentino trató a la niñez pobre como un problema de orden, no de derechos. Casi setenta años después de esa ley, un puñado de educadores del conurbano bonaerense decidió organizarse para cambiar esa idea de raíz.</p>
+  </div>
+
+  <section id="historia">
+    <div class="section-head">
+      <div class="eyebrow">Casi un siglo de historia, en diez tramos</div>
+      <h2>La historia, de principio a fin</h2>
+    </div>
+
+    <div class="timeline">
+      <div class="rail" id="rail">
+        <div class="rail-track"></div>
+        <div class="rail-fill" id="railFill"></div>
+        <div class="rail-marker" id="railMarker" aria-hidden="true">☀️</div>
+      </div>
+
+      <div class="eras">
+
+        <article class="era" id="era-1">
+          <div class="era-top"><span class="era-no num">01</span><span class="era-years num">Desde 1919</span></div>
+          <h3>Antes de todo: los chicos como objeto de tutela</h3>
+          <p>Desde 1919, la Ley 10.903 —conocida como Ley Agote— le daba al Estado el "patronato" sobre la niñez pobre o abandonada: un juez podía disponer de un chico igual que de un delincuente e internarlo en un instituto sin que mediara ningún delito. Era la doctrina de la "situación irregular": el chico pobre no era sujeto de derechos, sino un problema a corregir.</p>
+          <p>Ese fue el sistema contra el que, más de sesenta años después, un grupo de educadores del conurbano empezó a organizarse.</p>
+        </article>
+
+        <article class="era" id="era-2">
+          <div class="era-top"><span class="era-no num">02</span><span class="era-years num">1974 – 1986</span></div>
+          <h3>Casas aisladas frente a la misma pobreza</h3>
+          <p>Alberto Morlachetti, hijo de un canillita de Gerli, estudiaba sociología en la UBA cuando la pobreza de los chicos de la calle lo empujó a actuar: en 1974 hipotecó su propia casa para sostener un primer proyecto, la Casa de los Niños. Perseguido y expulsado de la docencia durante la dictadura por su militancia comunista, no abandonó el trabajo territorial.</p>
+          <p>En 1982 fundó el Hogar Pelota de Trapo sobre unos terrenos ferroviarios de Piñeyro, Avellaneda, alrededor de una cancha de fútbol. En 1986 sumó el Hogar Juan Salvador Gaviota. En paralelo, el padre Carlos Cajade (La Plata), el padre Luis Farinello (Quilmes), el padre Elvio Mettone (Paso del Rey) y Enrique Spinetta (Berazategui) abrían casas similares, cada uno por su cuenta, frente a la misma realidad.</p>
+        </article>
+
+        <article class="era" id="era-3">
+          <div class="era-top"><span class="era-no num">03</span><span class="era-years num">30 sep 1987</span></div>
+          <h3>Una capilla en Florencio Varela</h3>
+          <p>Esos referentes se reúnen en una humilde capilla y firman el acta fundacional del <strong>Movimiento Nacional de los Chicos del Pueblo</strong>. Se declaran independientes de partidos políticos e iglesias, con formas organizativas propias y representación elegida democráticamente en asamblea.</p>
+          <button class="era-toggle" data-toggle="q3" aria-expanded="false">¿Por qué "chicos del pueblo"?</button>
+          <blockquote class="era-quote" id="q3">Eligieron llamarse "chicos del pueblo" y no "chicos de la calle" para no estigmatizarlos: la calle era una circunstancia, no una identidad.</blockquote>
+        </article>
+
+        <article class="era" id="era-4">
+          <div class="era-top"><span class="era-no num">04</span><span class="era-years num">1988 – 1990</span></div>
+          <h3>"Sin trabajo no hay infancia"</h3>
+          <p>En 1988 organizan su primer encuentro en la sede de la CGT. El Movimiento denuncia tempranamente la violencia contra la niñez pobre: las matanzas de Formosa (1989), Tigre (1992) y Canning (1994) —esta última acompañados por el cantante Joan Manuel Serrat—.</p>
+          <p>En 1990 realizan el <strong>Primer Encuentro Latinoamericano de los Chicos del Pueblo</strong>, con presencia de 18 países.</p>
+        </article>
+
+        <article class="era" id="era-5">
+          <div class="era-top"><span class="era-no num">05</span><span class="era-years num">Años 90</span></div>
+          <h3>De un puñado de educadores a una red nacional</h3>
+          <p>En 1997, lo que era un pequeño grupo se transforma en un Encuentro de Educadores de 2.000 personas en Mar del Plata. Ahí deciden incorporarse a la CTA (Central de Trabajadores de la Argentina), ya nucleando a cientos de organizaciones de todo el país, bajo el lema que los definiría: <em>"El hambre es un crimen."</em></p>
+        </article>
+
+        <article class="era" id="era-6">
+          <div class="era-top"><span class="era-no num">06</span><span class="era-years num">1999 – 2001</span></div>
+          <h3>Un reconocimiento y una nueva crisis</h3>
+          <p>En 1999, la Organización de las Naciones Unidas distingue a Pelota de Trapo con el Premio a la Vida y a la Obra.</p>
+          <p>En 2001, en la crisis social más profunda de la Argentina reciente, comienzan las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>, junto a la CTA, bajo "El hambre es un crimen" y "Ni un pibe menos". En esos años también atraviesan persecución: el Movimiento denunció ocho atentados en un solo año, incluyendo la toma armada de la imprenta de Pelota de Trapo y el secuestro de educadores.</p>
+        </article>
+
+        <article class="era" id="era-7">
+          <div class="era-top"><span class="era-no num">07</span><span class="era-years num">2002 – 2005</span></div>
+          <h3>Las Marchas por la Vida</h3>
+          <p>El 28 de octubre de 2002, cientos de chicos parten desde Iguazú, Misiones, hacia Plaza de Mayo en la primera Marcha por la Vida, con el respaldo del escritor Ernesto Sábato, el cantante Joan Manuel Serrat y el Nobel de la Paz Adolfo Pérez Esquivel.</p>
+          <p>En 2005 la Tercera Marcha por la Vida recorre 4.500 km desde Tucumán con unos 400 chicos y 100 educadores, y llega a Plaza de Mayo el 1° de julio. Ese mismo año, el 28 de septiembre, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
+        </article>
+
+        <article class="era" id="era-8">
+          <div class="era-top"><span class="era-no num">08</span><span class="era-years num">2010 – 2015</span></div>
+          <h3>La Asignación Universal y la despedida</h3>
+          <p>Morlachetti fue uno de los impulsores de la Asignación Universal por Hijo. El 21 de abril de 2015 muere, dejando el movimiento en manos de sus compañeros y compañeras, con Pelota de Trapo sosteniendo una Casa del Niño, hogares, una imprenta, una panadería y una agencia de noticias de infancia.</p>
+        </article>
+
+        <article class="era" id="era-9">
+          <div class="era-top"><span class="era-no num">09</span><span class="era-years num">2020</span></div>
+          <h3>Sostener la comida en la pandemia</h3>
+          <p>Durante la pandemia de COVID-19, las organizaciones del Movimiento reorganizan su trabajo territorial: reparten alcohol en gel, barbijos y viandas en tupper en distintos barrios, sosteniendo la asistencia alimentaria pese al aislamiento.</p>
+        </article>
+
+        <article class="era" id="era-10">
+          <div class="era-top"><span class="era-no num">10</span><span class="era-years num">2020s · hoy</span></div>
+          <h3>"No son del pueblo: son pueblo"</h3>
+          <p>El Movimiento sigue activo, denunciando que la "criminalidad del hambre" que señalaban hace más de 40 años sigue vigente en un contexto de altísima pobreza infantil. En noviembre de 2025, miles de chicos y organizaciones volvieron a marchar en la República de los Niños, en La Plata, bajo la consigna "El hambre es una decisión política", reclamando comida garantizada, más plazas y más escuelas.</p>
+          <p>La Fundación Pelota de Trapo sigue funcionando en Avellaneda con una Casa del Niño que asiste a unos 200 chicos.</p>
+          <p>Hoy la red se presenta con un lenguaje más inclusivo, como "Organizaciones de lxs Chicxs del Pueblo": mismo origen de 1987, mismas casas, nombre puesto al día. "Somos una gran comunidad de comunidades en donde cada una conserva su total autonomía", resume Paula Salinas, responsable de la comunicación institucional del Movimiento.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="crecimiento">
+    <div class="section-head">
+      <div class="eyebrow">De la tutela a la organización propia</div>
+      <h2>La historia en números</h2>
+    </div>
+
+    <div class="growth">
+      <div class="growth-num from">
+        <div class="big num" data-count="5" data-duration="900">5</div>
+        <div class="cap">casas fundadoras · 1987</div>
+      </div>
+      <div class="growth-arrow" aria-hidden="true"></div>
+      <div class="growth-num to">
+        <div class="big"><span class="num" data-count="400" data-duration="1400">0</span><span aria-hidden="true">+</span></div>
+        <div class="cap">organizaciones hoy, en todo el país</div>
+      </div>
+      <div class="growth-caption">De un acta firmada en una capilla a una red nacional: hoy la integran más de 400 organizaciones ("casas"), según Paula Salinas, responsable de comunicación de Chicxs del Pueblo.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="big num" data-count="18" data-duration="900">0</div><div class="cap">países en el Primer Encuentro Latinoamericano, 1990</div></div>
+      <div class="stat"><div class="big num" data-count="8" data-duration="700">0</div><div class="cap">atentados denunciados en un solo año, post-2001</div></div>
+      <div class="stat"><div class="big num" data-count="4500" data-duration="1400">0</div><div class="cap">km recorridos en la Tercera Marcha por la Vida, 2005</div></div>
+      <div class="stat"><div class="big num" data-count="86" data-duration="1000">0</div><div class="cap">años de patronato de menores, de la Ley Agote (1919) a la Ley 26.061 (2005)</div></div>
+      <div class="stat"><div class="big num" data-count="38" data-duration="900">0</div><div class="cap">años de trayectoria del Movimiento desde 1987</div></div>
+      <div class="stat"><div class="big num" data-count="10" data-duration="800">0</div><div class="cap">provincias con organizaciones de la red hoy, de Chubut a Chaco</div></div>
+    </div>
+  </section>
+
+  <section id="consignas">
+    <div class="section-head">
+      <div class="eyebrow">Lo que dicen las pancartas</div>
+      <h2>Las consignas de la marcha</h2>
+    </div>
+    <div class="lemas">
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"El hambre es un crimen"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Encuentro de educadores, 1997</span>
+            <p>La consigna que resume su denuncia central, y que llevan desde entonces en cada Marcha Nacional.</p>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"Con ternura venceremos"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Método, desde el origen</span>
+            <p>Su respuesta a la institucionalización: reconstruir vínculos de cuidado en lugar de encerrar a la infancia pobre.</p>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"Ni un pibe menos"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Marchas Nacionales, desde 2001</span>
+            <p>Consigna de las marchas junto a la CTA en los años más duros de la crisis social argentina.</p>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"No son del pueblo: son pueblo"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Idea central, hoy</span>
+            <p>Por qué nunca dijeron "chicos de la calle": los entienden como sujetos políticos, no como una circunstancia a corregir.</p>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <section id="fundadores">
+    <div class="section-head">
+      <div class="eyebrow">Cinco casas, un mismo acta</div>
+      <h2>Quiénes lo fundaron</h2>
+    </div>
+    <p style="max-width:62ch;color:var(--ink-soft);margin:0 0 1.4rem;font-size:.95rem;">Estas cinco casas del conurbano bonaerense firmaron el acta original en 1987. Hoy la red que fundaron ya no es solo esas cinco ciudades: creció en provincias como Buenos Aires, Santa Fe, Córdoba, Mendoza, San Juan, San Luis, Chaco, La Pampa, Río Negro y Chubut, y ya son más de 400 organizaciones.</p>
+    <div class="founders">
+      <div class="founder">
+        <div class="avatar" style="background:var(--marigold)"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="var(--marigold)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--ink)"/><circle cx="30" cy="24" r="11" fill="var(--ink)"/></svg></div>
+        <h4>Alberto Morlachetti</h4><div class="role">Sociólogo · Avellaneda<br>Fundador de Pelota de Trapo (1982)</div>
+      </div>
+      <div class="founder">
+        <div class="avatar" style="background:var(--teal)"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="var(--teal)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--ink)"/><circle cx="30" cy="24" r="11" fill="var(--ink)"/></svg></div>
+        <h4>Carlos Cajade</h4><div class="role">Sacerdote · La Plata<br>Hogar de la Madre Tres Veces Admirable</div>
+      </div>
+      <div class="founder">
+        <div class="avatar" style="background:var(--brick)"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="var(--brick)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--ink)"/><circle cx="30" cy="24" r="11" fill="var(--ink)"/></svg></div>
+        <h4>Luis Farinello</h4><div class="role">Sacerdote · Quilmes</div>
+      </div>
+      <div class="founder">
+        <div class="avatar" style="background:var(--marigold-deep)"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="var(--marigold-deep)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--ink)"/><circle cx="30" cy="24" r="11" fill="var(--ink)"/></svg></div>
+        <h4>Elvio Mettone</h4><div class="role">Sacerdote · Paso del Rey</div>
+      </div>
+      <div class="founder">
+        <div class="avatar" style="background:var(--ink)"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="var(--ink)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--paper)"/><circle cx="30" cy="24" r="11" fill="var(--paper)"/></svg></div>
+        <h4>Enrique Spinetta</h4><div class="role">Referente · Berazategui</div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="fuentes">
+    <div class="eyebrow" style="color:var(--brick)">Fuentes</div>
+    <p>Resumen histórico elaborado a partir de fuentes públicas del Movimiento, normativa oficial y notas periodísticas. Última revisión: septiembre de 2026.</p>
+    <ul class="sources">
+      <li><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: Chicxs del Pueblo (con Paula Salinas)</a></li>
+      <li><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
+      <li><a href="https://pelotadetrapo.org.ar/una-historia-larga-y-sostenida-en-el-tiempo/" target="_blank" rel="noopener">Pelota de Trapo — Una historia larga y sostenida en el tiempo</a></li>
+      <li><a href="https://chicxsdelpueblo.com.ar/quienes-somos/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Quiénes somos</a></li>
+      <li><a href="https://www.boletinsalesiano.com.ar/fallecio-alberto-morlachetti/" target="_blank" rel="noopener">Boletín Salesiano — Falleció Alberto Morlachetti</a></li>
+      <li><a href="https://www.revistacabal.coop/actualidad/movimiento-nacional-los-chicos-del-pueblo" target="_blank" rel="noopener">Revista Cabal — Movimiento Nacional Los Chicos del Pueblo</a></li>
+      <li><a href="https://www.uncuyo.edu.ar/prensa/cuando-los-chicos-del-pueblo-se-ponen-en-marcha" target="_blank" rel="noopener">Prensa UNCUYO — Cuando los chicos del pueblo se ponen en marcha</a></li>
+      <li><a href="https://agencia.farco.org.ar/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Agencia FARCO — Marcha en La Plata, noviembre 2025</a></li>
+      <li><a href="https://www.argentina.gob.ar/normativa/nacional/ley-26061-110778" target="_blank" rel="noopener">Argentina.gob.ar — Ley 26.061</a></li>
+      <li><a href="http://patagoniarebelde.undav.edu.ar/ley-n-10903-de-patronato-de-menores-o-ley-agote/" target="_blank" rel="noopener">UNDAV — Ley N.º 10.903 de Patronato de Menores (Ley Agote)</a></li>
+    </ul>
+
+    <div class="eyebrow" style="color:var(--teal); margin-top:2rem;">Créditos</div>
+    <p>Trabajo elaborado por estudiantes de la materia Laboratorio Interdisciplinario: Redes sociales y condiciones de vida, las organizaciones sociales en acción, Universidad Nacional de General Sarmiento (UNGS).</p>
+    <p><strong>Grupo 2:</strong> Jonathan, Juan, Ulises Fonseca y Valentina Arri.</p>
+    <p><strong>Docentes:</strong> Ana Luz Abramovich, Analía Belén Ayala, Débora Magdalena Pino Saponaro, Gonzalo María Vázquez y Anabella Cristina Zamora Albornoz.</p>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- hero SVG: sun + growing network of houses ---- */
+  var svg = document.getElementById('heroArt');
+  var ns = 'http://www.w3.org/2000/svg';
+  function el(name, attrs){
+    var e = document.createElementNS(ns, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  // sun (riso misregistration: brick echo behind marigold disc)
+  var sunX = 120, sunY = 78, sunR = 46;
+  var gSunBack = el('g', {transform:'translate(5,4)', opacity:'0.55'});
+  var gSunFront = el('g', {});
+  for (var i=0;i<16;i++){
+    var ang = (i/16) * Math.PI * 2;
+    var x1 = sunX + Math.cos(ang)*(sunR+6), y1 = sunY + Math.sin(ang)*(sunR+6);
+    var x2 = sunX + Math.cos(ang)*(sunR+26), y2 = sunY + Math.sin(ang)*(sunR+26);
+    gSunBack.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'var(--brick)','stroke-width':5,'stroke-linecap':'round'}));
+    gSunFront.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'var(--marigold)','stroke-width':5,'stroke-linecap':'round'}));
+  }
+  svg.appendChild(gSunBack);
+  svg.appendChild(gSunFront);
+  svg.appendChild(el('circle',{cx:sunX+5,cy:sunY+4,r:sunR,fill:'var(--brick)',opacity:'0.55'}));
+  svg.appendChild(el('circle',{cx:sunX,cy:sunY,r:sunR,fill:'var(--marigold)',stroke:'var(--ink)','stroke-width':3}));
+
+  // thread + 5 founding houses, then fading network of many small orgs
+  var baseY = 170;
+  var houseXs = [70,150,230,310,390];
+  var pathD = 'M ' + houseXs[0] + ' ' + baseY;
+  for (var h=1; h<houseXs.length; h++){ pathD += ' L ' + houseXs[h] + ' ' + baseY; }
+  pathD += ' L 780 ' + baseY;
+  svg.appendChild(el('path',{d:pathD, fill:'none', stroke:'var(--teal)', 'stroke-width':2.5, 'stroke-dasharray':'1 9', 'stroke-linecap':'round'}));
+
+  function house(x,y,scale){
+    var g = el('g',{transform:'translate('+x+','+y+') scale('+scale+')'});
+    g.appendChild(el('rect',{x:-13,y:-2,width:26,height:20,fill:'var(--card-bg)',stroke:'var(--ink)','stroke-width':2.5}));
+    g.appendChild(el('polygon',{points:'-16,-2 0,-18 16,-2', fill:'var(--brick)',stroke:'var(--ink)','stroke-width':2.5,'stroke-linejoin':'round'}));
+    return g;
+  }
+  houseXs.forEach(function(x){ svg.appendChild(house(x, baseY, 1)); });
+
+  var cluster = el('g', {'aria-hidden':'true'});
+  var n = 46;
+  for (var j=0;j<n;j++){
+    var t = j/n;
+    var cx = 410 + t*370 + (Math.sin(j*12.9)+1)*6;
+    var cy = baseY + Math.sin(j*3.7)*26*t;
+    var r = 6 - t*4.2;
+    cluster.appendChild(el('circle',{cx:cx,cy:cy,r:Math.max(r,1.4), fill:'var(--marigold-deep)', opacity: (0.85 - t*0.65).toFixed(2)}));
+  }
+  svg.appendChild(cluster);
+
+  /* ---- scroll reveal for era cards ---- */
+  var eras = document.querySelectorAll('.era');
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if (en.isIntersecting) en.target.classList.add('in-view'); });
+    }, {threshold:0.15});
+    eras.forEach(function(e){ io.observe(e); });
+  } else {
+    eras.forEach(function(e){ e.classList.add('in-view'); });
+  }
+
+  /* ---- chip nav: deterministic click handling + active state ---- */
+  var chips = document.querySelectorAll('.chip[data-nav]');
+  var chipMap = {};
+  var topbarEl = document.querySelector('.topbar');
+  var chipnavEl = document.querySelector('.chipnav');
+  var navPrev = document.getElementById('navPrev');
+  var navNext = document.getElementById('navNext');
+  if (navPrev) navPrev.addEventListener('click', function(){ chipnavEl.scrollBy({left:-160, behavior: reduced ? 'auto' : 'smooth'}); });
+  if (navNext) navNext.addEventListener('click', function(){ chipnavEl.scrollBy({left:160, behavior: reduced ? 'auto' : 'smooth'}); });
+  // same reference line everywhere: the vertical middle of the screen —
+  // clicking a chip brings its section there, and scrolling detects "current" there too.
+  function midY(){ return (window.innerHeight || document.documentElement.clientHeight) / 2; }
+  chips.forEach(function(c){
+    var targetId = c.getAttribute('href').slice(1);
+    chipMap[targetId] = c;
+    c.addEventListener('click', function(ev){
+      ev.preventDefault();
+      var target = document.getElementById(targetId);
+      if (!target) return;
+      var absoluteY = target.getBoundingClientRect().top + window.pageYOffset - midY();
+      window.scrollTo(0, Math.max(absoluteY, 0));
+    });
+  });
+  /* ---- rail progress + active chip: one calculation drives both, so they always agree ---- */
+  var railFill = document.getElementById('railFill');
+  var railMarker = document.getElementById('railMarker');
+  var rail = document.getElementById('rail');
+  var erasArr = Array.prototype.slice.call(eras);
+  function updateProgress(){
+    var refY = midY();
+    var idx = -1, frac = 0;
+    for (var i=0;i<erasArr.length;i++){
+      var r = erasArr[i].getBoundingClientRect();
+      if (r.bottom <= refY){ idx = i; frac = 1; continue; }
+      if (r.top <= refY && r.bottom > refY){ idx = i; frac = (refY - r.top) / Math.max(r.bottom - r.top, 1); break; }
+      if (r.top > refY) break;
+    }
+    var pct = idx === -1 ? 0 : Math.min(Math.max((idx + frac) / erasArr.length, 0), 1);
+    var railH = rail.clientHeight - 6;
+    railFill.style.height = Math.round(pct*railH) + 'px';
+    railMarker.style.top = (6 + pct*railH) + 'px';
+
+    var chip = idx >= 0 ? chipMap[erasArr[idx].id] : null;
+    chips.forEach(function(c){ c.removeAttribute('aria-current'); });
+    if (chip) chip.setAttribute('aria-current','true');
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if (!ticking){ window.requestAnimationFrame(function(){ updateProgress(); ticking=false; }); ticking = true; }
+  }, {passive:true});
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+
+  /* ---- count-up stats ---- */
+  var counters = document.querySelectorAll('[data-count]');
+  function animateCount(node){
+    var target = parseInt(node.getAttribute('data-count'),10);
+    if (reduced){ node.textContent = target; return; }
+    var duration = parseInt(node.getAttribute('data-duration'),10) || 1000;
+    var start = null;
+    function step(ts){
+      if (!start) start = ts;
+      var p = Math.min((ts-start)/duration, 1);
+      var eased = 1 - Math.pow(1-p, 3);
+      node.textContent = Math.round(eased*target);
+      if (p < 1) window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window){
+    var countIo = new IntersectionObserver(function(entries, obs){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ animateCount(en.target); obs.unobserve(en.target); }
+      });
+    }, {threshold:0.6});
+    counters.forEach(function(c){ countIo.observe(c); });
+  } else {
+    counters.forEach(function(c){ c.textContent = c.getAttribute('data-count'); });
+  }
+
+  /* ---- era quote toggles ---- */
+  document.querySelectorAll('[data-toggle]').forEach(function(btn){
+    var label = btn.textContent;
+    btn.addEventListener('click', function(){
+      var q = document.getElementById(btn.getAttribute('data-toggle'));
+      var open = q.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? 'Ocultar' : label;
+    });
+  });
+
+  /* ---- placard flip ---- */
+  document.querySelectorAll('[data-placard]').forEach(function(p){
+    p.addEventListener('click', function(){
+      var flipped = p.classList.toggle('flipped');
+      p.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+    });
+  });
+})();
+</script>
