@@ -654,7 +654,7 @@
       ev.preventDefault();
       var target = document.getElementById(targetId);
       if (!target) return;
-      var absoluteY = target.getBoundingClientRect().top + window.pageYOffset - midY();
+      var absoluteY = target.getBoundingClientRect().top + window.pageYOffset - midY() + 12;
       window.scrollTo(0, Math.max(absoluteY, 0));
     });
   });
