@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=7">
-<link rel="stylesheet" href="css/red.css?v=7">
+<link rel="stylesheet" href="css/marca.css?v=8">
+<link rel="stylesheet" href="css/red.css?v=8">
 </head>
 <body data-app>
 
@@ -114,23 +114,33 @@
           <div id="publicarBloqueado" class="card-text">
             Solo las organizaciones de la red pueden publicar. Si sos parte de una, tocá <strong>“Ingresar”</strong> arriba a la derecha con tu cuenta de Google habilitada.
           </div>
-          <form id="formAviso" class="form-stack" hidden>
+          <form id="formAviso" class="form-stack" novalidate hidden>
             <div class="seg" role="radiogroup" aria-label="Tipo de aviso">
               <label><input type="radio" name="avTipo" value="necesita" checked><span>Necesitamos</span></label>
               <label><input type="radio" name="avTipo" value="ofrece"><span>Ofrecemos</span></label>
               <label><input type="radio" name="avTipo" value="convoca"><span>Convocamos</span></label>
             </div>
             <label class="field">
-              <span class="field-label">Recurso</span>
+              <span class="field-label" id="avRecursoLabel">¿Qué necesitan?</span>
               <select id="avRecurso" class="field-control" required></select>
             </label>
+            <div class="grid-2 av-convoca" id="avConvoca" hidden>
+              <label class="field">
+                <span class="field-label">Fecha *</span>
+                <input id="avCuando" class="field-control" type="date">
+              </label>
+              <label class="field">
+                <span class="field-label">Lugar</span>
+                <input id="avLugar" class="field-control" maxlength="80" placeholder="Dirección o nombre del lugar">
+              </label>
+            </div>
             <label class="field">
-              <span class="field-label">Título</span>
-              <input id="avTitulo" class="field-control" maxlength="80" required placeholder="Ej.: Necesitamos 2 ollas grandes">
+              <span class="field-label">Título *</span>
+              <input id="avTitulo" class="field-control" maxlength="80" required>
             </label>
             <label class="field">
               <span class="field-label">Detalle</span>
-              <textarea id="avDetalle" class="field-control" rows="3" maxlength="400" placeholder="Cantidades, plazos, si pueden pasar a buscar…"></textarea>
+              <textarea id="avDetalle" class="field-control" rows="3" maxlength="400"></textarea>
             </label>
             <button class="btn btn-primary" type="submit">Publicar en el tablero</button>
           </form>
@@ -404,8 +414,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=7"></script>
-<script src="js/red-datos.js?v=7"></script>
-<script src="js/red.js?v=7"></script>
+<script src="js/sesion.js?v=8"></script>
+<script src="js/red-datos.js?v=8"></script>
+<script src="js/red.js?v=8"></script>
 </body>
 </html>
