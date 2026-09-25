@@ -339,6 +339,10 @@
         '<div class="org-meta">' + esc(TIPOS[o.tipo].label) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
         '<p class="org-desc">' + esc(o.descripcion) + "</p>" +
         '<div class="org-tags">' + tagsHtml(o, 3) + "</div>" +
+        '<div class="org-actions">' +
+        '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '" aria-label="Ver ficha de ' + esc(o.nombre) + '">Ver ficha</button>' +
+        '<button type="button" class="btn btn-sm" data-en-mapa-lista="' + o.id + '" aria-label="Ver ' + esc(o.nombre) + ' en el mapa">📍 En el mapa</button>' +
+        "</div>" +
         "</li>";
     }).join("");
   }
