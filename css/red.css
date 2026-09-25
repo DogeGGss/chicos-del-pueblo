@@ -3,38 +3,6 @@
    ========================================================== */
 .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 1.5rem; }
 
-/* ---------- barra celeste: vistas según el rol + sesión ---------- */
-.site-nav-inner--app{ overflow:visible; gap:.6rem; }
-.nav-links{ display:flex; align-items:stretch; min-width:0; flex:1; overflow-x:auto; scrollbar-width:none; }
-.nav-links::-webkit-scrollbar{ display:none; }
-.site-nav .nav-vista{ display:inline-flex; align-items:center; gap:.4rem; }
-.nav-links > a{ display:inline-flex; align-items:center; }
-.tab-count{
-  font-family:var(--f-head); font-size:.66rem; font-weight:800; letter-spacing:0;
-  min-width:1.35rem; padding:.05rem .35rem; border-radius:999px;
-  background:var(--ink); color:#fff; text-align:center; line-height:1.4;
-}
-.tab-count:empty{ display:none; }
-.site-nav .nav-vista[aria-current="true"] .tab-count{ background:var(--celeste); color:var(--ink); }
-
-.nav-sesion{ display:flex; align-items:center; gap:.45rem; flex-shrink:0; padding:.35rem 0; }
-.site-nav .nav-sesion button{
-  font-family:var(--f-head); font-weight:700; font-size:.78rem; text-transform:none; letter-spacing:.01em;
-  display:inline-flex; align-items:center; gap:.45rem; padding:.38rem .8rem .38rem .4rem;
-  border:2px solid var(--ink); border-radius:999px; background:var(--paper); color:var(--ink); cursor:pointer;
-}
-.site-nav .nav-sesion button:hover{ background:var(--celeste-50); }
-.site-nav .nav-sesion .btn-salir{ padding:.38rem .75rem; background:transparent; }
-.g-dot, .avatar{
-  width:1.55rem; height:1.55rem; border-radius:50%; flex-shrink:0;
-  display:inline-flex; align-items:center; justify-content:center;
-  font-family:var(--f-head); font-weight:800; font-size:.78rem;
-}
-.g-dot{ background:var(--paper); border:1.5px solid var(--line-strong); color:#4285F4; }
-.avatar{ background:var(--ink); color:var(--celeste); }
-.sesion-quien{ display:flex; flex-direction:column; line-height:1.1; text-align:left; }
-.sesion-quien small{ font-family:var(--f-body); font-weight:600; font-size:.66rem; color:var(--ink-soft); }
-
 .demo-banner{
   background:var(--celeste-50); border-bottom:1px solid var(--celeste-100);
   color:var(--celeste-900); font-size:.82rem; text-align:center; padding:.45rem 1rem;
@@ -337,9 +305,6 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
 }
 @media (max-width:640px){
   .wrap{ padding:0 1rem; }
-  .sesion-quien, .g-texto{ display:none; }
-  .site-nav .nav-sesion button{ padding:.32rem; }
-  .site-nav .nav-sesion .btn-salir{ padding:.32rem .6rem; }
   .acceso-grid{ grid-template-columns:1fr; }
   .vista{ padding-top:1.3rem; }
   .stats{ grid-template-columns:repeat(2, minmax(0,1fr)); }
