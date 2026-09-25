@@ -25,7 +25,7 @@
   var CAMPOS_LABEL = {
     nombre: "Nombre", tipo: "Tipo", referente: "Referente", descripcion: "Descripción",
     edades: "Edades", chicos: "Cantidad de chicxs", horarios: "Horarios", localidad: "Localidad",
-    direccion: "Dirección", mostrarDireccion: "Visibilidad de la ubicación", lat: "Ubicación en el mapa",
+    direccion: "Dirección", ubicacionPublica: "Ubicación para visitantes", ubicacionRed: "Ubicación para la red", lat: "Ubicación en el mapa",
     necesita: "Necesitan", ofrece: "Ofrecen", necesitaOtros: "Otras necesidades", ofreceOtros: "Otras ofertas", telefono: "Teléfono", correo: "Correo", redes: "Redes",
   };
 
@@ -216,6 +216,8 @@
     $("formAviso").hidden = rol !== "org";
     renderSesion();
     if (rol === "org") cargarFicha();
+    construirMarcadores();
+    aplicarFiltros();
     renderAvisos();
     renderCoordinacion();
     var boton = document.querySelector('.nav-vista[data-vista="' + vista + '"]');
@@ -409,11 +411,28 @@
     if (!mapa) return;
     marcadores = {};
     orgs.forEach(function (o) {
-      var m = L.marker([o.lat, o.lng], { icon: iconoPin(o, o.id === seleccionId), title: o.nombre, alt: o.nombre, keyboard: true });
+      var pv = posVisible(o);
+      var m = L.marker([pv.lat, pv.lng], { icon: iconoPin(o, o.id === seleccionId), title: o.nombre, alt: o.nombre, keyboard: true });
       m.bindPopup(popupHtml(o));
       m.on("click", function () { seleccionar(o.id, { desdeMapa: true }); });
       marcadores[o.id] = m;
     });
+  }
+
+  // ¿quien está mirando puede ver la dirección exacta de esta organización?
+  // (en la versión real lo decide el servidor: a quien no puede verla no le manda las coordenadas)
+  function veExacta(o) {
+    if (rol === "coord") return true;
+    if (rol === "org" && sesion && o.id === sesion.orgId) return true;
+    return (rol === "org" ? o.ubicacionRed : o.ubicacionPublica) === "exacta";
+  }
+  // si no puede verla, el punto se corre al centro de su localidad (con un pequeño desplazamiento propio)
+  function posVisible(o) {
+    if (veExacta(o)) return { lat: o.lat, lng: o.lng };
+    var loc = LOCALIDADES[o.localidad] || o;
+    var h = 0;
+    String(o.id).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 997; });
+    return { lat: +(loc.lat + Math.sin(h) * 0.012).toFixed(5), lng: +(loc.lng + Math.cos(h) * 0.015).toFixed(5) };
   }
 
   function actualizarMarcadores(visibles, reencuadrar) {
@@ -422,8 +441,9 @@
     zonas.clearLayers();
     cluster.addLayers(visibles.map(function (o) { return marcadores[o.id]; }).filter(Boolean));
     visibles.forEach(function (o) {
-      if (o.mostrarDireccion !== "exacta") {
-        L.circle([o.lat, o.lng], { radius: 1500, color: "#13739F", weight: 1.5, dashArray: "4 4", fillColor: "#63C2EB", fillOpacity: .18, interactive: false }).addTo(zonas);
+      if (!veExacta(o)) {
+        var p = posVisible(o);
+        L.circle([p.lat, p.lng], { radius: 1500, color: "#13739F", weight: 1.5, dashArray: "4 4", fillColor: "#63C2EB", fillOpacity: .18, interactive: false }).addTo(zonas);
       }
     });
     if (reencuadrar) encuadrar(visibles);
@@ -431,7 +451,7 @@
 
   function encuadrar(lista) {
     if (!mapa || !lista.length) return;
-    var b = L.latLngBounds(lista.map(function (o) { return [o.lat, o.lng]; }));
+    var b = L.latLngBounds(lista.map(function (o) { var p = posVisible(o); return [p.lat, p.lng]; }));
     mapa.fitBounds(b.pad(0.15), { maxZoom: 11 });
   }
 
@@ -453,7 +473,8 @@
       if (card && window.innerWidth > 980) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
     } else if (mapa && marcadores[id]) {
       if (window.innerWidth <= 980) $("mapa").scrollIntoView({ block: "center", behavior: "smooth" });
-      mapa.setView([o.lat, o.lng], 12);
+      var pv = posVisible(o);
+      mapa.setView([pv.lat, pv.lng], 12);
       cluster.zoomToShowLayer(marcadores[id], function () { marcadores[id].openPopup(); });
     }
   }
@@ -530,9 +551,18 @@
 
   function detalleHtml(o, opts) {
     opts = opts || {};
-    var ubic = o.mostrarDireccion === "exacta" && o.direccion
-      ? esc(o.direccion) + ", " + esc(o.localidad)
-      : "Zona de " + esc(o.localidad) + " (dirección reservada)";
+    var ubic;
+    if (opts.preview) {
+      var txt = { zona: "solo la zona", exacta: "la dirección exacta" };
+      ubic = (o.direccion ? esc(o.direccion) + ", " : "") + esc(o.localidad) +
+        "<br><small>Visitantes ven " + txt[o.ubicacionPublica] + "; la red ve " + txt[o.ubicacionRed] + ".</small>";
+    } else if (veExacta(o) && o.direccion) {
+      ubic = esc(o.direccion) + ", " + esc(o.localidad);
+    } else if (rol === "visitante" && o.ubicacionRed === "exacta") {
+      ubic = "Zona de " + esc(o.localidad) + "<br><small>La dirección la ven solo las organizaciones de la red.</small>";
+    } else {
+      ubic = "Zona de " + esc(o.localidad) + " (dirección reservada)";
+    }
     var html = '<button type="button" class="modal-close" data-cerrar aria-label="Cerrar">✕</button>';
     if (opts.preview) html += '<span class="preview-flag">Vista previa · así se verá en el mapa</span>';
     html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + TIPOS[o.tipo].icono + "</div>" +
@@ -663,7 +693,7 @@
     var yo = esOrg ? miOrg() : null;
     var porCercania = yo && avisoFiltro !== "mias" && ordenAvisos === "cerca";
     var dist = {};
-    if (yo) avisos.forEach(function (a) { var o = orgById(a.orgId); if (o) dist[a.id] = distanciaKm(yo, o); });
+    if (yo) avisos.forEach(function (a) { var o = orgById(a.orgId); if (o) dist[a.id] = distanciaKm(yo, posVisible(o)); });
     lista.sort(porCercania ? function (a, b) {
       var pa = a.orgId === yo.id ? 1 : 0, pb = b.orgId === yo.id ? 1 : 0;
       return pa - pb || (dist[a.id] || 0) - (dist[b.id] || 0) || porFecha(a, b);
@@ -855,6 +885,18 @@
   }
   $("oTipo") && $("oTipo").addEventListener("change", moverPinFicha);
 
+  // si los visitantes ven la dirección exacta, las organizaciones de la red también
+  function ajustarVisibilidad() {
+    var f = $("formFicha");
+    var publicaExacta = f.querySelector('input[name="oVisPublica"]:checked').value === "exacta";
+    var redZona = f.querySelector('input[name="oVisRed"][value="zona"]');
+    if (publicaExacta) f.querySelector('input[name="oVisRed"][value="exacta"]').checked = true;
+    redZona.disabled = publicaExacta;
+  }
+  $("formFicha").addEventListener("change", function (e) {
+    if (e.target.name === "oVisPublica" || e.target.name === "oVisRed") ajustarVisibilidad();
+  });
+
   function set(id, v) { $(id).value = v == null ? "" : v; }
 
   function cargarFicha() {
@@ -869,7 +911,9 @@
     set("oDescripcion", o.descripcion); set("oEdades", o.edades); set("oChicos", o.chicos);
     set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
     set("oTelefono", o.telefono); set("oCorreo", o.correo); set("oRedes", o.redes);
-    f.querySelector('input[name="oVisibilidad"][value="' + (o.mostrarDireccion === "exacta" ? "exacta" : "zona") + '"]').checked = true;
+    f.querySelector('input[name="oVisPublica"][value="' + (o.ubicacionPublica === "exacta" ? "exacta" : "zona") + '"]').checked = true;
+    f.querySelector('input[name="oVisRed"][value="' + (o.ubicacionRed === "exacta" ? "exacta" : "zona") + '"]').checked = true;
+    ajustarVisibilidad();
     f.querySelectorAll('input[name="necesita"]').forEach(function (c) { c.checked = (o.necesita || []).indexOf(c.value) !== -1; });
     f.querySelectorAll('input[name="ofrece"]').forEach(function (c) { c.checked = (o.ofrece || []).indexOf(c.value) !== -1; });
     set("oNecesitaOtros", (o.necesitaOtros || []).join(", "));
@@ -900,7 +944,8 @@
       localidad: loc,
       provincia: LOCALIDADES[loc] ? LOCALIDADES[loc].prov : "",
       direccion: $("oDireccion").value.trim(),
-      mostrarDireccion: f.querySelector('input[name="oVisibilidad"]:checked').value,
+      ubicacionPublica: f.querySelector('input[name="oVisPublica"]:checked').value,
+      ubicacionRed: f.querySelector('input[name="oVisRed"]:checked').value,
       lat: pos.lat, lng: pos.lng,
       necesita: Array.prototype.map.call(f.querySelectorAll('input[name="necesita"]:checked'), function (c) { return c.value; }),
       ofrece: Array.prototype.map.call(f.querySelectorAll('input[name="ofrece"]:checked'), function (c) { return c.value; }),
@@ -921,8 +966,13 @@
       else $(p[0]).removeAttribute("aria-invalid");
     });
     var err = $("fichaError");
+    var pideDireccion = (d.ubicacionPublica === "exacta" || d.ubicacionRed === "exacta") && !d.direccion;
+    if (pideDireccion) { $("oDireccion").setAttribute("aria-invalid", "true"); faltan.push("oDireccion"); }
+    else $("oDireccion").removeAttribute("aria-invalid");
     if (faltan.length) {
-      err.textContent = "Completá los campos marcados con * (" + faltan.length + " sin completar).";
+      err.textContent = pideDireccion && faltan.length === 1
+        ? "Elegiste mostrar la dirección exacta: completá el campo Dirección."
+        : "Completá los campos marcados con * (" + faltan.length + " sin completar).";
       err.hidden = false;
       $(faltan[0]).focus();
       return false;
@@ -1067,7 +1117,7 @@
       var nueva = Object.assign({
         edades: "", chicos: "", horarios: "", direccion: "", redes: "", telefono: "", necesita: [], ofrece: [], necesitaOtros: [], ofreceOtros: [],
         lat: +(loc.lat + Math.sin(nOrg) * 0.015).toFixed(5), lng: +(loc.lng + Math.cos(nOrg) * 0.02).toFixed(5),
-        mostrarDireccion: "zona",
+        ubicacionPublica: "zona", ubicacionRed: "zona",
       }, clone(d), { id: "org-" + nOrg, estado: "aprobada", actualizada: HOY, correo: d.correo || s.email });
       if (!nueva.descripcion) nueva.descripcion = "Ficha en preparación: la organización todavía no completó su información.";
       orgs.push(nueva);
