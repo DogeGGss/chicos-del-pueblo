@@ -48,7 +48,7 @@
   var vista = "mapa";
   var seleccionId = null;
   var avisoFiltro = "";
-  var yaRespondidos = {};
+  var avisosAbiertos = {};   // avisos con la lista completa de respuestas desplegada
   var ultimoPedido = null;       // nombre de la organización del último pedido enviado
   var emailRechazado = "";       // cuenta no habilitada con la que se intentó ingresar
   var nOrg = 1000;
@@ -601,6 +601,19 @@
     return RECURSOS[a.recurso] || "Otra cosa";
   }
 
+  // quiénes respondieron: lo ve cualquiera, también quien entra como visitante
+  function respuestasHtml(a) {
+    var quienes = (a.respondieron || []).map(orgById).filter(Boolean);
+    var titulo = { necesita: "Quieren ayudar", ofrece: "Les interesa", convoca: "Se suman" }[a.tipo];
+    if (!quienes.length) return '<p class="aviso-resp aviso-resp--vacio">Todavía ninguna organización respondió.</p>';
+    var max = avisosAbiertos[a.id] ? quienes.length : 3;
+    var html = quienes.slice(0, max).map(function (o) {
+      return '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button>";
+    }).join(", ");
+    if (quienes.length > max) html += ' y <button type="button" class="aviso-mas" data-abrir-resp="' + a.id + '">' + plural(quienes.length - max, "más", "más") + "</button>";
+    return '<p class="aviso-resp"><strong>' + titulo + " (" + quienes.length + "):</strong> " + html + "</p>";
+  }
+
   function opcionesAviso(tipo) {
     var t = TEXTOS_AVISO[tipo];
     var fuente = t.opciones === "convocatorias" ? CONVOCATORIAS : RECURSOS;
@@ -629,9 +642,15 @@
         accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Cerrar aviso</button>';
       } else {
         var txt = a.tipo === "necesita" ? "Podemos ayudar" : a.tipo === "ofrece" ? "Nos interesa" : "Nos sumamos";
-        var hecho = yaRespondidos[a.id];
-        accion = '<button type="button" class="btn btn-sm ' + (hecho ? "" : "btn-primary") + '" data-responder="' + a.id + '"' + (hecho ? " disabled" : "") + ">" +
-          (hecho ? "✓ Avisado" : txt) + "</button>";
+        if (rol === "visitante") {
+          // el visitante ve el botón, pero apagado y con la aclaración
+          accion = '<span class="aviso-hint">Solo organizaciones de la red</span>' +
+            '<button type="button" class="btn btn-sm btn-bloqueado" aria-disabled="true" data-responder="' + a.id + '">🔒 ' + txt + "</button>";
+        } else {
+          var hecho = (a.respondieron || []).indexOf(sesion.orgId) !== -1;
+          accion = '<button type="button" class="btn btn-sm ' + (hecho ? "" : "btn-primary") + '" data-responder="' + a.id + '"' + (hecho ? " disabled" : "") + ">" +
+            (hecho ? "✓ Avisado" : txt) + "</button>";
+        }
       }
       return '<li class="aviso aviso--' + a.tipo + (a.nuevo ? " is-new" : "") + '">' +
         '<div class="aviso-top"><span class="aviso-kind">' + etiquetaAviso(a.tipo) + '</span><span class="tag tag--neutral">' + esc(etiquetaRecurso(a)) + "</span>" +
@@ -640,9 +659,10 @@
         "<h3>" + esc(a.titulo) + "</h3>" +
         (a.cuando ? '<p class="aviso-evento">📅 ' + fecha(a.cuando) + (a.lugar ? " · 📍 " + esc(a.lugar) : "") + "</p>" : "") +
         (a.detalle ? "<p>" + esc(a.detalle) + "</p>" : "") +
+        respuestasHtml(a) +
         '<div class="aviso-foot"><span class="aviso-org">' +
         (o ? '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button> · " + esc(o.localidad) : "") +
-        '</span><span class="aviso-actions"><span class="aviso-int">' + (a.interesados ? plural(a.interesados, "organización respondió", "organizaciones respondieron") : "") + "</span>" + accion + "</span></div>" +
+        '</span><span class="aviso-actions">' + accion + "</span></div>" +
         "</li>";
     }).join("");
     avisos.forEach(function (a) { delete a.nuevo; });
@@ -665,6 +685,8 @@
     $("avisosList").addEventListener("click", function (e) {
       var ver = e.target.closest("[data-ver]");
       if (ver) { abrirFicha(ver.getAttribute("data-ver")); return; }
+      var mas = e.target.closest("[data-abrir-resp]");
+      if (mas) { avisosAbiertos[mas.getAttribute("data-abrir-resp")] = true; renderAvisos(); return; }
       var cerrar = e.target.closest("[data-cerrar-aviso]");
       if (cerrar) {
         var idc = cerrar.getAttribute("data-cerrar-aviso");
@@ -675,14 +697,14 @@
       }
       var resp = e.target.closest("[data-responder]");
       if (!resp) return;
-      if (rol === "visitante") { toast("Para responder avisos tenés que ingresar con una cuenta habilitada."); return; }
+      if (rol === "visitante") { toast("Solo las organizaciones de la red pueden responder. Si sos parte de una, tocá “Ingresar”."); return; }
+      if (rol !== "org") { toast("La coordinación modera el tablero, pero no responde avisos."); return; }
       var id = resp.getAttribute("data-responder");
       var a = avisos.filter(function (x) { return x.id === id; })[0];
       var o = orgById(a.orgId);
-      a.interesados = (a.interesados || 0) + 1;
-      yaRespondidos[id] = true;
+      a.respondieron = (a.respondieron || []).concat(sesion.orgId);
       renderAvisos();
-      var quien = rol === "org" ? miOrg().nombre : "La coordinación";
+      var quien = miOrg().nombre;
       toast("Le avisamos a " + (o ? o.nombre : "la organización") + " que " + quien + " quiere ponerse en contacto.");
     });
     $("formAviso").addEventListener("submit", function (e) {
@@ -699,7 +721,7 @@
       if (faltan.length) { $(faltan[0]).focus(); return; }
       var aviso = {
         id: "av-" + Date.now(), orgId: sesion.orgId, tipo: tipo, recurso: $("avRecurso").value,
-        fecha: HOY, titulo: titulo, detalle: $("avDetalle").value.trim(), interesados: 0, nuevo: true,
+        fecha: HOY, titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
       };
       if (tipo === "convoca") { aviso.cuando = cuando; aviso.lugar = $("avLugar").value.trim(); }
       avisos.push(aviso);
