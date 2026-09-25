@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/marca.css?v=3">
+<link rel="stylesheet" href="css/marca.css?v=4">
 <style>
   /* la paleta viene de css/marca.css; estos alias mantienen los nombres usados abajo */
   :root{
@@ -41,10 +41,12 @@
     max-width:var(--wrap); margin:0 auto; padding:.7rem 1.5rem;
     display:flex; align-items:center; gap:.6rem;
   }
-  .topbar-label{
-    font-family:var(--f-head); font-weight:700; font-size:.66rem; letter-spacing:.1em;
+  .chip-group{
+    font-family:var(--f-head); font-weight:700; font-size:.62rem; letter-spacing:.1em;
     text-transform:uppercase; color:var(--ink-mute); white-space:nowrap; flex-shrink:0;
+    align-self:center; padding:0 .15rem;
   }
+  .chip-group--mov{ margin-left:.5rem; padding-left:.7rem; border-left:2px solid var(--line-strong); color:var(--celeste-700); }
   .chipnav{
     display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none;
     padding-bottom:2px; scroll-behavior:smooth; flex:1; min-width:0;
@@ -69,7 +71,7 @@
   }
 
   /* anchor targets: clear the sticky header, regardless of nav path */
-  #historia, .era{ scroll-margin-top:7.5rem; }
+  #contexto, #historia, .era{ scroll-margin-top:7.5rem; }
 
   /* ---------- hero ---------- */
   .hero{ padding:3.2rem 0 1.5rem; position:relative; }
@@ -146,11 +148,11 @@
     transition:opacity .5s ease, transform .5s ease;
   }
   .era.in-view{ opacity:1; transform:translateY(0); }
-  .era-top{ display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; margin-bottom:.5rem; }
-  .era-no{ font-family:var(--f-head); font-size:1.5rem; color:var(--brick); }
-  .era-years{
-    font-family:var(--f-head); font-weight:700; font-size:.78rem;
-    letter-spacing:.06em; text-transform:uppercase; color:var(--teal);
+  .era-top{ margin-bottom:.35rem; }
+  .era-date{
+    display:inline-block; font-family:var(--f-head); font-weight:800;
+    font-size:clamp(1.5rem,4vw,2rem); line-height:1.05; letter-spacing:.005em;
+    color:var(--celeste-700);
   }
   .era h3{ font-size:clamp(1.2rem,3vw,1.55rem); margin:.15rem 0 .6rem; text-transform:none; letter-spacing:0; }
   .era p{ margin:0 0 .7rem; color:var(--ink); }
@@ -167,6 +169,21 @@
     font-style:italic; color:var(--ink-soft);
   }
   .era-quote.open{ display:block; }
+
+  /* ---------- dos partes: contexto (antes de 1987) y movimiento (desde 1987) ---------- */
+  .etapa-lead{ max-width:62ch; color:var(--ink-soft); margin:-.9rem 0 1.4rem; }
+  .etapa--contexto .section-head .eyebrow{ color:var(--ink-mute); }
+  .etapa--contexto .era{ border-style:dashed; border-color:var(--ink-mute); box-shadow:5px 5px 0 var(--line); }
+  .etapa--contexto .era-date{ color:var(--ink-soft); }
+  .etapa--contexto .rail-fill{ background:var(--ink-mute); }
+  .etapa--contexto .rail-marker{ background:var(--paper); border-color:var(--ink-mute); }
+  .hito{
+    background:var(--celeste); border:2px solid var(--ink); border-radius:.6rem;
+    box-shadow:6px 6px 0 var(--ink); padding:1.3rem 1.4rem 1.4rem; margin:0 0 2rem;
+  }
+  .hito .eyebrow{ color:var(--ink); }
+  .hito h2{ font-size:clamp(1.8rem,5vw,2.7rem); margin:.35rem 0 .5rem; }
+  .hito p{ margin:0; max-width:60ch; }
 
   /* ---------- crecimiento ---------- */
   .growth{
@@ -242,6 +259,8 @@
   .fuentes p{ font-size:.85rem; color:var(--ink-soft); max-width:62ch; }
   .sources{ font-family:var(--f-head); font-size:.78rem; display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin-top:.8rem; padding:0; list-style:none; }
   .sources a{ color:var(--celeste-700); }
+  .fuentes-tit{ font-size:1rem; margin:1.6rem 0 .15rem; }
+  .fuentes-def{ margin:0 0 .5rem !important; font-size:.8rem !important; font-style:italic; }
   ol.sources{ list-style:decimal; padding-left:1.4rem; flex-direction:column; flex-wrap:nowrap; gap:.35rem; }
   ol.sources li{ scroll-margin-top:8rem; }
   ol.sources li:target{ background:var(--celeste-100); border-radius:.25rem; }
@@ -275,7 +294,6 @@
     .founder:nth-child(4), .founder:nth-child(5){ grid-column:1 / -1; grid-row:auto; }
     .stats{ grid-template-columns:1fr 1fr; }
     .cta-red{ grid-template-columns:1fr; }
-    .topbar-label{ display:none; }
   }
   @media (max-width:480px){
     .lemas{ grid-template-columns:1fr; }
@@ -304,11 +322,12 @@
   </nav>
   <div class="topbar">
     <div class="topbar-inner">
-      <span class="topbar-label">Etapas</span>
       <button class="nav-arrow" id="navPrev" aria-label="Etapas anteriores" type="button">‹</button>
       <nav class="chipnav" aria-label="Navegar por etapas">
+        <span class="chip-group">Contexto</span>
         <a class="chip" data-nav href="#era-1">Patronato</a>
         <a class="chip" data-nav href="#era-2">Casas aisladas</a>
+        <span class="chip-group chip-group--mov">Movimiento</span>
         <a class="chip" data-nav href="#era-3">Fundación</a>
         <a class="chip" data-nav href="#era-4">Primeros años</a>
         <a class="chip" data-nav href="#era-5">Red nacional</a>
@@ -338,24 +357,25 @@
     <p>Durante gran parte del siglo XX, el Estado argentino trató a la niñez pobre como un problema de orden, no de derechos. Casi setenta años después de esa ley, un puñado de educadores del conurbano bonaerense decidió organizarse para cambiar esa idea de raíz.</p>
   </div>
 
-  <section id="historia">
+  <section id="contexto" class="etapa etapa--contexto">
     <div class="section-head">
-      <div class="eyebrow">Casi un siglo de historia, en diez tramos</div>
-      <h2>La historia del movimiento</h2>
+      <div class="eyebrow">Parte 1 · 1919 – 1986 · antes del Movimiento</div>
+      <h2>El contexto</h2>
     </div>
+    <p class="etapa-lead">El Movimiento todavía no existía. Estos dos tramos cuentan cómo trataba el Estado a la niñez pobre y cómo surgieron, cada una por su lado, las casas que después lo fundarían.</p>
     <p class="titulos-nota">Los títulos de cada tramo son de elaboración propia. Cuando un título o una frase va <strong>entre comillas</strong>, es una cita textual y se indica quién la dijo y la fuente, con un número que remite a la lista del final.</p>
 
     <div class="timeline">
-      <div class="rail" id="rail">
+      <div class="rail" aria-hidden="true">
         <div class="rail-track"></div>
-        <div class="rail-fill" id="railFill"></div>
-        <div class="rail-marker" id="railMarker" aria-hidden="true">☀️</div>
+        <div class="rail-fill"></div>
+        <div class="rail-marker"></div>
       </div>
 
       <div class="eras">
 
         <article class="era" id="era-1">
-          <div class="era-top"><span class="era-no num">01</span><span class="era-years num">Desde 1919</span></div>
+          <div class="era-top"><span class="era-date num">Desde 1919</span></div>
           <h3>Antes de todo: los chicos como objeto de tutela</h3>
           <p>Desde 1919, la Ley 10.903 —conocida como Ley Agote<sup><a class="ref" href="#ref-10" aria-label="Fuente 10">[10]</a></sup>— le daba al Estado el "patronato" sobre la niñez pobre o abandonada: un juez podía disponer de un chico igual que de un delincuente e internarlo en un instituto sin que mediara ningún delito. Era la doctrina de la "situación irregular": el chico pobre no era sujeto de derechos, sino un problema a corregir.</p>
           <p>Ese fue el sistema contra el que, más de sesenta años después, un grupo de educadores del conurbano empezó a organizarse.</p>
@@ -363,15 +383,35 @@
         </article>
 
         <article class="era" id="era-2">
-          <div class="era-top"><span class="era-no num">02</span><span class="era-years num">1974 – 1986</span></div>
+          <div class="era-top"><span class="era-date num">1974 – 1986</span></div>
           <h3>Casas aisladas frente a la misma pobreza</h3>
           <p>Alberto Morlachetti, hijo de un canillita de Gerli, estudiaba sociología en la UBA cuando la pobreza de los chicos de la calle lo empujó a actuar: en 1974 hipotecó su propia casa para sostener un primer proyecto, la Casa de los Niños. Perseguido y expulsado de la docencia durante la dictadura por su militancia comunista, no abandonó el trabajo territorial.</p>
           <p>En 1982 fundó el Hogar Pelota de Trapo sobre unos terrenos ferroviarios de Piñeyro, Avellaneda, alrededor de una cancha de fútbol. En 1986 sumó el Hogar Juan Salvador Gaviota. En paralelo, el padre Carlos Cajade (La Plata), el padre Luis Farinello (Quilmes), el padre Elvio Mettone (Paso del Rey) y Enrique Spinetta (Berazategui) abrían casas similares, cada uno por su cuenta, frente a la misma realidad.</p>
           <p>Estos casos, que en principio parecen aislados, hablan de una problematica a nivel nacional, y lo que destacan en todos los casos es la necesidad de dar cuidados a nuestros chicos ese es el espiritu del movimiento.</p>
         </article>
 
+      </div>
+    </div>
+  </section>
+
+  <section id="historia" class="etapa etapa--movimiento">
+    <div class="hito">
+      <div class="eyebrow">Parte 2 · desde 1987</div>
+      <h2>La historia del Movimiento</h2>
+      <p>Acá empieza la historia de la organización: en 1987 nace el Movimiento Nacional de los Chicos del Pueblo, que hoy reúne a más de 400 organizaciones de todo el país.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="rail" aria-hidden="true">
+        <div class="rail-track"></div>
+        <div class="rail-fill"></div>
+        <div class="rail-marker">☀️</div>
+      </div>
+
+      <div class="eras">
+
         <article class="era" id="era-3">
-          <div class="era-top"><span class="era-no num">03</span><span class="era-years num">30 sep 1987</span></div>
+          <div class="era-top"><span class="era-date num">30 de septiembre de 1987</span></div>
           <h3>Una capilla en Florencio Varela</h3>
           <p>Esos referentes se reúnen en una humilde capilla y firman el acta fundacional del <strong>Movimiento Nacional de los Chicos del Pueblo</strong>. Se declaran independientes de partidos políticos e iglesias, con formas organizativas propias y representación elegida democráticamente en asamblea.</p>
           <button class="era-toggle" data-toggle="q3" aria-expanded="false">¿Por qué "chicos del pueblo"?</button>
@@ -379,7 +419,7 @@
         </article>
 
         <article class="era" id="era-4">
-          <div class="era-top"><span class="era-no num">04</span><span class="era-years num">1988 – 1990</span></div>
+          <div class="era-top"><span class="era-date num">1988 – 1994</span></div>
           <h3>Primeros encuentros, primeras denuncias</h3>
           <p>En 1988 organizan su primer encuentro en la sede de la CGT. El Movimiento denuncia tempranamente la violencia contra la niñez pobre: las matanzas de Formosa (1989), Tigre (1992) y Canning (1994) —esta última acompañados por el cantante Joan Manuel Serrat—.</p>
           <p>En 1990 realizan el <strong>Primer Encuentro Latinoamericano de los Chicos del Pueblo</strong>, con presencia de 18 países.</p>
@@ -387,39 +427,39 @@
         </article>
 
         <article class="era" id="era-5">
-          <div class="era-top"><span class="era-no num">05</span><span class="era-years num">Años 90</span></div>
+          <div class="era-top"><span class="era-date num">1997</span></div>
           <h3>De un puñado de educadores a una red nacional</h3>
           <p>En 1997, lo que era un pequeño grupo se transforma en un Encuentro de Educadores de 2.000 personas en Mar del Plata. Ahí deciden incorporarse a la CTA (Central de Trabajadores de la Argentina), ya nucleando a cientos de organizaciones de todo el país, bajo el lema que los definiría: <em>"El hambre es un crimen"</em>, acuñado por Alberto Morlachetti.<sup><a class="ref" href="#ref-11" aria-label="Fuente 11">[11]</a></sup></p>
         </article>
 
         <article class="era" id="era-6">
-          <div class="era-top"><span class="era-no num">06</span><span class="era-years num">1999 – 2001</span></div>
+          <div class="era-top"><span class="era-date num">1999 – 2001</span></div>
           <h3>Un reconocimiento y una nueva crisis</h3>
           <p>En 1999, la Organización de las Naciones Unidas distingue a Pelota de Trapo con el Premio a la Vida y a la Obra.</p>
           <p>En 2001, en la crisis social más profunda de la Argentina reciente, comienzan las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>, junto a la CTA, bajo "El hambre es un crimen". En esos años también atraviesan persecución: el Movimiento denunció ocho atentados en un solo año, incluyendo la toma armada de la imprenta de Pelota de Trapo y el secuestro de educadores.</p>
         </article>
 
         <article class="era" id="era-7">
-          <div class="era-top"><span class="era-no num">07</span><span class="era-years num">2002 – 2005</span></div>
+          <div class="era-top"><span class="era-date num">2002 – 2005</span></div>
           <h3>Las Marchas por la Vida</h3>
           <p>El 28 de octubre de 2002, cientos de chicos parten desde Iguazú, Misiones, hacia Plaza de Mayo en la primera Marcha por la Vida, con el respaldo del escritor Ernesto Sábato, el cantante Joan Manuel Serrat y el Nobel de la Paz Adolfo Pérez Esquivel.</p>
           <p>En 2005 la Tercera Marcha por la Vida recorre 4.500 km desde Tucumán con unos 400 chicos y 100 educadores, y llega a Plaza de Mayo el 1° de julio. Ese mismo año, el 28 de septiembre, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong><sup><a class="ref" href="#ref-9" aria-label="Fuente 9">[9]</a></sup>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
         </article>
 
         <article class="era" id="era-8">
-          <div class="era-top"><span class="era-no num">08</span><span class="era-years num">2010 – 2015</span></div>
+          <div class="era-top"><span class="era-date num">2009 – 2015</span></div>
           <h3>La Asignación Universal y la despedida</h3>
-          <p>Morlachetti fue uno de los impulsores de la Asignación Universal por Hijo. El 21 de abril de 2015 muere, dejando el movimiento en manos de sus compañeros y compañeras, con Pelota de Trapo sosteniendo una Casa del Niño, hogares, una imprenta, una panadería y una agencia de noticias de infancia.</p>
+          <p>Morlachetti fue uno de los impulsores de la Asignación Universal por Hijo, creada en 2009. El 21 de abril de 2015 muere, dejando el movimiento en manos de sus compañeros y compañeras, con Pelota de Trapo sosteniendo una Casa del Niño, hogares, una imprenta, una panadería y una agencia de noticias de infancia.</p>
         </article>
 
         <article class="era" id="era-9">
-          <div class="era-top"><span class="era-no num">09</span><span class="era-years num">2020</span></div>
+          <div class="era-top"><span class="era-date num">2020</span></div>
           <h3>Sostener la comida en la pandemia</h3>
           <p>Durante la pandemia de COVID-19, las organizaciones del Movimiento reorganizan su trabajo territorial: reparten alcohol en gel, barbijos y viandas en tupper en distintos barrios, sosteniendo la asistencia alimentaria pese al aislamiento.</p>
         </article>
 
         <article class="era" id="era-10">
-          <div class="era-top"><span class="era-no num">10</span><span class="era-years num">2020s · hoy</span></div>
+          <div class="era-top"><span class="era-date num">2025 – hoy</span></div>
           <h3>"La patria son lxs pibxs"</h3>
           <p class="era-cite">Consigna de las Organizaciones de lxs Chicxs del Pueblo, declaración de 2019<sup><a class="ref" href="#ref-2" aria-label="Fuente 2">[2]</a></sup></p>
           <p>El Movimiento sigue activo, denunciando que la "criminalidad del hambre" que señalaban hace más de 40 años sigue vigente en un contexto de altísima pobreza infantil. En noviembre de 2025, miles de chicos y organizaciones volvieron a marchar en la República de los Niños, en La Plata, bajo la consigna "El hambre es una decisión política", reclamando comida garantizada, más plazas y más escuelas.<sup><a class="ref" href="#ref-8" aria-label="Fuente 8">[8]</a></sup><sup><a class="ref" href="#ref-14" aria-label="Fuente 14">[14]</a></sup></p>
@@ -447,7 +487,7 @@
         <div class="big"><span class="num" data-count="400" data-duration="1400">0</span><span aria-hidden="true">+</span></div>
         <div class="cap">organizaciones hoy, en todo el país</div>
       </div>
-      <div class="growth-caption">De un acta firmada en una capilla a una red nacional: hoy la integran más de 400 organizaciones ("casas"), según Paula Salinas, responsable de comunicación de Chicxs del Pueblo.</div>
+      <div class="growth-caption">De un acta firmada en una capilla a una red nacional: hoy la integran más de 400 organizaciones ("casas"), según Paula Salinas, responsable de comunicación de Chicxs del Pueblo.<sup><a class="ref" href="#ref-1" aria-label="Fuente 1">[1]</a></sup></div>
     </div>
 
     <div class="stats">
@@ -563,9 +603,17 @@
 
   <section class="fuentes" id="fuentes">
     <div class="eyebrow">Fuentes</div>
-    <p>Resumen histórico elaborado a partir de fuentes públicas del Movimiento, normativa oficial y notas periodísticas. Última revisión: septiembre de 2026.</p>
+    <p>Resumen histórico elaborado a partir de una fuente primaria —el testimonio de una integrante de la organización— y de fuentes secundarias consultadas en internet. Última revisión: septiembre de 2026.</p>
+
+    <h3 class="fuentes-tit">Fuentes primarias</h3>
+    <p class="fuentes-def">Testimonio directo de una integrante de la organización.</p>
     <ol class="sources">
-      <li id="ref-1"><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: Chicxs del Pueblo (con Paula Salinas)</a></li>
+      <li id="ref-1">Entrevista a <strong>Paula Salinas</strong>, responsable de comunicación institucional de las Organizaciones de lxs Chicxs del Pueblo, publicada por la Asociación Lola Mora: <a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">"Las organizaciones comunitarias: un pilar fundamental para sostener los cuidados en los barrios populares"</a></li>
+    </ol>
+
+    <h3 class="fuentes-tit">Fuentes secundarias</h3>
+    <p class="fuentes-def">Documentos del Movimiento, normativa oficial y notas periodísticas consultadas en internet.</p>
+    <ol class="sources" start="2">
       <li id="ref-2"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
       <li id="ref-3"><a href="https://pelotadetrapo.org.ar/una-historia-larga-y-sostenida-en-el-tiempo/" target="_blank" rel="noopener">Pelota de Trapo — Una historia larga y sostenida en el tiempo</a></li>
       <li id="ref-4"><a href="https://chicxsdelpueblo.com.ar/quienes-somos/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Quiénes somos</a></li>
@@ -703,24 +751,37 @@
     });
   });
   /* ---- rail progress + active chip: one calculation drives both, so they always agree ---- */
-  var railFill = document.getElementById('railFill');
-  var railMarker = document.getElementById('railMarker');
-  var rail = document.getElementById('rail');
+  // one rail per part (context / movement); the chip nav follows all eras together
   var erasArr = Array.prototype.slice.call(eras);
-  function updateProgress(){
-    var refY = midY();
+  var timelines = Array.prototype.slice.call(document.querySelectorAll('.timeline')).map(function(tl){
+    return {
+      eras: Array.prototype.slice.call(tl.querySelectorAll('.era')),
+      rail: tl.querySelector('.rail'),
+      fill: tl.querySelector('.rail-fill'),
+      marker: tl.querySelector('.rail-marker')
+    };
+  });
+  function locate(list, refY){
     var idx = -1, frac = 0;
-    for (var i=0;i<erasArr.length;i++){
-      var r = erasArr[i].getBoundingClientRect();
+    for (var i=0;i<list.length;i++){
+      var r = list[i].getBoundingClientRect();
       if (r.bottom <= refY){ idx = i; frac = 1; continue; }
       if (r.top <= refY && r.bottom > refY){ idx = i; frac = (refY - r.top) / Math.max(r.bottom - r.top, 1); break; }
       if (r.top > refY) break;
     }
-    var pct = idx === -1 ? 0 : Math.min(Math.max((idx + frac) / erasArr.length, 0), 1);
-    var railH = rail.clientHeight - 6;
-    railFill.style.height = Math.round(pct*railH) + 'px';
-    railMarker.style.top = (6 + pct*railH) + 'px';
+    return {idx: idx, frac: frac};
+  }
+  function updateProgress(){
+    var refY = midY();
+    timelines.forEach(function(t){
+      var p = locate(t.eras, refY);
+      var pct = p.idx === -1 ? 0 : Math.min(Math.max((p.idx + p.frac) / t.eras.length, 0), 1);
+      var railH = t.rail.clientHeight - 6;
+      t.fill.style.height = Math.round(pct*railH) + 'px';
+      t.marker.style.top = (6 + pct*railH) + 'px';
+    });
 
+    var idx = locate(erasArr, refY).idx;
     var chip = idx >= 0 ? chipMap[erasArr[idx].id] : null;
     chips.forEach(function(c){ c.removeAttribute('aria-current'); });
     if (chip) chip.setAttribute('aria-current','true');

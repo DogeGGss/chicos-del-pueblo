@@ -248,9 +248,10 @@
   var cluster = null;
   var zonas = null;
   var marcadores = {};
-  // Teselas estándar de OpenStreetMap: gratuitas, sin API key (requieren la atribución).
-  var TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-  var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+  // Mapa base Argenmap del Instituto Geográfico Nacional: gratuito, sin API key y con la
+  // toponimia oficial argentina (p. ej. "Islas Malvinas"). Es un servicio TMS: {-y} invierte la fila.
+  var TILE_URL = "https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png";
+  var TILE_ATTR = '<a href="https://www.ign.gob.ar/" target="_blank" rel="noopener">Instituto Geográfico Nacional</a> + <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
 
   function iconoPin(o, sel) {
     return L.divIcon({
@@ -272,7 +273,7 @@
       return;
     }
     mapa = L.map("mapa", { zoomControl: true, scrollWheelZoom: true, minZoom: 3 });
-    L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(mapa);
+    L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapa);
     mapa.setView([-35.5, -63.5], 4);
     zonas = L.layerGroup().addTo(mapa);
     cluster = L.markerClusterGroup({
@@ -594,7 +595,7 @@
     if (typeof L === "undefined") return;
     if (!mapaFicha) {
       mapaFicha = L.map("mapaFicha", { scrollWheelZoom: false });
-      L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(mapaFicha);
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapaFicha);
       mapaFicha.on("click", function (e) {
         fichaPos = { lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) };
         moverPinFicha();
