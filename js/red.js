@@ -614,6 +614,13 @@
     return '<p class="aviso-resp"><strong>' + titulo + " (" + quienes.length + "):</strong> " + html + "</p>";
   }
 
+  function marcarFiltroAviso(f) {
+    avisoFiltro = f;
+    document.querySelectorAll("[data-av-filtro]").forEach(function (x) {
+      x.setAttribute("aria-pressed", x.getAttribute("data-av-filtro") === f ? "true" : "false");
+    });
+  }
+
   function opcionesAviso(tipo) {
     var t = TEXTOS_AVISO[tipo];
     var fuente = t.opciones === "convocatorias" ? CONVOCATORIAS : RECURSOS;
@@ -629,9 +636,21 @@
 
   function renderAvisos() {
     var ul = $("avisosList");
-    var lista = avisos.filter(function (a) { return !avisoFiltro || a.tipo === avisoFiltro; })
-      .sort(function (a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; });
-    if (!lista.length) { ul.innerHTML = '<li class="vacio">No hay avisos de este tipo por ahora.</li>'; renderStats(); return; }
+    var esOrg = rol === "org";
+    $("filtroMias").hidden = !esOrg;
+    if (!esOrg && avisoFiltro === "mias") marcarFiltroAviso("");
+    if (esOrg) $("cuentaMias").textContent = avisos.filter(function (a) { return a.orgId === sesion.orgId; }).length || "";
+    var lista = avisos.filter(function (a) {
+      if (avisoFiltro === "mias") return a.orgId === sesion.orgId;
+      return !avisoFiltro || a.tipo === avisoFiltro;
+    }).sort(function (a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; });
+    if (!lista.length) {
+      ul.innerHTML = '<li class="vacio">' + (avisoFiltro === "mias"
+        ? "Todavía no publicaron avisos. Usá el formulario “Publicar un aviso”."
+        : "No hay avisos de este tipo por ahora.") + "</li>";
+      renderStats();
+      return;
+    }
     ul.innerHTML = lista.map(function (a) {
       var o = orgById(a.orgId);
       var propio = rol === "org" && a.orgId === sesion.orgId;
@@ -677,8 +696,7 @@
     });
     document.querySelectorAll("[data-av-filtro]").forEach(function (b) {
       b.addEventListener("click", function () {
-        avisoFiltro = b.getAttribute("data-av-filtro");
-        document.querySelectorAll("[data-av-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        marcarFiltroAviso(b.getAttribute("data-av-filtro"));
         renderAvisos();
       });
     });
@@ -727,8 +745,7 @@
       avisos.push(aviso);
       this.reset();
       opcionesAviso("necesita");
-      avisoFiltro = "";
-      document.querySelectorAll("[data-av-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-av-filtro") === "" ? "true" : "false"); });
+      if (avisoFiltro !== "mias") marcarFiltroAviso("");   // en "Mis publicaciones" el aviso nuevo ya se ve
       renderAvisos();
       toast("¡Publicado! Las organizaciones de la red ya lo pueden ver.");
     });

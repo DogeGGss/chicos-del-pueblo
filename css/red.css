@@ -36,6 +36,9 @@
   display:inline-flex; align-items:center; gap:.35rem;
 }
 .pill:hover{ border-color:var(--ink); }
+.pill--mias{ border-color:var(--celeste); background:var(--celeste-50); }
+.pill--mias .tab-count{ margin-left:.1rem; }
+.pill--mias[aria-pressed="true"] .tab-count{ background:var(--celeste); color:var(--ink); }
 .pill[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:#fff; }
 
 /* ---------- listado + mapa ---------- */
