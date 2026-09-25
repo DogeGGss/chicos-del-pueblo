@@ -13,10 +13,11 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 
 ### Historia
 
-- Línea de tiempo con diez tramos históricos, con scroll-spy y barra de progreso
+- Línea de tiempo en dos partes: el **contexto** previo (1919 – 1986) y la **historia del Movimiento** (desde 1987), con cada tramo encabezado por su fecha, scroll-spy y barra de progreso
 - Estadísticas animadas (organizaciones, países, kilómetros recorridos, años de trayectoria)
-- Tarjetas con las consignas históricas del movimiento (flip on click)
-- Fuentes y créditos documentados al pie
+- Tarjetas con las consignas históricas del movimiento (flip on click), con autor y fuente
+- Títulos propios diferenciados de las citas; cada cita remite a una fuente numerada
+- Fuentes divididas en primarias (testimonio de Paula Salinas) y secundarias, y créditos al pie
 
 ### Mapa de la red (prototipo)
 
@@ -37,7 +38,7 @@ HTML, CSS y JavaScript vanilla, sin frameworks ni dependencias de build.
 
 - `css/marca.css`: identidad compartida (celeste `#63C2EB`, blanco y negro, logo de Organizaciones de lxs Chicxs del Pueblo), tomada de [chicxsdelpueblo.com.ar](https://chicxsdelpueblo.com.ar/).
 - `red.html`, `css/red.css`, `js/red.js`, `js/red-datos.js`: mapa de la red.
-- `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base: teselas de © OpenStreetMap (sin API key).
+- `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base: [Argenmap](https://www.ign.gob.ar/) del Instituto Geográfico Nacional (sin API key, con la toponimia oficial argentina: "Islas Malvinas"), sobre datos de © OpenStreetMap.
 
 ## Ver el sitio
 
