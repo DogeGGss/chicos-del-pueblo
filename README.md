@@ -37,6 +37,7 @@ La interfaz del mapa se basa en el prototipo "Portal de Talleres" de Ingeniería
 
 HTML, CSS y JavaScript vanilla, sin frameworks ni dependencias de build.
 
+- `js/tema.js`: interruptor de **modo claro / oscuro** (el mismo del prototipo de Ingeniería de Software), recordado entre visitas. El modo oscuro usa azul noche con el mismo celeste de la marca.
 - `css/marca.css`: identidad compartida (celeste `#63C2EB`, blanco y negro, logo de Organizaciones de lxs Chicxs del Pueblo), tomada de [chicxsdelpueblo.com.ar](https://chicxsdelpueblo.com.ar/).
 - `red.html`, `css/red.css`, `js/red.js`, `js/red-datos.js`: mapa de la red.
 - `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base: [Argenmap](https://www.ign.gob.ar/) del Instituto Geográfico Nacional (sin API key, con la toponimia oficial argentina: "Islas Malvinas"), sobre datos de © OpenStreetMap.
