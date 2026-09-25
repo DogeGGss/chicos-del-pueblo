@@ -213,7 +213,7 @@ img{ max-width:100%; }
 .g-dot{ background:#fff; border:1.5px solid rgba(30,32,31,.28); color:#4285F4; }
 .avatar{ background:#1E201F; color:var(--celeste); }
 .sesion-quien{ display:flex; flex-direction:column; line-height:1.1; text-align:left; color:var(--nav-ink); }
-.sesion-quien small{ font-family:var(--f-body); font-weight:600; font-size:.66rem; color:#3A4246; }
+.sesion-quien small{ font-family:var(--f-body); font-weight:600; font-size:.66rem; color:#4B5256; }
 
 /* ---------- botones y campos ---------- */
 .btn{
