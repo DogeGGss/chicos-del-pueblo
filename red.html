@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=6">
-<link rel="stylesheet" href="css/red.css?v=6">
+<link rel="stylesheet" href="css/marca.css?v=7">
+<link rel="stylesheet" href="css/red.css?v=7">
 </head>
 <body data-app>
 
@@ -228,10 +228,18 @@
             <div class="field">
               <span class="field-label">Necesitamos</span>
               <div class="check-chips check-chips--necesita" id="oNecesita"></div>
+              <label class="field otro-campo">
+                <span class="field-hint">¿Algo más que no está en la lista? Escribilo, separado por comas.</span>
+                <input id="oNecesitaOtros" class="field-control" maxlength="160" placeholder="Ej.: pañales, garrafa de gas">
+              </label>
             </div>
             <div class="field">
               <span class="field-label">Podemos ofrecer</span>
               <div class="check-chips check-chips--ofrece" id="oOfrece"></div>
+              <label class="field otro-campo">
+                <span class="field-hint">¿Algo más que puedan ofrecer? Escribilo, separado por comas.</span>
+                <input id="oOfreceOtros" class="field-control" maxlength="160" placeholder="Ej.: equipo de sonido, clases de guitarra">
+              </label>
             </div>
           </div>
         </fieldset>
@@ -396,8 +404,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=6"></script>
-<script src="js/red-datos.js?v=6"></script>
-<script src="js/red.js?v=6"></script>
+<script src="js/sesion.js?v=7"></script>
+<script src="js/red-datos.js?v=7"></script>
+<script src="js/red.js?v=7"></script>
 </body>
 </html>

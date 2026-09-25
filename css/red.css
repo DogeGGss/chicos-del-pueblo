@@ -76,6 +76,8 @@
 }
 .tag--necesita{ background:var(--ink); color:#fff; }
 .tag--ofrece{ background:var(--celeste-100); border-color:var(--celeste); color:var(--ink); }
+.tag--otro{ border-style:dashed; }
+.otro-campo{ margin-top:.6rem; }
 .tag--neutral{ border-color:var(--line-strong); color:var(--ink-soft); }
 .tag--pendiente{ border-color:var(--warn); color:var(--warn); }
 
