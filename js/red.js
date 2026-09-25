@@ -13,7 +13,7 @@
     nombre: "Nombre", tipo: "Tipo", referente: "Referente", descripcion: "Descripción",
     edades: "Edades", chicos: "Cantidad de chicxs", horarios: "Horarios", localidad: "Localidad",
     direccion: "Dirección", mostrarDireccion: "Visibilidad de la ubicación", lat: "Ubicación en el mapa",
-    necesita: "Necesitan", ofrece: "Ofrecen", telefono: "Teléfono", correo: "Correo", redes: "Redes",
+    necesita: "Necesitan", ofrece: "Ofrecen", necesitaOtros: "Otras necesidades", ofreceOtros: "Otras ofertas", telefono: "Teléfono", correo: "Correo", redes: "Redes",
   };
 
   /* ---------------- estado ---------------- */
@@ -54,6 +54,17 @@
   function fecha(iso) {
     var p = String(iso).split("-");
     return +p[2] + " " + MESES[+p[1] - 1];
+  }
+  // "pañales, garrafa de gas" -> ["Pañales", "Garrafa de gas"] (sin repetidos, máx. 6)
+  function separarOtros(texto) {
+    var vistos = {};
+    return String(texto || "").split(/[,;\n]/).map(function (t) { return t.trim().slice(0, 40); })
+      .filter(function (t) {
+        var k = norm(t);
+        if (!k || vistos[k]) return false;
+        vistos[k] = true;
+        return true;
+      }).slice(0, 6).map(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); });
   }
   function plural(n, uno, varios) { return n + " " + (n === 1 ? uno : varios); }
   function orgById(id) {
@@ -263,7 +274,8 @@
     if (filtro.q) {
       var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, o.referente, TIPOS[o.tipo].label,
         (o.necesita || []).map(function (k) { return RECURSOS[k]; }).join(" "),
-        (o.ofrece || []).map(function (k) { return RECURSOS[k]; }).join(" ")].join(" "));
+        (o.ofrece || []).map(function (k) { return RECURSOS[k]; }).join(" "),
+        (o.necesitaOtros || []).join(" "), (o.ofreceOtros || []).join(" ")].join(" "));
       var palabras = norm(filtro.q).split(/\s+/).filter(Boolean);
       for (var i = 0; i < palabras.length; i++) if (blob.indexOf(palabras[i]) === -1) return false;
     }
@@ -285,15 +297,16 @@
   function tagsHtml(o, max) {
     var html = "";
     var n = 0;
-    (o.necesita || []).forEach(function (k) {
+    function tag(txt, clase) {
       if (max && n >= max) return;
-      html += '<span class="tag tag--necesita">Necesita: ' + esc(RECURSOS[k]) + "</span>"; n++;
-    });
-    (o.ofrece || []).forEach(function (k) {
-      if (max && n >= max) return;
-      html += '<span class="tag tag--ofrece">Ofrece: ' + esc(RECURSOS[k]) + "</span>"; n++;
-    });
-    var total = (o.necesita || []).length + (o.ofrece || []).length;
+      html += '<span class="tag ' + clase + '">' + txt + "</span>"; n++;
+    }
+    // primero todo lo que necesitan, después todo lo que ofrecen (lo escrito a mano va con borde punteado)
+    (o.necesita || []).forEach(function (k) { tag("Necesita: " + esc(RECURSOS[k]), "tag--necesita"); });
+    (o.necesitaOtros || []).forEach(function (t) { tag("Necesita: " + esc(t), "tag--necesita tag--otro"); });
+    (o.ofrece || []).forEach(function (k) { tag("Ofrece: " + esc(RECURSOS[k]), "tag--ofrece"); });
+    (o.ofreceOtros || []).forEach(function (t) { tag("Ofrece: " + esc(t), "tag--ofrece tag--otro"); });
+    var total = (o.necesita || []).length + (o.ofrece || []).length + (o.necesitaOtros || []).length + (o.ofreceOtros || []).length;
     if (max && total > max) html += '<span class="tag tag--neutral">+' + (total - max) + "</span>";
     return html;
   }
@@ -468,8 +481,10 @@
     var lesSirve = [];
     orgs.forEach(function (x) {
       if (x.id === o.id) return;
-      var dan = (x.ofrece || []).filter(function (k) { return (o.necesita || []).indexOf(k) !== -1; });
-      var reciben = (x.necesita || []).filter(function (k) { return (o.ofrece || []).indexOf(k) !== -1; });
+      var dan = (x.ofrece || []).filter(function (k) { return (o.necesita || []).indexOf(k) !== -1; })
+        .map(function (k) { return RECURSOS[k]; }).concat(cruceOtros(o.necesitaOtros, x.ofreceOtros));
+      var reciben = (x.necesita || []).filter(function (k) { return (o.ofrece || []).indexOf(k) !== -1; })
+        .map(function (k) { return RECURSOS[k]; }).concat(cruceOtros(o.ofreceOtros, x.necesitaOtros));
       var cerca = x.provincia === o.provincia ? 0 : 1;
       if (dan.length) leSirven.push({ org: x, recursos: dan, cerca: cerca });
       if (reciben.length) lesSirve.push({ org: x, recursos: reciben, cerca: cerca });
@@ -478,11 +493,19 @@
     return { leSirven: leSirven.sort(orden).slice(0, 4), lesSirve: lesSirve.sort(orden).slice(0, 4) };
   }
 
+  // coincidencias entre textos libres: "pañales" cruza con "Pañales talle M"
+  function cruceOtros(a, b) {
+    return (a || []).filter(function (t) {
+      var nt = norm(t);
+      return (b || []).some(function (u) { var nu = norm(u); return nt.indexOf(nu) !== -1 || nu.indexOf(nt) !== -1; });
+    });
+  }
+
   function listaMatches(items) {
     return '<ul class="matches">' + items.map(function (m) {
       return '<li><button type="button" data-ver="' + m.org.id + '">' + esc(m.org.nombre) + "</button> · " +
         esc(m.org.localidad) + (m.cerca ? ", " + esc(m.org.provincia) : "") + " — " +
-        esc(m.recursos.map(function (k) { return RECURSOS[k]; }).join(", ")) + "</li>";
+        esc(m.recursos.join(", ")) + "</li>";
     }).join("") + "</ul>";
   }
 
@@ -505,7 +528,7 @@
       "<div><dt>Días y horarios</dt><dd>" + esc(o.horarios || "—") + "</dd></div>" +
       "<div><dt>Ficha actualizada</dt><dd>" + fecha(o.actualizada || HOY) + "</dd></div>" +
       "</dl>";
-    if ((o.necesita || []).length || (o.ofrece || []).length) {
+    if ((o.necesita || []).length || (o.ofrece || []).length || (o.necesitaOtros || []).length || (o.ofreceOtros || []).length) {
       html += '<div class="det-sec"><h3>Necesitan y ofrecen</h3><div class="org-tags" style="margin:0">' + tagsHtml(o) + "</div></div>";
     }
     if (!opts.preview) {
@@ -731,6 +754,8 @@
     f.querySelector('input[name="oVisibilidad"][value="' + (o.mostrarDireccion === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     f.querySelectorAll('input[name="necesita"]').forEach(function (c) { c.checked = (o.necesita || []).indexOf(c.value) !== -1; });
     f.querySelectorAll('input[name="ofrece"]').forEach(function (c) { c.checked = (o.ofrece || []).indexOf(c.value) !== -1; });
+    set("oNecesitaOtros", (o.necesitaOtros || []).join(", "));
+    set("oOfreceOtros", (o.ofreceOtros || []).join(", "));
     fichaPos = { lat: o.lat, lng: o.lng };
     var estado = $("fichaEstado");
     estado.hidden = false;
@@ -761,6 +786,8 @@
       lat: pos.lat, lng: pos.lng,
       necesita: Array.prototype.map.call(f.querySelectorAll('input[name="necesita"]:checked'), function (c) { return c.value; }),
       ofrece: Array.prototype.map.call(f.querySelectorAll('input[name="ofrece"]:checked'), function (c) { return c.value; }),
+      necesitaOtros: separarOtros($("oNecesitaOtros").value),
+      ofreceOtros: separarOtros($("oOfreceOtros").value),
       telefono: $("oTelefono").value.trim(),
       correo: $("oCorreo").value.trim(),
       redes: $("oRedes").value.trim(),
@@ -920,7 +947,7 @@
       var loc = LOCALIDADES[d.localidad];
       nOrg += 1;
       var nueva = Object.assign({
-        edades: "", chicos: "", horarios: "", direccion: "", redes: "", telefono: "", necesita: [], ofrece: [],
+        edades: "", chicos: "", horarios: "", direccion: "", redes: "", telefono: "", necesita: [], ofrece: [], necesitaOtros: [], ofreceOtros: [],
         lat: +(loc.lat + Math.sin(nOrg) * 0.015).toFixed(5), lng: +(loc.lng + Math.cos(nOrg) * 0.02).toFixed(5),
         mostrarDireccion: "zona",
       }, clone(d), { id: "org-" + nOrg, estado: "aprobada", actualizada: HOY, correo: d.correo || s.email });
