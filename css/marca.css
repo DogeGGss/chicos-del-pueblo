@@ -32,6 +32,10 @@
   --sombra-dura:#1E201F;     /* sombras "de sello" y trazos del título */
   --footer-bg:#1E201F;
   --mapa-filtro:saturate(.7);
+  /* etiquetas "Necesita": negras en modo claro */
+  --necesita-bg:#1E201F;
+  --necesita-fg:#FFFFFF;
+  --necesita-borde:#1E201F;
 
   --f-head:'Archivo', 'Arial Narrow', Arial, sans-serif;
   --f-body:'Open Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -67,6 +71,10 @@
   --sombra-dura:#02080C;
   --footer-bg:#060F15;
   --mapa-filtro:invert(1) hue-rotate(180deg) brightness(.88) saturate(.55);
+  /* "Necesita" en modo oscuro: casi negro con borde gris (Ofrece es azul con borde celeste) */
+  --necesita-bg:#04090D;
+  --necesita-fg:#E6EFF3;
+  --necesita-borde:#7D909A;
   color-scheme:dark;
 }
 
