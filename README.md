@@ -37,7 +37,7 @@ HTML, CSS y JavaScript vanilla, sin frameworks ni dependencias de build.
 
 - `css/marca.css`: identidad compartida (celeste `#63C2EB`, blanco y negro, logo de Organizaciones de lxs Chicxs del Pueblo), tomada de [chicxsdelpueblo.com.ar](https://chicxsdelpueblo.com.ar/).
 - `red.html`, `css/red.css`, `js/red.js`, `js/red-datos.js`: mapa de la red.
-- `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base de © OpenStreetMap / CARTO.
+- `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base: teselas de © OpenStreetMap (sin API key).
 
 ## Ver el sitio
 
