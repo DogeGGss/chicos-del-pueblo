@@ -21,7 +21,7 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 
 ### Mapa de la red (prototipo)
 
-- **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia, qué necesitan u ofrecen) sincronizado con un mapa Leaflet. Las casas que no quieren mostrar su dirección aparecen como una zona aproximada.
+- **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia, qué necesitan u ofrecen) sincronizado con un mapa Leaflet. Cada organización elige por separado si los visitantes y las otras organizaciones ven su dirección exacta o solo una zona aproximada.
 - **Ficha de cada organización**: qué hacen, edades, horarios y el cruce automático con otras casas que pueden ayudarles o a las que pueden ayudar.
 - **Tablero de la red**: avisos de "necesitamos", "ofrecemos" y convocatorias entre organizaciones.
 - **Acceso solo para la red**: mirar es público; publicar es solo para organizaciones con una cuenta de Google habilitada por la coordinación. El ingreso con Google está **simulado** con cuentas de ejemplo (una de ellas no habilitada, para mostrar el rechazo).

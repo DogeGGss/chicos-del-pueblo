@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=12">
-<link rel="stylesheet" href="css/red.css?v=12">
+<link rel="stylesheet" href="css/marca.css?v=13">
+<link rel="stylesheet" href="css/red.css?v=13">
 </head>
 <body data-app>
 
@@ -224,15 +224,27 @@
             </label>
             <label class="field">
               <span class="field-label">Dirección</span>
-              <input id="oDireccion" class="field-control" maxlength="80" placeholder="Calle y número (opcional)">
+              <input id="oDireccion" class="field-control" maxlength="80" placeholder="Calle y número (obligatoria si se muestra exacta)">
             </label>
             <div class="field col-2">
-              <span class="field-label">¿Qué se muestra en el mapa?</span>
-              <div class="seg" role="radiogroup" aria-label="Visibilidad de la ubicación">
-                <label><input type="radio" name="oVisibilidad" value="zona" checked><span>Solo la zona aproximada</span></label>
-                <label><input type="radio" name="oVisibilidad" value="exacta"><span>La dirección exacta</span></label>
+              <span class="field-label">¿Qué ubicación se muestra?</span>
+              <div class="visibilidad">
+                <div class="vis-fila">
+                  <span class="vis-quien">👀 Visitantes <small>(cualquier persona)</small></span>
+                  <div class="seg" role="radiogroup" aria-label="Qué ven los visitantes">
+                    <label><input type="radio" name="oVisPublica" value="zona" checked><span>Solo la zona aproximada</span></label>
+                    <label><input type="radio" name="oVisPublica" value="exacta"><span>La dirección exacta</span></label>
+                  </div>
+                </div>
+                <div class="vis-fila">
+                  <span class="vis-quien">🤝 Organizaciones de la red</span>
+                  <div class="seg" role="radiogroup" aria-label="Qué ven las organizaciones de la red">
+                    <label><input type="radio" name="oVisRed" value="zona" checked><span>Solo la zona aproximada</span></label>
+                    <label><input type="radio" name="oVisRed" value="exacta"><span>La dirección exacta</span></label>
+                  </div>
+                </div>
               </div>
-              <span class="field-hint">Para cuidar a lxs chicxs, recomendamos mostrar solo la zona si son un hogar o casa convivencial.</span>
+              <span class="field-hint" id="visHint">Para cuidar a lxs chicxs, recomendamos mostrar solo la zona si son un hogar o casa convivencial. Si los visitantes ven la dirección, la red también la ve.</span>
             </div>
             <div class="field col-2">
               <span class="field-label">Marcá el lugar en el mapa</span>
@@ -425,8 +437,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=12"></script>
-<script src="js/red-datos.js?v=12"></script>
-<script src="js/red.js?v=12"></script>
+<script src="js/sesion.js?v=13"></script>
+<script src="js/red-datos.js?v=13"></script>
+<script src="js/red.js?v=13"></script>
 </body>
 </html>
