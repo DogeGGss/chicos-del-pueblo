@@ -2,7 +2,7 @@
 
 Micrositio con dos páginas:
 
-- **Historia** (`index.html`): recorre, en diez tramos, la historia del **Movimiento Nacional de los Chicos del Pueblo** en Argentina, desde la Ley Agote de 1919 hasta la red de más de 400 organizaciones que existe hoy.
+- **Historia** (`index.html`): recorre, en once tramos, la historia del **Movimiento Nacional de los Chicos del Pueblo** en Argentina, desde la Ley Agote de 1919 hasta la red de más de 400 organizaciones que existe hoy.
 - **Mapa de la red** (`red.html`): prototipo de herramienta para que las organizaciones de la red se ubiquen en un mapa, cuenten qué hacen y se comuniquen entre sí (qué necesitan, qué pueden ofrecer).
 
 Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes sociales y condiciones de vida — las organizaciones sociales en acción** (Universidad Nacional de General Sarmiento).
