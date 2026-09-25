@@ -115,10 +115,7 @@
         '<span>Ingresar<span class="g-texto"> con Google</span></span></button>';
       return;
     }
-    var sub = sesion.rol === "coord" ? "Coordinación" : (miOrg() ? miOrg().nombre : "");
-    box.innerHTML = '<span class="avatar" aria-hidden="true">' + esc(iniciales(sesion.nombre)) + "</span>" +
-      '<span class="sesion-quien"><strong>' + esc(sesion.nombre) + "</strong><small>" + esc(sub) + "</small></span>" +
-      '<button type="button" class="btn-salir" id="btnSalir">Salir</button>';
+    box.innerHTML = window.CDPSesion.htmlSesion(datosSesion());
   }
   $("navSesion").addEventListener("click", function (e) {
     if (e.target.closest("#btnIngresar")) abrirIngreso();
@@ -163,10 +160,27 @@
       '<button type="button" class="btn" data-cerrar>Seguir como visitante</button></div></div>');
   }
 
+  // lo que se recuerda al pasar a Historia (y al volver)
+  function datosSesion() {
+    if (!sesion) return null;
+    var o = miOrg();
+    return { email: sesion.email, nombre: sesion.nombre, rol: sesion.rol, orgId: sesion.orgId, orgNombre: o ? o.nombre : "" };
+  }
+
   function setSesion(s) {
     sesion = s;
     rol = s ? s.rol : "visitante";
+    window.CDPSesion.guardar(datosSesion());
     aplicarRol();
+  }
+
+  // al entrar desde Historia con una sesión abierta, se retoma (si la cuenta sigue habilitada)
+  function retomarSesion() {
+    var g = window.CDPSesion.leer();
+    if (!g) return;
+    var u = usuarioPorEmail(g.email);
+    if (u && (u.rol === "coord" || orgById(u.orgId))) setSesion({ email: u.email, nombre: u.nombre, rol: u.rol, orgId: u.orgId || null });
+    else window.CDPSesion.guardar(null);
   }
 
   function aplicarRol() {
@@ -783,6 +797,7 @@
     construirMarcadores();
     aplicarFiltros();
     renderStats();
+    window.CDPSesion.guardar(datosSesion());
     renderSesion();
     cargarFicha();
     window.scrollTo(0, 0);
@@ -973,6 +988,11 @@
   aplicarFiltros(true);
   aplicarRol();
   renderStats();
+  retomarSesion();
   var inicial = location.hash.replace("#", "");
   mostrarVista(VISTAS.indexOf(inicial) !== -1 ? inicial : "mapa", true);
+  if (inicial === "ingresar") {
+    history.replaceState(null, "", location.pathname);
+    if (!sesion) abrirIngreso();
+  }
 })();
