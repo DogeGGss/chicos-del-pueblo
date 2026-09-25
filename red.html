@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=11">
-<link rel="stylesheet" href="css/red.css?v=11">
+<link rel="stylesheet" href="css/marca.css?v=12">
+<link rel="stylesheet" href="css/red.css?v=12">
 </head>
 <body data-app>
 
@@ -152,6 +152,17 @@
             <button class="pill" type="button" data-av-filtro="necesita" aria-pressed="false">Necesitan</button>
             <button class="pill" type="button" data-av-filtro="ofrece" aria-pressed="false">Ofrecen</button>
             <button class="pill" type="button" data-av-filtro="convoca" aria-pressed="false">Convocatorias</button>
+            <button class="pill pill--mias" type="button" data-av-filtro="mias" aria-pressed="false" id="filtroMias" hidden>Mis publicaciones <span class="tab-count num" id="cuentaMias"></span></button>
+          </div>
+          <div class="avisos-orden" id="avisosOrden" hidden>
+            <span id="avisosOrdenTexto"></span>
+            <label class="orden-sel">
+              <span class="sr-only">Ordenar avisos</span>
+              <select id="ordenAvisos" class="field-control">
+                <option value="cerca">Más cercanos primero</option>
+                <option value="recientes">Más recientes primero</option>
+              </select>
+            </label>
           </div>
           <ul class="avisos" id="avisosList" aria-label="Avisos de la red"></ul>
         </div>
@@ -414,8 +425,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=11"></script>
-<script src="js/red-datos.js?v=11"></script>
-<script src="js/red.js?v=11"></script>
+<script src="js/sesion.js?v=12"></script>
+<script src="js/red-datos.js?v=12"></script>
+<script src="js/red.js?v=12"></script>
 </body>
 </html>

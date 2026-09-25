@@ -48,6 +48,7 @@
   var vista = "mapa";
   var seleccionId = null;
   var avisoFiltro = "";
+  var ordenAvisos = "cerca";   // para organizaciones: por cercanía (por defecto) o por fecha
   var avisosAbiertos = {};   // avisos con la lista completa de respuestas desplegada
   var ultimoPedido = null;       // nombre de la organización del último pedido enviado
   var emailRechazado = "";       // cuenta no habilitada con la que se intentó ingresar
@@ -614,6 +615,26 @@
     return '<p class="aviso-resp"><strong>' + titulo + " (" + quienes.length + "):</strong> " + html + "</p>";
   }
 
+  // distancia en km entre dos organizaciones (fórmula del haversine)
+  function distanciaKm(a, b) {
+    var R = 6371, rad = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function textoDistancia(km) {
+    if (km < 1) return "a menos de 1 km";
+    return "a " + (km < 10 ? km.toFixed(1).replace(".", ",") : Math.round(km).toLocaleString("es-AR")) + " km";
+  }
+
+  function marcarFiltroAviso(f) {
+    avisoFiltro = f;
+    document.querySelectorAll("[data-av-filtro]").forEach(function (x) {
+      x.setAttribute("aria-pressed", x.getAttribute("data-av-filtro") === f ? "true" : "false");
+    });
+  }
+
   function opcionesAviso(tipo) {
     var t = TEXTOS_AVISO[tipo];
     var fuente = t.opciones === "convocatorias" ? CONVOCATORIAS : RECURSOS;
@@ -629,9 +650,38 @@
 
   function renderAvisos() {
     var ul = $("avisosList");
-    var lista = avisos.filter(function (a) { return !avisoFiltro || a.tipo === avisoFiltro; })
-      .sort(function (a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; });
-    if (!lista.length) { ul.innerHTML = '<li class="vacio">No hay avisos de este tipo por ahora.</li>'; renderStats(); return; }
+    var esOrg = rol === "org";
+    $("filtroMias").hidden = !esOrg;
+    if (!esOrg && avisoFiltro === "mias") marcarFiltroAviso("");
+    if (esOrg) $("cuentaMias").textContent = avisos.filter(function (a) { return a.orgId === sesion.orgId; }).length || "";
+    var lista = avisos.filter(function (a) {
+      if (avisoFiltro === "mias") return a.orgId === sesion.orgId;
+      return !avisoFiltro || a.tipo === avisoFiltro;
+    });
+    function porFecha(a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; }
+    // una organización ve primero los avisos de las casas más cercanas (los propios, al final)
+    var yo = esOrg ? miOrg() : null;
+    var porCercania = yo && avisoFiltro !== "mias" && ordenAvisos === "cerca";
+    var dist = {};
+    if (yo) avisos.forEach(function (a) { var o = orgById(a.orgId); if (o) dist[a.id] = distanciaKm(yo, o); });
+    lista.sort(porCercania ? function (a, b) {
+      var pa = a.orgId === yo.id ? 1 : 0, pb = b.orgId === yo.id ? 1 : 0;
+      return pa - pb || (dist[a.id] || 0) - (dist[b.id] || 0) || porFecha(a, b);
+    } : porFecha);
+    $("avisosOrden").hidden = !yo || avisoFiltro === "mias";
+    if (yo) {
+      $("ordenAvisos").value = ordenAvisos;
+      $("avisosOrdenTexto").innerHTML = porCercania
+        ? "Ordenados por cercanía a <strong>" + esc(yo.nombre) + "</strong> (" + esc(yo.localidad) + ")."
+        : "Ordenados por fecha de publicación.";
+    }
+    if (!lista.length) {
+      ul.innerHTML = '<li class="vacio">' + (avisoFiltro === "mias"
+        ? "Todavía no publicaron avisos. Usá el formulario “Publicar un aviso”."
+        : "No hay avisos de este tipo por ahora.") + "</li>";
+      renderStats();
+      return;
+    }
     ul.innerHTML = lista.map(function (a) {
       var o = orgById(a.orgId);
       var propio = rol === "org" && a.orgId === sesion.orgId;
@@ -655,6 +705,7 @@
       return '<li class="aviso aviso--' + a.tipo + (a.nuevo ? " is-new" : "") + '">' +
         '<div class="aviso-top"><span class="aviso-kind">' + etiquetaAviso(a.tipo) + '</span><span class="tag tag--neutral">' + esc(etiquetaRecurso(a)) + "</span>" +
         (propio ? '<span class="tag tag--ofrece">Tu aviso</span>' : "") +
+        (yo && a.orgId !== yo.id && dist[a.id] != null ? '<span class="aviso-dist">📍 ' + textoDistancia(dist[a.id]) + "</span>" : "") +
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
         (a.cuando ? '<p class="aviso-evento">📅 ' + fecha(a.cuando) + (a.lugar ? " · 📍 " + esc(a.lugar) : "") + "</p>" : "") +
@@ -675,10 +726,10 @@
     document.querySelectorAll('input[name="avTipo"]').forEach(function (r) {
       r.addEventListener("change", function () { opcionesAviso(r.value); });
     });
+    $("ordenAvisos").addEventListener("change", function () { ordenAvisos = this.value; renderAvisos(); });
     document.querySelectorAll("[data-av-filtro]").forEach(function (b) {
       b.addEventListener("click", function () {
-        avisoFiltro = b.getAttribute("data-av-filtro");
-        document.querySelectorAll("[data-av-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        marcarFiltroAviso(b.getAttribute("data-av-filtro"));
         renderAvisos();
       });
     });
@@ -727,8 +778,7 @@
       avisos.push(aviso);
       this.reset();
       opcionesAviso("necesita");
-      avisoFiltro = "";
-      document.querySelectorAll("[data-av-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-av-filtro") === "" ? "true" : "false"); });
+      if (avisoFiltro !== "mias") marcarFiltroAviso("");   // en "Mis publicaciones" el aviso nuevo ya se ve
       renderAvisos();
       toast("¡Publicado! Las organizaciones de la red ya lo pueden ver.");
     });

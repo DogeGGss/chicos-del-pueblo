@@ -36,6 +36,9 @@
   display:inline-flex; align-items:center; gap:.35rem;
 }
 .pill:hover{ border-color:var(--ink); }
+.pill--mias{ border-color:var(--celeste); background:var(--celeste-50); }
+.pill--mias .tab-count{ margin-left:.1rem; }
+.pill--mias[aria-pressed="true"] .tab-count{ background:var(--celeste); color:var(--ink); }
 .pill[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:#fff; }
 
 /* ---------- listado + mapa ---------- */
@@ -134,6 +137,12 @@
 
 .av-convoca{ gap:.6rem; }
 .aviso-evento{ font-size:.85rem; font-weight:600; color:var(--celeste-900); margin:0 0 .45rem !important; }
+.avisos-orden{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.4rem .8rem;
+  font-size:.84rem; color:var(--ink-soft); margin:-.2rem 0 .8rem;
+}
+.orden-sel .field-control{ padding:.35rem .6rem; font-size:.84rem; width:auto; }
+.aviso-dist{ font-size:.76rem; font-weight:700; color:var(--celeste-700); }
 .avisos-filtros{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.8rem; }
 .avisos{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.75rem; }
 .aviso{
