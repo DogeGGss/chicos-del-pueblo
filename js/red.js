@@ -7,7 +7,6 @@
   var TIPOS = window.RED_TIPOS;
   var RECURSOS = window.RED_RECURSOS;
   var LOCALIDADES = window.RED_LOCALIDADES;
-  var ORG_DEMO_ID = window.RED_ORG_DEMO_ID;
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   var CAMPOS_LABEL = {
@@ -19,22 +18,27 @@
 
   /* ---------------- estado ---------------- */
   var orgs = [];
-  var solicitudes = [];
+  var solicitudes = [];   // pedidos de acceso de organizaciones que quieren sumarse
   window.RED_ORGS.forEach(function (o) {
     var copia = clone(o);
     if (copia.estado === "pendiente") {
-      solicitudes.push({ id: "sol-" + copia.id, kind: "alta", datos: copia, fecha: copia.actualizada });
+      solicitudes.push({ id: "sol-" + copia.id, datos: copia, email: copia.emailSolicitud,
+        mensaje: copia.mensaje, fecha: copia.actualizada });
     } else {
       orgs.push(copia);
     }
   });
   var avisos = window.RED_AVISOS.map(clone);
+  var usuarios = window.RED_USUARIOS.map(clone);   // lista de cuentas habilitadas
+  var sesion = null;      // { email, nombre, rol: "org" | "coord", orgId }
   var rol = "visitante";
   var vista = "mapa";
   var seleccionId = null;
   var avisoFiltro = "";
   var yaRespondidos = {};
-  var miAltaEnviada = null;   // nombre de la última alta enviada como visitante
+  var ultimoPedido = null;       // nombre de la organización del último pedido enviado
+  var emailRechazado = "";       // cuenta no habilitada con la que se intentó ingresar
+  var nOrg = 1000;
   var filtro = { q: "", prov: "", recurso: "", tipos: {} };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -56,7 +60,13 @@
     for (var i = 0; i < orgs.length; i++) if (orgs[i].id === id) return orgs[i];
     return null;
   }
-  function miOrg() { return orgById(ORG_DEMO_ID); }
+  function miOrg() { return sesion && sesion.orgId ? orgById(sesion.orgId) : null; }
+  function usuarioPorEmail(email) {
+    email = String(email || "").trim().toLowerCase();
+    for (var i = 0; i < usuarios.length; i++) if (usuarios[i].email === email) return usuarios[i];
+    return null;
+  }
+  function emailValido(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
   /* ---------------- toast ---------------- */
   var toastTimer;
@@ -68,54 +78,109 @@
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3200);
   }
 
-  /* ---------------- vistas / pestañas ---------------- */
-  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  /* ---------------- vistas (botones de la barra celeste) ---------------- */
+  var botonesVista = Array.prototype.slice.call(document.querySelectorAll(".nav-vista"));
+  var VISTAS = ["mapa", "tablero", "ficha", "acceso", "coord"];
   function mostrarVista(v, sinHash) {
-    var tab = document.querySelector('.tab[data-vista="' + v + '"]');
-    if (!tab || tab.hidden) v = "mapa";
+    var boton = document.querySelector('.nav-vista[data-vista="' + v + '"]');
+    if (!boton || boton.hidden) v = "mapa";
     vista = v;
-    tabs.forEach(function (t) {
-      var on = t.getAttribute("data-vista") === v;
-      t.setAttribute("aria-selected", on ? "true" : "false");
-      t.tabIndex = on ? 0 : -1;
-      $(t.getAttribute("aria-controls")).hidden = !on;
+    botonesVista.forEach(function (b) {
+      var on = b.getAttribute("data-vista") === v;
+      if (on) {
+        b.setAttribute("aria-current", "true");
+        b.scrollIntoView({ block: "nearest", inline: "nearest" });
+      } else b.removeAttribute("aria-current");
+      $(b.getAttribute("aria-controls")).hidden = !on;
     });
     if (!sinHash) history.replaceState(null, "", v === "mapa" ? location.pathname : "#" + v);
     if (v === "mapa" && mapa) setTimeout(function () { mapa.invalidateSize(); }, 0);
     if (v === "ficha") initMapaFicha();
     window.scrollTo(0, 0);
   }
-  tabs.forEach(function (t, i) {
-    t.addEventListener("click", function () { mostrarVista(t.getAttribute("data-vista")); });
-    t.addEventListener("keydown", function (e) {
-      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      var visibles = tabs.filter(function (x) { return !x.hidden; });
-      var idx = visibles.indexOf(t) + (e.key === "ArrowRight" ? 1 : -1);
-      var next = visibles[(idx + visibles.length) % visibles.length];
-      next.focus();
-      mostrarVista(next.getAttribute("data-vista"));
-    });
+  botonesVista.forEach(function (b) {
+    b.addEventListener("click", function () { mostrarVista(b.getAttribute("data-vista")); });
   });
 
-  /* ---------------- roles ---------------- */
-  $("rolSelect").addEventListener("change", function () {
-    rol = this.value;
-    aplicarRol();
-    var msg = { visitante: "Estás viendo el sitio como visitante.",
-      org: "Entraste como Merendero Los Gurises.",
-      coord: "Entraste como coordinación de la red." }[rol];
-    toast(msg);
+  /* ---------------- sesión y roles ---------------- */
+  // Prototipo: el ingreso con Google está simulado y la lista de cuentas vive en la página.
+  // En la versión real, Google confirma la identidad y el servidor decide qué puede hacer cada cuenta.
+  function iniciales(nombre) {
+    return String(nombre || "?").split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join("").toUpperCase();
+  }
+  function renderSesion() {
+    var box = $("navSesion");
+    if (!sesion) {
+      box.innerHTML = '<button type="button" id="btnIngresar"><span class="g-dot" aria-hidden="true">G</span>' +
+        '<span>Ingresar<span class="g-texto"> con Google</span></span></button>';
+      return;
+    }
+    var sub = sesion.rol === "coord" ? "Coordinación" : (miOrg() ? miOrg().nombre : "");
+    box.innerHTML = '<span class="avatar" aria-hidden="true">' + esc(iniciales(sesion.nombre)) + "</span>" +
+      '<span class="sesion-quien"><strong>' + esc(sesion.nombre) + "</strong><small>" + esc(sub) + "</small></span>" +
+      '<button type="button" class="btn-salir" id="btnSalir">Salir</button>';
+  }
+  $("navSesion").addEventListener("click", function (e) {
+    if (e.target.closest("#btnIngresar")) abrirIngreso();
+    if (e.target.closest("#btnSalir")) {
+      setSesion(null);
+      toast("Cerraste sesión. Estás viendo la red como visitante.");
+    }
   });
+
+  function abrirIngreso() {
+    var html = '<button type="button" class="modal-close" data-cerrar aria-label="Cerrar">✕</button>' +
+      '<div class="g-head"><span class="g-dot" aria-hidden="true">G</span><h2 id="modalOrgTitulo">Ingresar con Google</h2></div>' +
+      '<p class="g-sub">Elegí una cuenta para continuar a <strong>Mapa de la red · Chicxs del Pueblo</strong>.</p>' +
+      '<ul class="g-cuentas">' + window.RED_CUENTAS_DEMO.map(function (c) {
+        return '<li><button type="button" data-login="' + esc(c.email) + '"><span class="avatar" aria-hidden="true">' + esc(iniciales(c.nombre)) + "</span>" +
+          "<span><strong>" + esc(c.nombre) + "</strong><small>" + esc(c.email) + "</small></span>" +
+          '<span class="g-nota">' + esc(c.nota) + "</span></button></li>";
+      }).join("") + "</ul>" +
+      '<form class="g-otra" data-login-otra novalidate><label class="field"><span class="field-label">Usar otra cuenta</span>' +
+      '<input type="email" class="field-control" name="email" placeholder="nombre@ejemplo.com" autocomplete="email"></label>' +
+      '<button type="submit" class="btn">Continuar</button></form>' +
+      '<p class="g-aviso">Simulación del prototipo: en la versión real se abre la ventana de Google, y es el servidor el que verifica si la cuenta está habilitada.</p>';
+    mostrarModal(html);
+  }
+
+  function intentarIngreso(email) {
+    email = String(email || "").trim().toLowerCase();
+    if (!emailValido(email)) { toast("Escribí un mail válido."); return; }
+    var u = usuarioPorEmail(email);
+    if (u && (u.rol === "coord" || orgById(u.orgId))) {
+      modal.close();
+      setSesion({ email: u.email, nombre: u.nombre, rol: u.rol, orgId: u.orgId || null });
+      toast(u.rol === "coord" ? "Entraste como coordinación de la red." : "Entraste como " + miOrg().nombre + ".");
+      return;
+    }
+    emailRechazado = email;
+    mostrarModal('<button type="button" class="modal-close" data-cerrar aria-label="Cerrar">✕</button>' +
+      '<div class="rechazo"><div class="big" aria-hidden="true">🔒</div>' +
+      '<h2 id="modalOrgTitulo">Tu cuenta no está habilitada</h2>' +
+      "<p><strong>" + esc(email) + "</strong> no figura entre las cuentas de la red. Si sos parte de lxs Chicxs del Pueblo, pedile acceso a la coordinación.</p>" +
+      '<div class="det-actions"><button type="button" class="btn btn-primary" data-ir-acceso>Solicitar acceso</button>' +
+      '<button type="button" class="btn" data-cerrar>Seguir como visitante</button></div></div>');
+  }
+
+  function setSesion(s) {
+    sesion = s;
+    rol = s ? s.rol : "visitante";
+    aplicarRol();
+  }
+
   function aplicarRol() {
+    $("tab-ficha").hidden = rol !== "org";
+    $("tab-acceso").hidden = rol !== "visitante";
     $("tab-coord").hidden = rol !== "coord";
-    $("tab-ficha").hidden = rol === "coord";
-    $("tabFichaLabel").textContent = rol === "org" ? "Mi organización" : "Sumar organización";
     $("publicarBloqueado").hidden = rol === "org";
     $("formAviso").hidden = rol !== "org";
-    cargarFicha();
+    renderSesion();
+    if (rol === "org") cargarFicha();
     renderAvisos();
-    renderSolicitudes();
-    if ((vista === "coord" && rol !== "coord") || (vista === "ficha" && rol === "coord")) mostrarVista("mapa");
+    renderCoordinacion();
+    var boton = document.querySelector('.nav-vista[data-vista="' + vista + '"]');
+    if (!boton || boton.hidden) mostrarVista("mapa");
     else if (vista === "ficha") initMapaFicha();
   }
 
@@ -130,6 +195,7 @@
     $("statAvisos").textContent = avisos.length;
     $("cuentaAvisos").textContent = avisos.length;
     $("cuentaPendientes").textContent = solicitudes.length || "";
+    $("cuentaPedidos").textContent = solicitudes.length || "";
   }
 
   /* ---------------- filtros ---------------- */
@@ -366,7 +432,21 @@
     var contacto = e.target.closest("[data-contacto]");
     if (contacto) { toast("En el prototipo los contactos son ficticios: acá se abriría " + contacto.getAttribute("data-contacto") + "."); return; }
     var enviar = e.target.closest("[data-enviar-ficha]");
-    if (enviar) { modal.close(); enviarFicha(); }
+    if (enviar) { modal.close(); enviarFicha(); return; }
+    var login = e.target.closest("[data-login]");
+    if (login) { intentarIngreso(login.getAttribute("data-login")); return; }
+    if (e.target.closest("[data-ir-acceso]")) {
+      modal.close();
+      mostrarVista("acceso");
+      $("aEmail").value = emailRechazado;
+      $("aNombre").focus();
+    }
+  });
+  modal.addEventListener("submit", function (e) {
+    var f = e.target.closest("[data-login-otra]");
+    if (!f) return;
+    e.preventDefault();
+    intentarIngreso(f.elements.email.value);
   });
 
   function coincidencias(o) {
@@ -427,16 +507,14 @@
     }
     html += '<div class="det-sec"><h3>Contacto</h3>';
     if (rol === "visitante" && !opts.preview) {
-      html += '<p class="card-text" style="margin:0">Los datos de contacto solo los ven las organizaciones de la red. <em>(En la demo: “Ver como: Organización”.)</em></p></div>';
+      html += '<p class="card-text" style="margin:0">Los datos de contacto solo los ven las organizaciones de la red. Si sos parte de una, tocá <strong>“Ingresar”</strong> con tu cuenta habilitada.</p></div>';
     } else {
       html += '<p style="margin:0;font-size:.9rem">📞 ' + esc(o.telefono || "—") + (o.correo ? " · ✉️ " + esc(o.correo) : "") + (o.redes ? " · " + esc(o.redes) : "") + "</p></div>";
     }
     html += '<div class="det-actions">';
     if (opts.preview) {
-      html += '<button type="button" class="btn btn-primary" data-enviar-ficha>Enviar a revisión</button>' +
+      html += '<button type="button" class="btn btn-primary" data-enviar-ficha>Guardar y publicar</button>' +
         '<button type="button" class="btn" data-cerrar>Seguir editando</button>';
-    } else if (opts.revision) {
-      html += '<button type="button" class="btn" data-cerrar>Cerrar</button>';
     } else {
       if (rol !== "visitante") {
         html += '<button type="button" class="btn btn-primary" data-contacto="WhatsApp">💬 WhatsApp</button>' +
@@ -471,9 +549,11 @@
     if (!lista.length) { ul.innerHTML = '<li class="vacio">No hay avisos de este tipo por ahora.</li>'; renderStats(); return; }
     ul.innerHTML = lista.map(function (a) {
       var o = orgById(a.orgId);
-      var propio = rol === "org" && a.orgId === ORG_DEMO_ID;
+      var propio = rol === "org" && a.orgId === sesion.orgId;
       var accion;
-      if (propio) {
+      if (rol === "coord") {
+        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Quitar aviso</button>';
+      } else if (propio) {
         accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Cerrar aviso</button>';
       } else {
         var txt = a.tipo === "necesita" ? "Podemos ayudar" : a.tipo === "ofrece" ? "Nos interesa" : "Nos sumamos";
@@ -516,12 +596,12 @@
         var idc = cerrar.getAttribute("data-cerrar-aviso");
         avisos = avisos.filter(function (a) { return a.id !== idc; });
         renderAvisos();
-        toast("Cerraste el aviso. ¡Ojalá se haya resuelto!");
+        toast(rol === "coord" ? "La coordinación quitó el aviso del tablero." : "Cerraste el aviso. ¡Ojalá se haya resuelto!");
         return;
       }
       var resp = e.target.closest("[data-responder]");
       if (!resp) return;
-      if (rol === "visitante") { toast("Para responder avisos tenés que entrar como organización."); return; }
+      if (rol === "visitante") { toast("Para responder avisos tenés que ingresar con una cuenta habilitada."); return; }
       var id = resp.getAttribute("data-responder");
       var a = avisos.filter(function (x) { return x.id === id; })[0];
       var o = orgById(a.orgId);
@@ -538,7 +618,7 @@
       $("avTitulo").removeAttribute("aria-invalid");
       var tipo = this.querySelector('input[name="avTipo"]:checked').value;
       avisos.push({
-        id: "av-" + Date.now(), orgId: ORG_DEMO_ID, tipo: tipo, recurso: $("avRecurso").value,
+        id: "av-" + Date.now(), orgId: sesion.orgId, tipo: tipo, recurso: $("avRecurso").value,
         fecha: HOY, titulo: titulo, detalle: $("avDetalle").value.trim(), interesados: 0, nuevo: true,
       });
       this.reset();
@@ -624,39 +704,24 @@
 
   function cargarFicha() {
     var f = $("formFicha");
+    var o = miOrg();
+    if (!o) return;
     f.reset();
     f.querySelectorAll("[aria-invalid]").forEach(function (x) { x.removeAttribute("aria-invalid"); });
     $("fichaError").hidden = true;
+    $("fichaTitulo").textContent = o.nombre;
+    set("oNombre", o.nombre); set("oTipo", o.tipo); set("oReferente", o.referente);
+    set("oDescripcion", o.descripcion); set("oEdades", o.edades); set("oChicos", o.chicos);
+    set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
+    set("oTelefono", o.telefono); set("oCorreo", o.correo); set("oRedes", o.redes);
+    f.querySelector('input[name="oVisibilidad"][value="' + (o.mostrarDireccion === "exacta" ? "exacta" : "zona") + '"]').checked = true;
+    f.querySelectorAll('input[name="necesita"]').forEach(function (c) { c.checked = (o.necesita || []).indexOf(c.value) !== -1; });
+    f.querySelectorAll('input[name="ofrece"]').forEach(function (c) { c.checked = (o.ofrece || []).indexOf(c.value) !== -1; });
+    fichaPos = { lat: o.lat, lng: o.lng };
     var estado = $("fichaEstado");
-    if (rol === "org") {
-      var o = miOrg();
-      var pendiente = solicitudPendienteDe(o.id);
-      var d = pendiente ? pendiente.datos : o;
-      $("fichaEyebrow").textContent = "Tu ficha en la red";
-      $("fichaTitulo").textContent = o.nombre;
-      $("fichaLead").textContent = "Mantené tus datos al día: horarios, qué necesitan y qué pueden ofrecer. Los cambios los revisa la coordinación.";
-      $("btnEnviarFicha").textContent = "Guardar cambios";
-      set("oNombre", d.nombre); set("oTipo", d.tipo); set("oReferente", d.referente);
-      set("oDescripcion", d.descripcion); set("oEdades", d.edades); set("oChicos", d.chicos);
-      set("oHorarios", d.horarios); set("oLocalidad", d.localidad); set("oDireccion", d.direccion);
-      set("oTelefono", d.telefono); set("oCorreo", d.correo); set("oRedes", d.redes);
-      f.querySelector('input[name="oVisibilidad"][value="' + (d.mostrarDireccion === "exacta" ? "exacta" : "zona") + '"]').checked = true;
-      f.querySelectorAll('input[name="necesita"]').forEach(function (c) { c.checked = d.necesita.indexOf(c.value) !== -1; });
-      f.querySelectorAll('input[name="ofrece"]').forEach(function (c) { c.checked = d.ofrece.indexOf(c.value) !== -1; });
-      fichaPos = { lat: d.lat, lng: d.lng };
-      estado.hidden = false;
-      estado.innerHTML = pendiente
-        ? "⏳ Tenés <strong>cambios pendientes de revisión</strong>. Mientras tanto, en el mapa se ve la versión anterior."
-        : "✅ Tu ficha está <strong>publicada</strong> en el mapa. Última actualización: " + fecha(o.actualizada) + ".";
-    } else {
-      $("fichaEyebrow").textContent = "Sumate a la red";
-      $("fichaTitulo").textContent = "Sumá tu organización";
-      $("fichaLead").textContent = "Completá la ficha de tu casa. La coordinación de la red la revisa antes de publicarla en el mapa.";
-      $("btnEnviarFicha").textContent = "Enviar a revisión";
-      fichaPos = null;
-      estado.hidden = !miAltaEnviada;
-      if (miAltaEnviada) estado.innerHTML = "📨 Recibimos la solicitud de <strong>" + esc(miAltaEnviada) + "</strong>. La coordinación la va a revisar pronto.";
-    }
+    estado.hidden = false;
+    estado.innerHTML = "✅ Tu ficha está <strong>publicada</strong> en el mapa. Última actualización: " + fecha(o.actualizada) +
+      ". Estás editando con <strong>" + esc(sesion.email) + "</strong>.";
     $("mapaFichaHint").textContent = "Elegí la localidad y después tocá el mapa para ajustar el punto.";
     moverPinFicha();
   }
@@ -664,7 +729,7 @@
   function leerFicha() {
     var f = $("formFicha");
     var loc = $("oLocalidad").value;
-    var base = rol === "org" ? miOrg() : {};
+    var base = miOrg() || {};
     var pos = fichaPos || (LOCALIDADES[loc] ? { lat: LOCALIDADES[loc].lat, lng: LOCALIDADES[loc].lng } : { lat: null, lng: null });
     return {
       id: base.id || null,
@@ -707,31 +772,21 @@
     return true;
   }
 
-  function solicitudPendienteDe(orgId) {
-    for (var i = 0; i < solicitudes.length; i++) if (solicitudes[i].kind === "cambio" && solicitudes[i].orgId === orgId) return solicitudes[i];
-    return null;
-  }
-
   function enviarFicha() {
+    var o = miOrg();
+    if (rol !== "org" || !o) return;
     var d = leerFicha();
     if (!validarFicha(d)) return;
-    if (rol === "org") {
-      var o = miOrg();
-      if (!diferencias(o, d).length) { toast("No hay cambios para guardar."); return; }
-      var previa = solicitudPendienteDe(o.id);
-      if (previa) { previa.datos = d; previa.fecha = HOY; }
-      else solicitudes.push({ id: "sol-" + Date.now(), kind: "cambio", orgId: o.id, datos: d, fecha: HOY });
-      toast("Cambios enviados. La coordinación los va a revisar.");
-    } else {
-      d.id = "org-nueva-" + Date.now();
-      solicitudes.push({ id: "sol-" + d.id, kind: "alta", datos: d, fecha: HOY });
-      miAltaEnviada = d.nombre;
-      toast("¡Gracias! Tu solicitud quedó pendiente de revisión.");
-    }
+    if (!diferencias(o, d).length) { toast("No hay cambios para guardar."); return; }
+    Object.keys(d).forEach(function (k) { if (k !== "id") o[k] = d[k]; });
+    o.actualizada = HOY;
+    construirMarcadores();
+    aplicarFiltros();
     renderStats();
-    renderSolicitudes();
+    renderSesion();
     cargarFicha();
     window.scrollTo(0, 0);
+    toast("¡Listo! Los cambios ya se ven en el mapa.");
   }
 
   function diferencias(a, b) {
@@ -743,70 +798,181 @@
     });
   }
 
+  /* ---------------- solicitar acceso (visitantes) ---------------- */
+  function initAcceso() {
+    $("aTipo").innerHTML = $("oTipo").innerHTML;
+    $("aLocalidad").innerHTML = $("oLocalidad").innerHTML;
+    $("formAcceso").addEventListener("input", function (e) {
+      if (e.target.getAttribute("aria-invalid")) e.target.removeAttribute("aria-invalid");
+    });
+    $("formAcceso").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var d = {
+        nombre: $("aNombre").value.trim(), tipo: $("aTipo").value, localidad: $("aLocalidad").value,
+        referente: $("aReferente").value.trim(), email: $("aEmail").value.trim().toLowerCase(),
+        mensaje: $("aMensaje").value.trim(),
+      };
+      var faltan = [];
+      [["aNombre", d.nombre], ["aTipo", d.tipo], ["aLocalidad", d.localidad], ["aReferente", d.referente],
+        ["aEmail", emailValido(d.email)]].forEach(function (p) {
+        if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
+        else $(p[0]).removeAttribute("aria-invalid");
+      });
+      var err = $("accesoError");
+      if (faltan.length) {
+        err.textContent = "Completá los campos marcados con * (revisá también que el mail sea válido).";
+        err.hidden = false;
+        $(faltan[0]).focus();
+        return;
+      }
+      err.hidden = true;
+      if (usuarioPorEmail(d.email)) {
+        err.textContent = "Ese mail ya está habilitado: tocá “Ingresar” arriba a la derecha.";
+        err.hidden = false;
+        return;
+      }
+      solicitudes.push({
+        id: "sol-" + Date.now(), email: d.email, mensaje: d.mensaje, fecha: HOY,
+        datos: { nombre: d.nombre, tipo: d.tipo, localidad: d.localidad, provincia: LOCALIDADES[d.localidad].prov,
+          referente: d.referente, descripcion: "" },
+      });
+      ultimoPedido = d.nombre;
+      this.reset();
+      var estado = $("accesoEstado");
+      estado.hidden = false;
+      estado.innerHTML = "📨 Recibimos el pedido de <strong>" + esc(ultimoPedido) + "</strong>. Cuando la coordinación lo apruebe, vas a poder ingresar con <strong>" + esc(d.email) + "</strong>.";
+      renderCoordinacion();
+      toast("¡Gracias! La coordinación va a revisar tu pedido.");
+    });
+  }
+
   /* ---------------- coordinación ---------------- */
+  function renderCoordinacion() {
+    renderSolicitudes();
+    renderCuentas();
+    renderStats();
+  }
+
   function renderSolicitudes() {
     var ul = $("solicitudesList");
     $("solicitudesVacio").hidden = solicitudes.length > 0;
     ul.innerHTML = solicitudes.map(function (s) {
       var d = s.datos;
-      var extra = "";
-      if (s.kind === "cambio") {
-        var campos = diferencias(orgById(s.orgId), d);
-        extra = '<ul class="cambios">' + campos.map(function (k) { return "<li>Cambió: " + esc(CAMPOS_LABEL[k]) + "</li>"; }).join("") + "</ul>";
-      }
       return '<li class="card solicitud">' +
-        '<div class="org-tags" style="margin:0"><span class="tag ' + (s.kind === "alta" ? "tag--ofrece" : "tag--pendiente") + '">' + (s.kind === "alta" ? "Alta nueva" : "Cambio de ficha") + '</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
+        '<div class="org-tags" style="margin:0"><span class="tag tag--ofrece">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
         "<h3>" + TIPOS[d.tipo].icono + " " + esc(d.nombre) + "</h3>" +
         '<p class="org-meta">' + esc(TIPOS[d.tipo].label) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
-        "<p>" + esc(d.descripcion) + "</p>" + extra +
+        '<p class="pedido-mail">Cuenta a habilitar: <strong>' + esc(s.email) + "</strong></p>" +
+        (s.mensaje ? "<blockquote>" + esc(s.mensaje) + "</blockquote>" : "") +
         '<div class="solicitud-actions">' +
-        '<button type="button" class="btn btn-sm btn-primary" data-aprobar="' + s.id + '">Aprobar</button>' +
+        '<button type="button" class="btn btn-sm btn-primary" data-aprobar="' + s.id + '">Aprobar y habilitar</button>' +
         '<button type="button" class="btn btn-sm" data-rechazar="' + s.id + '">Rechazar</button>' +
-        '<button type="button" class="btn btn-sm" data-revisar="' + s.id + '">Ver ficha</button>' +
         "</div></li>";
     }).join("");
-    renderStats();
   }
 
+  function renderCuentas() {
+    var q = norm($("cuentasBuscar").value);
+    var lista = orgs.slice().sort(function (a, b) { return a.nombre.localeCompare(b.nombre, "es"); });
+    $("cuentasBody").innerHTML = lista.map(function (o) {
+      var mails = usuarios.filter(function (u) { return u.rol === "org" && u.orgId === o.id; });
+      if (q && norm(o.nombre + " " + o.localidad + " " + mails.map(function (u) { return u.email; }).join(" ")).indexOf(q) === -1) return "";
+      return "<tr><td><strong>" + esc(o.nombre) + '</strong><span class="org-meta">' + esc(o.localidad) + ", " + esc(o.provincia) + "</span></td>" +
+        '<td><div class="mails">' +
+        (mails.length ? mails.map(function (u) {
+          return '<span class="mail">' + esc(u.email) + '<button type="button" data-quitar-mail="' + esc(u.email) + '" aria-label="Quitar ' + esc(u.email) + '">✕</button></span>';
+        }).join("") : '<span class="sin-cuentas">Sin cuentas: nadie puede editarla</span>') +
+        '<form class="mail-add" data-agregar-mail="' + o.id + '" novalidate><input type="email" name="email" placeholder="Agregar mail…" aria-label="Agregar mail a ' + esc(o.nombre) + '">' +
+        '<button type="submit" class="btn btn-sm">Agregar</button></form></div></td>' +
+        '<td><button type="button" class="btn btn-sm" data-baja="' + o.id + '">Quitar del mapa</button></td></tr>';
+    }).join("") || '<tr><td colspan="3" class="vacio">No hay organizaciones que coincidan.</td></tr>';
+    $("cuentasCoord").innerHTML = usuarios.filter(function (u) { return u.rol === "coord"; }).map(function (u) {
+      return '<span class="mail mail--solo">' + esc(u.email) + "</span>";
+    }).join("");
+  }
+
+  $("cuentasBuscar").addEventListener("input", renderCuentas);
+
   $("solicitudesList").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-aprobar],[data-rechazar],[data-revisar]");
+    var b = e.target.closest("[data-aprobar],[data-rechazar]");
     if (!b) return;
-    var id = b.getAttribute("data-aprobar") || b.getAttribute("data-rechazar") || b.getAttribute("data-revisar");
+    var id = b.getAttribute("data-aprobar") || b.getAttribute("data-rechazar");
     var s = solicitudes.filter(function (x) { return x.id === id; })[0];
     if (!s) return;
-    if (b.hasAttribute("data-revisar")) { mostrarModal(detalleHtml(s.datos, { revision: true })); return; }
     solicitudes = solicitudes.filter(function (x) { return x !== s; });
     if (b.hasAttribute("data-aprobar")) {
-      if (s.kind === "alta") {
-        var nueva = clone(s.datos);
-        nueva.estado = "aprobada";
-        nueva.actualizada = HOY;
-        orgs.push(nueva);
-        toast("Aprobada: " + nueva.nombre + " ya aparece en el mapa.");
-      } else {
-        var o = orgById(s.orgId);
-        Object.keys(s.datos).forEach(function (k) { if (k !== "id") o[k] = s.datos[k]; });
-        o.actualizada = HOY;
-        toast("Cambios aprobados: la ficha de " + o.nombre + " está actualizada.");
-      }
+      var d = s.datos;
+      var loc = LOCALIDADES[d.localidad];
+      nOrg += 1;
+      var nueva = Object.assign({
+        edades: "", chicos: "", horarios: "", direccion: "", redes: "", telefono: "", necesita: [], ofrece: [],
+        lat: +(loc.lat + Math.sin(nOrg) * 0.015).toFixed(5), lng: +(loc.lng + Math.cos(nOrg) * 0.02).toFixed(5),
+        mostrarDireccion: "zona",
+      }, clone(d), { id: "org-" + nOrg, estado: "aprobada", actualizada: HOY, correo: d.correo || s.email });
+      if (!nueva.descripcion) nueva.descripcion = "Ficha en preparación: la organización todavía no completó su información.";
+      orgs.push(nueva);
+      if (!usuarioPorEmail(s.email)) usuarios.push({ email: s.email, nombre: d.referente, rol: "org", orgId: nueva.id });
       construirMarcadores();
       aplicarFiltros();
+      toast("Aprobada: " + nueva.nombre + " ya está en el mapa y " + s.email + " puede ingresar.");
     } else {
-      toast("Solicitud rechazada. Se le avisará a " + s.datos.nombre + " por correo.");
+      toast("Pedido rechazado. Se le avisará a " + s.email + " por correo.");
     }
-    renderSolicitudes();
-    cargarFicha();
+    renderCoordinacion();
+  });
+
+  $("cuentasBody").addEventListener("click", function (e) {
+    var quitar = e.target.closest("[data-quitar-mail]");
+    if (quitar) {
+      var email = quitar.getAttribute("data-quitar-mail");
+      usuarios = usuarios.filter(function (u) { return u.email !== email; });
+      renderCuentas();
+      toast(email + " ya no puede ingresar como organización.");
+      return;
+    }
+    var baja = e.target.closest("[data-baja]");
+    if (baja) {
+      var o = orgById(baja.getAttribute("data-baja"));
+      if (!o || !window.confirm("¿Quitar “" + o.nombre + "” del mapa? También se desactivan sus cuentas y sus avisos.")) return;
+      orgs = orgs.filter(function (x) { return x !== o; });
+      usuarios = usuarios.filter(function (u) { return u.orgId !== o.id; });
+      avisos = avisos.filter(function (a) { return a.orgId !== o.id; });
+      if (seleccionId === o.id) seleccionId = null;
+      construirMarcadores();
+      aplicarFiltros();
+      renderAvisos();
+      renderCoordinacion();
+      toast(o.nombre + " se quitó del mapa.");
+    }
+  });
+
+  $("cuentasBody").addEventListener("submit", function (e) {
+    var f = e.target.closest("[data-agregar-mail]");
+    if (!f) return;
+    e.preventDefault();
+    var email = f.elements.email.value.trim().toLowerCase();
+    if (!emailValido(email)) { toast("Escribí un mail válido."); f.elements.email.focus(); return; }
+    var ya = usuarioPorEmail(email);
+    if (ya) {
+      toast(ya.rol === "coord" ? "Ese mail es de la coordinación." : "Ese mail ya está habilitado para " + (orgById(ya.orgId) || { nombre: "otra organización" }).nombre + ".");
+      return;
+    }
+    var o = orgById(f.getAttribute("data-agregar-mail"));
+    usuarios.push({ email: email, nombre: o.referente || o.nombre, rol: "org", orgId: o.id });
+    renderCuentas();
+    toast(email + " ahora puede ingresar como " + o.nombre + ".");
   });
 
   /* ---------------- arranque ---------------- */
   initFiltros();
   initTablero();
   initFormFicha();
+  initAcceso();
   initMapa();
   construirMarcadores();
   aplicarFiltros(true);
   aplicarRol();
   renderStats();
   var inicial = location.hash.replace("#", "");
-  mostrarVista(["tablero", "ficha", "coord"].indexOf(inicial) !== -1 ? inicial : "mapa", true);
+  mostrarVista(VISTAS.indexOf(inicial) !== -1 ? inicial : "mapa", true);
 })();

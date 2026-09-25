@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=4">
-<link rel="stylesheet" href="css/red.css?v=4">
+<link rel="stylesheet" href="css/marca.css?v=5">
+<link rel="stylesheet" href="css/red.css?v=5">
 </head>
 <body>
 
@@ -28,39 +28,28 @@
 
 <div class="sticky-top">
   <nav class="site-nav" aria-label="Secciones del sitio">
-    <div class="site-nav-inner">
-      <a href="index.html">Historia</a>
-      <a href="red.html" aria-current="page">Mapa de la red</a>
+    <div class="site-nav-inner site-nav-inner--app">
+      <div class="nav-links">
+        <a href="index.html">Historia</a>
+        <button type="button" class="nav-vista" data-vista="mapa" aria-controls="vista-mapa" aria-current="true">Mapa de la red</button>
+        <button type="button" class="nav-vista" data-vista="tablero" aria-controls="vista-tablero">Tablero <span class="tab-count num" id="cuentaAvisos"></span></button>
+        <button type="button" class="nav-vista" data-vista="ficha" aria-controls="vista-ficha" id="tab-ficha" hidden>Mi organización</button>
+        <button type="button" class="nav-vista" data-vista="acceso" aria-controls="vista-acceso" id="tab-acceso">Solicitar acceso</button>
+        <button type="button" class="nav-vista" data-vista="coord" aria-controls="vista-coord" id="tab-coord" hidden>Coordinación <span class="tab-count num" id="cuentaPendientes"></span></button>
+      </div>
+      <div class="nav-sesion" id="navSesion"></div>
     </div>
   </nav>
-  <div class="subnav">
-    <div class="subnav-inner">
-      <div class="tabs" role="tablist" aria-label="Herramientas de la red">
-        <button class="tab" role="tab" id="tab-mapa" aria-controls="vista-mapa" aria-selected="true" data-vista="mapa" type="button">Mapa y directorio</button>
-        <button class="tab" role="tab" id="tab-tablero" aria-controls="vista-tablero" aria-selected="false" data-vista="tablero" type="button">Tablero de la red <span class="tab-count num" id="cuentaAvisos"></span></button>
-        <button class="tab" role="tab" id="tab-ficha" aria-controls="vista-ficha" aria-selected="false" data-vista="ficha" type="button"><span id="tabFichaLabel">Sumar organización</span></button>
-        <button class="tab" role="tab" id="tab-coord" aria-controls="vista-coord" aria-selected="false" data-vista="coord" type="button" hidden>Coordinación <span class="tab-count tab-count--alert num" id="cuentaPendientes"></span></button>
-      </div>
-      <label class="rol">
-        <span class="rol-label">Ver como</span>
-        <select id="rolSelect" class="rol-select">
-          <option value="visitante">Visitante</option>
-          <option value="org">Organización (Merendero Los Gurises)</option>
-          <option value="coord">Coordinación de la red</option>
-        </select>
-      </label>
-    </div>
-  </div>
 </div>
 
 <div class="demo-banner" role="note">
-  <strong>Prototipo:</strong> las organizaciones, contactos y avisos son <strong>ficticios</strong> y los cambios no se guardan al recargar.
+  <strong>Prototipo:</strong> las organizaciones, contactos y avisos son <strong>ficticios</strong>, el ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
 </div>
 
 <main>
 
   <!-- ============ MAPA Y DIRECTORIO ============ -->
-  <section class="vista" id="vista-mapa" role="tabpanel" aria-labelledby="tab-mapa">
+  <section class="vista" id="vista-mapa">
     <div class="wrap">
       <div class="intro">
         <div>
@@ -111,7 +100,7 @@
   </section>
 
   <!-- ============ TABLERO ============ -->
-  <section class="vista" id="vista-tablero" role="tabpanel" aria-labelledby="tab-tablero" hidden>
+  <section class="vista" id="vista-tablero" hidden>
     <div class="wrap">
       <div class="intro intro--simple">
         <div class="eyebrow">Lo que sobra en una casa, falta en otra</div>
@@ -123,7 +112,7 @@
         <aside class="publicar card" id="publicarCard">
           <h2 class="card-title">Publicar un aviso</h2>
           <div id="publicarBloqueado" class="card-text">
-            Para publicar tenés que entrar como organización. En la demo, elegí <strong>“Ver como: Organización”</strong> arriba.
+            Solo las organizaciones de la red pueden publicar. Si sos parte de una, tocá <strong>“Ingresar”</strong> arriba a la derecha con tu cuenta de Google habilitada.
           </div>
           <form id="formAviso" class="form-stack" hidden>
             <div class="seg" role="radiogroup" aria-label="Tipo de aviso">
@@ -161,12 +150,12 @@
   </section>
 
   <!-- ============ FICHA (alta / mi organización) ============ -->
-  <section class="vista" id="vista-ficha" role="tabpanel" aria-labelledby="tab-ficha" hidden>
+  <section class="vista" id="vista-ficha" hidden>
     <div class="wrap">
       <div class="intro intro--simple">
-        <div class="eyebrow" id="fichaEyebrow">Sumate a la red</div>
-        <h1 class="vista-title" id="fichaTitulo">Sumá tu organización</h1>
-        <p class="vista-lead" id="fichaLead">Completá la ficha de tu casa. La coordinación de la red la revisa antes de publicarla en el mapa.</p>
+        <div class="eyebrow">Tu ficha en la red</div>
+        <h1 class="vista-title" id="fichaTitulo">Mi organización</h1>
+        <p class="vista-lead">Mantené tus datos al día: horarios, qué necesitan y qué pueden ofrecer. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
         <p class="estado-ficha" id="fichaEstado" hidden></p>
       </div>
 
@@ -269,22 +258,118 @@
         <div class="ficha-acciones">
           <p class="form-error" id="fichaError" role="alert" hidden></p>
           <button class="btn" type="button" id="btnVistaPrevia">Vista previa</button>
-          <button class="btn btn-primary" type="submit" id="btnEnviarFicha">Enviar a revisión</button>
+          <button class="btn btn-primary" type="submit" id="btnEnviarFicha">Guardar y publicar</button>
         </div>
       </form>
     </div>
   </section>
 
+  <!-- ============ SOLICITAR ACCESO ============ -->
+  <section class="vista" id="vista-acceso" hidden>
+    <div class="wrap">
+      <div class="intro intro--simple">
+        <div class="eyebrow">Una herramienta de la red, para la red</div>
+        <h1 class="vista-title">Quién puede hacer qué</h1>
+        <p class="vista-lead">Mirar el mapa es público. Publicar es solo para las organizaciones de lxs Chicxs del Pueblo: cada casa entra con una cuenta de Google que la coordinación habilitó.</p>
+      </div>
+
+      <div class="acceso-grid">
+        <div class="acceso-info">
+          <div class="card">
+            <h2 class="card-title">Tres tipos de usuario</h2>
+            <div class="tabla-wrap">
+              <table class="roles">
+                <thead><tr><th scope="col">Quién</th><th scope="col">Cómo entra</th><th scope="col">Qué puede hacer</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, las fichas y qué necesita u ofrece cada organización. No ve teléfonos ni mails.</td></tr>
+                  <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar avisos, responder los de otras y ver los contactos de la red.</td></tr>
+                  <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">El recorrido</h2>
+            <ol class="pasos">
+              <li>La <strong>coordinación</strong> carga la organización y le asigna uno o más mails autorizados (el de la referente, el de otro compañero).</li>
+              <li>La referente entra a la página y toca <strong>“Ingresar con Google”</strong>.</li>
+              <li>Si su mail está en la lista, entra en <strong>modo organización</strong>, ya vinculada a su casa.</li>
+              <li>Si una persona cualquiera inicia sesión, ve <em>“Tu cuenta no está habilitada”</em> y sigue como visitante.</li>
+            </ol>
+            <p class="card-text" style="margin:0">No hace falta tener Gmail: cualquier mail puede convertirse en una cuenta de Google.</p>
+          </div>
+
+          <div class="card card--nota">
+            <h2 class="card-title">El control no puede estar solo en la página</h2>
+            <p class="card-text" style="margin:0">Si el control de “¿está habilitado?” lo hiciera solo el código de la página, cualquiera con un poco de conocimiento podría saltearlo, porque ese código se modifica desde el navegador. En la versión real, <strong>la verificación la hace el servidor</strong> que guarda los datos. Lo mismo pasa con los contactos: el servidor no se los manda a un visitante.</p>
+          </div>
+        </div>
+
+        <aside class="card publicar" id="accesoCard">
+          <h2 class="card-title">Solicitar acceso</h2>
+          <p class="card-text">¿Tu organización es parte de lxs Chicxs del Pueblo y todavía no tiene cuenta? Dejá los datos: la coordinación los revisa y, si corresponde, habilita tu mail.</p>
+          <p class="estado-ficha" id="accesoEstado" hidden></p>
+          <form id="formAcceso" class="form-stack" novalidate>
+            <label class="field">
+              <span class="field-label">Organización *</span>
+              <input id="aNombre" class="field-control" maxlength="80" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Tipo *</span>
+              <select id="aTipo" class="field-control" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Localidad *</span>
+              <select id="aLocalidad" class="field-control" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Referente *</span>
+              <input id="aReferente" class="field-control" maxlength="60" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Mail de Google a habilitar *</span>
+              <input id="aEmail" class="field-control" type="email" maxlength="80" required autocomplete="email">
+            </label>
+            <label class="field">
+              <span class="field-label">¿Cómo participan de la red?</span>
+              <textarea id="aMensaje" class="field-control" rows="3" maxlength="400" placeholder="Ej.: vamos a los encuentros de zona sur; nos conoce tal organización."></textarea>
+            </label>
+            <p class="form-error" id="accesoError" role="alert" hidden></p>
+            <button class="btn btn-primary" type="submit">Enviar pedido</button>
+          </form>
+        </aside>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ COORDINACIÓN ============ -->
-  <section class="vista" id="vista-coord" role="tabpanel" aria-labelledby="tab-coord" hidden>
+  <section class="vista" id="vista-coord" hidden>
     <div class="wrap">
       <div class="intro intro--simple">
         <div class="eyebrow">Panel de coordinación</div>
-        <h1 class="vista-title">Solicitudes para revisar</h1>
-        <p class="vista-lead">Altas nuevas y cambios de fichas. Al aprobar, la organización aparece (o se actualiza) en el mapa.</p>
+        <h1 class="vista-title">Coordinación de la red</h1>
+        <p class="vista-lead">Revisá los pedidos de acceso y decidí qué cuentas de Google pertenecen a cada organización.</p>
       </div>
+
+      <h2 class="bloque-title">Pedidos de acceso <span class="tab-count num" id="cuentaPedidos"></span></h2>
       <ul class="solicitudes" id="solicitudesList"></ul>
-      <p class="vacio" id="solicitudesVacio" hidden>No hay solicitudes pendientes. ¡Todo al día!</p>
+      <p class="vacio" id="solicitudesVacio" hidden>No hay pedidos pendientes. ¡Todo al día!</p>
+
+      <h2 class="bloque-title">Organizaciones y cuentas habilitadas</h2>
+      <label class="field cuentas-buscar">
+        <span class="sr-only">Buscar organización</span>
+        <input type="search" id="cuentasBuscar" class="field-control" placeholder="Buscar organización o mail…" autocomplete="off">
+      </label>
+      <div class="tabla-wrap card cuentas-card">
+        <table class="cuentas">
+          <thead><tr><th scope="col">Organización</th><th scope="col">Cuentas de Google habilitadas</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead>
+          <tbody id="cuentasBody"></tbody>
+        </table>
+      </div>
+
+      <h2 class="bloque-title">Cuentas de coordinación</h2>
+      <div class="mails" id="cuentasCoord"></div>
     </div>
   </section>
 
@@ -311,7 +396,7 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/red-datos.js?v=4"></script>
-<script src="js/red.js?v=4"></script>
+<script src="js/red-datos.js?v=5"></script>
+<script src="js/red.js?v=5"></script>
 </body>
 </html>
