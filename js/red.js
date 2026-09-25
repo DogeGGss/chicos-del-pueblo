@@ -401,6 +401,12 @@
       },
     });
     mapa.addLayer(cluster);
+
+    // Easter egg: un punto propio sobre las Islas Malvinas, fuera del listado, los filtros y los grupos
+    L.marker([-51.75, -59.2], {
+      icon: L.divIcon({ className: "", html: '<div class="pin-malvinas"><span></span></div>', iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -12] }),
+      title: "Islas Malvinas", alt: "Islas Malvinas", keyboard: true, zIndexOffset: -100,
+    }).bindPopup('<p class="popup-malvinas">Las Malvinas son argentinas</p>').addTo(mapa);
     $("mapa").addEventListener("click", function (e) {
       var b = e.target.closest("[data-ver]");
       if (b) abrirFicha(b.getAttribute("data-ver"));

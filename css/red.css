@@ -103,6 +103,17 @@
   font-family:var(--f-head); font-weight:800; font-size:.9rem;
 }
 .leaflet-container{ font-family:var(--f-body); }
+/* easter egg: Islas Malvinas con los colores de la bandera */
+.pin-malvinas{
+  width:26px; height:26px; border-radius:50%; border:2px solid #1E201F; position:relative;
+  background:linear-gradient(#74ACDF 0 34%, #fff 34% 66%, #74ACDF 66%);
+  box-shadow:2px 2px 0 rgba(0,0,0,.25);
+}
+.pin-malvinas span{
+  position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px;
+  border-radius:50%; background:#F6B40E; box-shadow:0 0 0 1px #85340A;
+}
+.popup-malvinas{ margin:0; font-family:var(--f-head); font-weight:800; font-size:1rem; text-align:center; }
 /* suaviza el mapa base para que resalten los pines celestes */
 .leaflet-tile-pane{ filter:var(--mapa-filtro); }
 .leaflet-popup-content-wrapper{ border-radius:var(--radius); border:2px solid var(--ink); box-shadow:4px 4px 0 var(--celeste); }
