@@ -98,6 +98,8 @@
     color:var(--ink-soft); max-width:42ch; margin:1.1rem 0 0;
   }
   .hero-art{ width:100%; height:auto; margin-top:1.6rem; display:block; }
+  .hero-art .hdot{ opacity:0; animation:hdot .5s ease forwards; }
+  @keyframes hdot{ from{ opacity:0; transform:translateY(4px); } to{ opacity:.9; transform:none; } }
 
   /* ---------- manifiesto ---------- */
   .manifiesto{
@@ -240,6 +242,20 @@
   .fuentes p{ font-size:.85rem; color:var(--ink-soft); max-width:62ch; }
   .sources{ font-family:var(--f-head); font-size:.78rem; display:flex; flex-wrap:wrap; gap:.4rem 1rem; margin-top:.8rem; padding:0; list-style:none; }
   .sources a{ color:var(--celeste-700); }
+  ol.sources{ list-style:decimal; padding-left:1.4rem; flex-direction:column; flex-wrap:nowrap; gap:.35rem; }
+  ol.sources li{ scroll-margin-top:8rem; }
+  ol.sources li:target{ background:var(--celeste-100); border-radius:.25rem; }
+  .ref{ font-family:var(--f-head); font-weight:700; font-size:.7em; text-decoration:none; color:var(--celeste-700); padding:0 .1em; }
+  .ref:hover{ text-decoration:underline; }
+  .era-cite{
+    font-family:var(--f-head); font-size:.76rem; color:var(--ink-soft);
+    margin:-.35rem 0 .75rem !important; padding-left:.6rem; border-left:3px solid var(--celeste);
+  }
+  .titulos-nota{
+    font-size:.85rem; color:var(--ink-soft); max-width:62ch; margin:-.8rem 0 1.6rem;
+    padding:.6rem .8rem; background:var(--celeste-50); border-radius:.4rem;
+  }
+  .placard-back .fuente{ font-family:var(--f-head); font-size:.7rem; color:var(--ink-soft); }
 
   /* ---------- puente al mapa de la red ---------- */
   .cta-red{
@@ -312,7 +328,7 @@
   <section class="hero" id="hero">
     <div class="hero-badge"><span class="dot"></span> Movimiento Nacional · fundado el 30 de septiembre de 1987</div>
     <h1 class="masthead"><span class="l1">CHICXS</span><span class="l2">DEL PUEBLO</span></h1>
-    <p class="hero-sub">Del patronato de menores a "son pueblo, sujetos políticos": la historia del movimiento, desde sus orígenes hasta hoy.</p>
+    <p class="hero-sub">Del patronato de menores a reconocer a lxs chicxs como sujetos políticos: la historia del movimiento, desde sus orígenes hasta hoy.</p>
     <svg class="hero-art" id="heroArt" viewBox="0 0 800 220" width="800" height="220" role="img" aria-label="Ilustración de un sol sobre una red de casas comunitarias unidas por un hilo, creciendo de cinco puntos a cientos">
       <title>De cinco casas a una red nacional, bajo el mismo sol</title>
     </svg>
@@ -327,6 +343,7 @@
       <div class="eyebrow">Casi un siglo de historia, en diez tramos</div>
       <h2>La historia del movimiento</h2>
     </div>
+    <p class="titulos-nota">Los títulos de cada tramo son de elaboración propia. Cuando un título o una frase va <strong>entre comillas</strong>, es una cita textual y se indica quién la dijo y la fuente, con un número que remite a la lista del final.</p>
 
     <div class="timeline">
       <div class="rail" id="rail">
@@ -340,7 +357,7 @@
         <article class="era" id="era-1">
           <div class="era-top"><span class="era-no num">01</span><span class="era-years num">Desde 1919</span></div>
           <h3>Antes de todo: los chicos como objeto de tutela</h3>
-          <p>Desde 1919, la Ley 10.903 —conocida como Ley Agote— le daba al Estado el "patronato" sobre la niñez pobre o abandonada: un juez podía disponer de un chico igual que de un delincuente e internarlo en un instituto sin que mediara ningún delito. Era la doctrina de la "situación irregular": el chico pobre no era sujeto de derechos, sino un problema a corregir.</p>
+          <p>Desde 1919, la Ley 10.903 —conocida como Ley Agote<sup><a class="ref" href="#ref-10" aria-label="Fuente 10">[10]</a></sup>— le daba al Estado el "patronato" sobre la niñez pobre o abandonada: un juez podía disponer de un chico igual que de un delincuente e internarlo en un instituto sin que mediara ningún delito. Era la doctrina de la "situación irregular": el chico pobre no era sujeto de derechos, sino un problema a corregir.</p>
           <p>Ese fue el sistema contra el que, más de sesenta años después, un grupo de educadores del conurbano empezó a organizarse.</p>
           <p>Esto se da en el largo proceso de industrialización por sustitución de importaciones en el que Argentina y sobre todo Buenos Aires recibieron una de las grandes oleadas de inmigrantes provenientes de Europa y aqui se dan los primeros pasos por parte del Estado para intentar resolver esta demanda.</p>
         </article>
@@ -358,12 +375,12 @@
           <h3>Una capilla en Florencio Varela</h3>
           <p>Esos referentes se reúnen en una humilde capilla y firman el acta fundacional del <strong>Movimiento Nacional de los Chicos del Pueblo</strong>. Se declaran independientes de partidos políticos e iglesias, con formas organizativas propias y representación elegida democráticamente en asamblea.</p>
           <button class="era-toggle" data-toggle="q3" aria-expanded="false">¿Por qué "chicos del pueblo"?</button>
-          <blockquote class="era-quote" id="q3">Eligieron llamarse "chicos del pueblo" y no "chicos de la calle" para no estigmatizarlos: la calle era una circunstancia, no una identidad.</blockquote>
+          <blockquote class="era-quote" id="q3">Eligieron llamarse "chicos del pueblo" y no "chicos de la calle" para no estigmatizarlos: la calle era una circunstancia, no una identidad.<sup><a class="ref" href="#ref-3" aria-label="Fuente 3">[3]</a></sup></blockquote>
         </article>
 
         <article class="era" id="era-4">
           <div class="era-top"><span class="era-no num">04</span><span class="era-years num">1988 – 1990</span></div>
-          <h3>"Sin trabajo no hay infancia"</h3>
+          <h3>Primeros encuentros, primeras denuncias</h3>
           <p>En 1988 organizan su primer encuentro en la sede de la CGT. El Movimiento denuncia tempranamente la violencia contra la niñez pobre: las matanzas de Formosa (1989), Tigre (1992) y Canning (1994) —esta última acompañados por el cantante Joan Manuel Serrat—.</p>
           <p>En 1990 realizan el <strong>Primer Encuentro Latinoamericano de los Chicos del Pueblo</strong>, con presencia de 18 países.</p>
           <p>Hoy en dia tambien se suman para dar respaldo al movimiento las dos CTA junto con la CGT, esto manifiesta la importancia del movimiento obrero en respaldo del movimientode los chicos del pueblo.</p>
@@ -372,21 +389,21 @@
         <article class="era" id="era-5">
           <div class="era-top"><span class="era-no num">05</span><span class="era-years num">Años 90</span></div>
           <h3>De un puñado de educadores a una red nacional</h3>
-          <p>En 1997, lo que era un pequeño grupo se transforma en un Encuentro de Educadores de 2.000 personas en Mar del Plata. Ahí deciden incorporarse a la CTA (Central de Trabajadores de la Argentina), ya nucleando a cientos de organizaciones de todo el país, bajo el lema que los definiría: <em>"El hambre es un crimen."</em></p>
+          <p>En 1997, lo que era un pequeño grupo se transforma en un Encuentro de Educadores de 2.000 personas en Mar del Plata. Ahí deciden incorporarse a la CTA (Central de Trabajadores de la Argentina), ya nucleando a cientos de organizaciones de todo el país, bajo el lema que los definiría: <em>"El hambre es un crimen"</em>, acuñado por Alberto Morlachetti.<sup><a class="ref" href="#ref-11" aria-label="Fuente 11">[11]</a></sup></p>
         </article>
 
         <article class="era" id="era-6">
           <div class="era-top"><span class="era-no num">06</span><span class="era-years num">1999 – 2001</span></div>
           <h3>Un reconocimiento y una nueva crisis</h3>
           <p>En 1999, la Organización de las Naciones Unidas distingue a Pelota de Trapo con el Premio a la Vida y a la Obra.</p>
-          <p>En 2001, en la crisis social más profunda de la Argentina reciente, comienzan las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>, junto a la CTA, bajo "El hambre es un crimen" y "Ni un pibe menos". En esos años también atraviesan persecución: el Movimiento denunció ocho atentados en un solo año, incluyendo la toma armada de la imprenta de Pelota de Trapo y el secuestro de educadores.</p>
+          <p>En 2001, en la crisis social más profunda de la Argentina reciente, comienzan las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>, junto a la CTA, bajo "El hambre es un crimen". En esos años también atraviesan persecución: el Movimiento denunció ocho atentados en un solo año, incluyendo la toma armada de la imprenta de Pelota de Trapo y el secuestro de educadores.</p>
         </article>
 
         <article class="era" id="era-7">
           <div class="era-top"><span class="era-no num">07</span><span class="era-years num">2002 – 2005</span></div>
           <h3>Las Marchas por la Vida</h3>
           <p>El 28 de octubre de 2002, cientos de chicos parten desde Iguazú, Misiones, hacia Plaza de Mayo en la primera Marcha por la Vida, con el respaldo del escritor Ernesto Sábato, el cantante Joan Manuel Serrat y el Nobel de la Paz Adolfo Pérez Esquivel.</p>
-          <p>En 2005 la Tercera Marcha por la Vida recorre 4.500 km desde Tucumán con unos 400 chicos y 100 educadores, y llega a Plaza de Mayo el 1° de julio. Ese mismo año, el 28 de septiembre, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
+          <p>En 2005 la Tercera Marcha por la Vida recorre 4.500 km desde Tucumán con unos 400 chicos y 100 educadores, y llega a Plaza de Mayo el 1° de julio. Ese mismo año, el 28 de septiembre, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong><sup><a class="ref" href="#ref-9" aria-label="Fuente 9">[9]</a></sup>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
         </article>
 
         <article class="era" id="era-8">
@@ -403,10 +420,11 @@
 
         <article class="era" id="era-10">
           <div class="era-top"><span class="era-no num">10</span><span class="era-years num">2020s · hoy</span></div>
-          <h3>"No son del pueblo: son pueblo"</h3>
-          <p>El Movimiento sigue activo, denunciando que la "criminalidad del hambre" que señalaban hace más de 40 años sigue vigente en un contexto de altísima pobreza infantil. En noviembre de 2025, miles de chicos y organizaciones volvieron a marchar en la República de los Niños, en La Plata, bajo la consigna "El hambre es una decisión política", reclamando comida garantizada, más plazas y más escuelas.</p>
+          <h3>"La patria son lxs pibxs"</h3>
+          <p class="era-cite">Consigna de las Organizaciones de lxs Chicxs del Pueblo, declaración de 2019<sup><a class="ref" href="#ref-2" aria-label="Fuente 2">[2]</a></sup></p>
+          <p>El Movimiento sigue activo, denunciando que la "criminalidad del hambre" que señalaban hace más de 40 años sigue vigente en un contexto de altísima pobreza infantil. En noviembre de 2025, miles de chicos y organizaciones volvieron a marchar en la República de los Niños, en La Plata, bajo la consigna "El hambre es una decisión política", reclamando comida garantizada, más plazas y más escuelas.<sup><a class="ref" href="#ref-8" aria-label="Fuente 8">[8]</a></sup><sup><a class="ref" href="#ref-14" aria-label="Fuente 14">[14]</a></sup></p>
           <p>La Fundación Pelota de Trapo sigue funcionando en Avellaneda con una Casa del Niño que asiste a unos 200 chicos.</p>
-          <p>Hoy la red se presenta con un lenguaje más inclusivo, como "Organizaciones de lxs Chicxs del Pueblo": mismo origen de 1987, mismas casas, nombre puesto al día. "Somos una gran comunidad de comunidades en donde cada una conserva su total autonomía", resume Paula Salinas, responsable de la comunicación institucional del Movimiento.</p>
+          <p>Hoy la red se presenta con un lenguaje más inclusivo, como "Organizaciones de lxs Chicxs del Pueblo": mismo origen de 1987, mismas casas, nombre puesto al día. "Somos una gran comunidad de comunidades en donde cada una conserva su total autonomía", resume Paula Salinas, responsable de la comunicación institucional del Movimiento.<sup><a class="ref" href="#ref-1" aria-label="Fuente 1">[1]</a></sup></p>
         </article>
 
       </div>
@@ -447,14 +465,16 @@
       <div class="eyebrow">Lo que dicen las pancartas</div>
       <h2>Las consignas de la marcha</h2>
     </div>
+    <p class="titulos-nota">Tocá cada pancarta para ver quién acuñó la consigna y de dónde sale.</p>
     <div class="lemas">
 
       <button class="placard" data-placard aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"El hambre es un crimen"</div></div>
           <div class="placard-face placard-back">
-            <span class="when">Encuentro de educadores, 1997</span>
-            <p>La consigna que resume su denuncia central, y que llevan desde entonces en cada Marcha Nacional.</p>
+            <span class="when">Consigna de Alberto Morlachetti</span>
+            <p>Resume la denuncia central del Movimiento y se repite en cada Marcha Nacional, hasta hoy.</p>
+            <span class="fuente">Fuentes [11] y [4]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -464,8 +484,9 @@
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Con ternura venceremos"</div></div>
           <div class="placard-face placard-back">
-            <span class="when">Método, desde el origen</span>
+            <span class="when">Lema del padre Carlos Cajade</span>
             <p>Su respuesta a la institucionalización: reconstruir vínculos de cuidado en lugar de encerrar a la infancia pobre.</p>
+            <span class="fuente">Fuente [12]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -475,8 +496,9 @@
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Ni un pibe menos"</div></div>
           <div class="placard-face placard-back">
-            <span class="when">Marchas Nacionales, desde 2001</span>
-            <p>Consigna de las marchas junto a la CTA en los años más duros de la crisis social argentina.</p>
+            <span class="when">Marcha Nacional de 2007</span>
+            <p>De Puerto Iguazú a Plaza de Mayo, junto a la CTA: "El hambre es un crimen. Ni un pibe menos".</p>
+            <span class="fuente">Fuente [13]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -484,10 +506,11 @@
 
       <button class="placard" data-placard aria-expanded="false">
         <div class="placard-inner">
-          <div class="placard-face placard-front"><div class="lema">"No son del pueblo: son pueblo"</div></div>
+          <div class="placard-face placard-front"><div class="lema">"La patria son lxs pibxs"</div></div>
           <div class="placard-face placard-back">
-            <span class="when">Idea central, hoy</span>
-            <p>Por qué nunca dijeron "chicos de la calle": los entienden como sujetos políticos, no como una circunstancia a corregir.</p>
+            <span class="when">Declaración de las organizaciones, 2019</span>
+            <p>Lxs chicxs como parte central del pueblo y como sujetos políticos, no como un problema a corregir.</p>
+            <span class="fuente">Fuentes [2] y [4]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -541,18 +564,22 @@
   <section class="fuentes" id="fuentes">
     <div class="eyebrow">Fuentes</div>
     <p>Resumen histórico elaborado a partir de fuentes públicas del Movimiento, normativa oficial y notas periodísticas. Última revisión: septiembre de 2026.</p>
-    <ul class="sources">
-      <li><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: Chicxs del Pueblo (con Paula Salinas)</a></li>
-      <li><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
-      <li><a href="https://pelotadetrapo.org.ar/una-historia-larga-y-sostenida-en-el-tiempo/" target="_blank" rel="noopener">Pelota de Trapo — Una historia larga y sostenida en el tiempo</a></li>
-      <li><a href="https://chicxsdelpueblo.com.ar/quienes-somos/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Quiénes somos</a></li>
-      <li><a href="https://www.boletinsalesiano.com.ar/fallecio-alberto-morlachetti/" target="_blank" rel="noopener">Boletín Salesiano — Falleció Alberto Morlachetti</a></li>
-      <li><a href="https://www.revistacabal.coop/actualidad/movimiento-nacional-los-chicos-del-pueblo" target="_blank" rel="noopener">Revista Cabal — Movimiento Nacional Los Chicos del Pueblo</a></li>
-      <li><a href="https://www.uncuyo.edu.ar/prensa/cuando-los-chicos-del-pueblo-se-ponen-en-marcha" target="_blank" rel="noopener">Prensa UNCUYO — Cuando los chicos del pueblo se ponen en marcha</a></li>
-      <li><a href="https://agencia.farco.org.ar/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Agencia FARCO — Marcha en La Plata, noviembre 2025</a></li>
-      <li><a href="https://www.argentina.gob.ar/normativa/nacional/ley-26061-110778" target="_blank" rel="noopener">Argentina.gob.ar — Ley 26.061</a></li>
-      <li><a href="http://patagoniarebelde.undav.edu.ar/ley-n-10903-de-patronato-de-menores-o-ley-agote/" target="_blank" rel="noopener">UNDAV — Ley N.º 10.903 de Patronato de Menores (Ley Agote)</a></li>
-    </ul>
+    <ol class="sources">
+      <li id="ref-1"><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: Chicxs del Pueblo (con Paula Salinas)</a></li>
+      <li id="ref-2"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
+      <li id="ref-3"><a href="https://pelotadetrapo.org.ar/una-historia-larga-y-sostenida-en-el-tiempo/" target="_blank" rel="noopener">Pelota de Trapo — Una historia larga y sostenida en el tiempo</a></li>
+      <li id="ref-4"><a href="https://chicxsdelpueblo.com.ar/quienes-somos/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Quiénes somos</a></li>
+      <li id="ref-5"><a href="https://www.boletinsalesiano.com.ar/fallecio-alberto-morlachetti/" target="_blank" rel="noopener">Boletín Salesiano — Falleció Alberto Morlachetti</a></li>
+      <li id="ref-6"><a href="https://www.revistacabal.coop/actualidad/movimiento-nacional-los-chicos-del-pueblo" target="_blank" rel="noopener">Revista Cabal — Movimiento Nacional Los Chicos del Pueblo</a></li>
+      <li id="ref-7"><a href="https://www.uncuyo.edu.ar/prensa/cuando-los-chicos-del-pueblo-se-ponen-en-marcha" target="_blank" rel="noopener">Prensa UNCUYO — Cuando los chicos del pueblo se ponen en marcha</a></li>
+      <li id="ref-8"><a href="https://agencia.farco.org.ar/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Agencia FARCO — Marcha en La Plata, noviembre 2025</a></li>
+      <li id="ref-9"><a href="https://www.argentina.gob.ar/normativa/nacional/ley-26061-110778" target="_blank" rel="noopener">Argentina.gob.ar — Ley 26.061</a></li>
+      <li id="ref-10"><a href="http://patagoniarebelde.undav.edu.ar/ley-n-10903-de-patronato-de-menores-o-ley-agote/" target="_blank" rel="noopener">UNDAV — Ley N.º 10.903 de Patronato de Menores (Ley Agote)</a></li>
+      <li id="ref-11"><a href="https://www.ctacapital.org/alberto-morlachetti-el-hombre-que-torcio-el-destino-de-los-mas-debiles/" target="_blank" rel="noopener">CTA Capital — Alberto Morlachetti: el hombre que torció el destino de los más débiles</a></li>
+      <li id="ref-12"><a href="https://www.0221.com.ar/la-plata/el-dia-que-murio-carlos-cajade-y-la-plata-perdio-al-protector-los-chicos-la-calle-n117823" target="_blank" rel="noopener">0221 — El día que murió Carlos Cajade (lema "Con ternura venceremos")</a></li>
+      <li id="ref-13"><a href="https://misionesonline.net/2007/05/08/la-marcha-de-los-chicos-del-pueblo-se-hizo-sentir-en-posadas/" target="_blank" rel="noopener">MisionesOnline — La marcha de los Chicos del Pueblo se hizo sentir en Posadas (2007)</a></li>
+      <li id="ref-14"><a href="https://argentina.indymedia.org/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Indymedia Argentina — Marcha contra el hambre en La Plata, noviembre 2025</a></li>
+    </ol>
 
   </section>
 
@@ -614,16 +641,32 @@
   }
   houseXs.forEach(function(x){ svg.appendChild(house(x, baseY, 1)); });
 
+  // de 5 casas a más de 400: 395 puntos más, cada vez más densos y dispersos hacia la derecha
+  var seed = 1987;
+  function rnd(){ seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
   var cluster = el('g', {'aria-hidden':'true'});
-  var n = 46;
+  var n = 395, x0 = 418, x1 = 792;
+  var dots = [];
   for (var j=0;j<n;j++){
-    var t = j/n;
-    var cx = 410 + t*370 + (Math.sin(j*12.9)+1)*6;
-    var cy = baseY + Math.sin(j*3.7)*26*t;
-    var r = 6 - t*4.2;
-    cluster.appendChild(el('circle',{cx:cx,cy:cy,r:Math.max(r,1.4), fill:'var(--marigold-deep)', opacity: (0.85 - t*0.65).toFixed(2)}));
+    var t = Math.pow(rnd(), 0.45);          // exponente < 1: se acumulan hacia la derecha
+    var cx = x0 + t*(x1 - x0);
+    var spread = 4 + t*t*56;                // la nube se abre a medida que crece la red
+    var cy = baseY + (rnd() + rnd() - 1) * spread;
+    cy = Math.min(Math.max(cy, 104), 214);
+    dots.push({x:cx, y:cy, t:t});
   }
+  dots.sort(function(a,b){ return a.x - b.x; });
+  dots.forEach(function(d, k){
+    var c = el('circle',{cx:d.x.toFixed(1), cy:d.y.toFixed(1), r:(2.9 - d.t*1.1).toFixed(2),
+      fill: k % 9 === 0 ? 'var(--ink)' : (k % 3 === 0 ? 'var(--celeste)' : 'var(--celeste-700)')});
+    if (!reduced){ c.setAttribute('class','hdot'); c.style.animationDelay = (0.3 + d.t*1.8).toFixed(2) + 's'; }
+    cluster.appendChild(c);
+  });
   svg.appendChild(cluster);
+  var lblStyle = {'font-family':'Archivo, sans-serif','font-weight':700,'font-size':12,'letter-spacing':'.06em',fill:'var(--ink-soft)'};
+  var lbl1 = el('text', Object.assign({x:230, y:212, 'text-anchor':'middle'}, lblStyle)); lbl1.textContent = '1987 · 5 CASAS';
+  var lbl2 = el('text', Object.assign({x:792, y:92, 'text-anchor':'end'}, lblStyle)); lbl2.textContent = 'HOY · MÁS DE 400 ORGANIZACIONES';
+  svg.appendChild(lbl1); svg.appendChild(lbl2);
 
   /* ---- scroll reveal for era cards ---- */
   var eras = document.querySelectorAll('.era');
