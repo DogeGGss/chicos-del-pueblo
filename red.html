@@ -154,6 +154,16 @@
             <button class="pill" type="button" data-av-filtro="convoca" aria-pressed="false">Convocatorias</button>
             <button class="pill pill--mias" type="button" data-av-filtro="mias" aria-pressed="false" id="filtroMias" hidden>Mis publicaciones <span class="tab-count num" id="cuentaMias"></span></button>
           </div>
+          <div class="avisos-orden" id="avisosOrden" hidden>
+            <span id="avisosOrdenTexto"></span>
+            <label class="orden-sel">
+              <span class="sr-only">Ordenar avisos</span>
+              <select id="ordenAvisos" class="field-control">
+                <option value="cerca">Más cercanos primero</option>
+                <option value="recientes">Más recientes primero</option>
+              </select>
+            </label>
+          </div>
           <ul class="avisos" id="avisosList" aria-label="Avisos de la red"></ul>
         </div>
       </div>
