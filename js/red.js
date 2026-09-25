@@ -248,8 +248,9 @@
   var cluster = null;
   var zonas = null;
   var marcadores = {};
-  var TILE_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-  var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  // Teselas estándar de OpenStreetMap: gratuitas, sin API key (requieren la atribución).
+  var TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
   function iconoPin(o, sel) {
     return L.divIcon({
@@ -271,7 +272,7 @@
       return;
     }
     mapa = L.map("mapa", { zoomControl: true, scrollWheelZoom: true, minZoom: 3 });
-    L.tileLayer(TILE_URL, { attribution: TILE_ATTR, subdomains: "abcd", maxZoom: 18 }).addTo(mapa);
+    L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(mapa);
     mapa.setView([-35.5, -63.5], 4);
     zonas = L.layerGroup().addTo(mapa);
     cluster = L.markerClusterGroup({
@@ -593,7 +594,7 @@
     if (typeof L === "undefined") return;
     if (!mapaFicha) {
       mapaFicha = L.map("mapaFicha", { scrollWheelZoom: false });
-      L.tileLayer(TILE_URL, { attribution: TILE_ATTR, subdomains: "abcd", maxZoom: 18 }).addTo(mapaFicha);
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(mapaFicha);
       mapaFicha.on("click", function (e) {
         fichaPos = { lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) };
         moverPinFicha();
