@@ -17,6 +17,17 @@
 
   /* Vocabulario común de recursos: lo que una organización necesita
      y lo que otra puede ofrecer se cruzan por estas claves. */
+  /* Para los avisos de tipo "Convocamos": qué clase de actividad es. */
+  window.RED_CONVOCATORIAS = {
+    encuentro:  "Encuentro o reunión",
+    jornada:    "Jornada solidaria",
+    taller:     "Taller o capacitación",
+    marcha:     "Marcha o movilización",
+    festival:   "Festival o actividad cultural",
+    deporte:    "Torneo o actividad deportiva",
+    colecta:    "Colecta o campaña",
+  };
+
   window.RED_RECURSOS = {
     alimentos:     "Alimentos",
     ropa:          "Ropa y calzado",
@@ -301,7 +312,8 @@
       titulo: "Prestamos herramientas de carpintería",
       detalle: "Tenemos una caja de herramientas de sobra (serrucho, martillos, taladro). La podemos prestar por un mes.",
       interesados: 0 },
-    { id: "av-5", orgId: "org-1", tipo: "convoca", recurso: "capacitacion", fecha: "2026-09-18",
+    { id: "av-5", orgId: "org-1", tipo: "convoca", recurso: "encuentro", fecha: "2026-09-18",
+      cuando: "2026-10-04", lugar: "Casa del Niño Semillitas, Avellaneda",
       titulo: "Encuentro de educadorxs de zona sur — sábado 4/10",
       detalle: "Nos juntamos a compartir experiencias de apoyo escolar. Traer algo para compartir. Hay espacio para 40 personas.",
       interesados: 9 },
@@ -317,7 +329,8 @@
       titulo: "Excedente de verduras de la huerta",
       detalle: "Esta temporada la huerta dio de más: acelga, zapallo y huevos. Lo compartimos con comedores de Santa Rosa.",
       interesados: 4 },
-    { id: "av-9", orgId: "org-15", tipo: "convoca", recurso: "voluntarixs", fecha: "2026-09-10",
+    { id: "av-9", orgId: "org-15", tipo: "convoca", recurso: "jornada", fecha: "2026-09-10",
+      cuando: "2026-09-27", lugar: "Centro Comunitario Los Pibes del Sur, Rosario",
       titulo: "Jornada de pintura del centro comunitario",
       detalle: "Sábado 27/9 pintamos el salón. Invitamos a otras organizaciones de Rosario a sumarse con los chicos.",
       interesados: 6 },

@@ -6,6 +6,19 @@
 
   var TIPOS = window.RED_TIPOS;
   var RECURSOS = window.RED_RECURSOS;
+  var CONVOCATORIAS = window.RED_CONVOCATORIAS;
+  // el formulario del tablero cambia según el tipo de aviso
+  var TEXTOS_AVISO = {
+    necesita: { label: "¿Qué necesitan?", opciones: "recursos",
+      titulo: "Ej.: Necesitamos 2 ollas grandes para la olla popular",
+      detalle: "Cantidades, para cuándo lo necesitan, si pueden pasar a buscar…" },
+    ofrece: { label: "¿Qué ofrecen?", opciones: "recursos",
+      titulo: "Ej.: Tenemos ropa de invierno para chicos de 4 a 10 años",
+      detalle: "Qué tienen, cuánto, hasta cuándo y cómo se retira…" },
+    convoca: { label: "Tipo de convocatoria", opciones: "convocatorias",
+      titulo: "Ej.: Jornada de pintura en el centro comunitario",
+      detalle: "A quiénes invitan, qué hay que llevar, cómo anotarse…" },
+  };
   var LOCALIDADES = window.RED_LOCALIDADES;
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -219,6 +232,7 @@
     $("statChicos").textContent = chicos.toLocaleString("es-AR");
     $("statAvisos").textContent = avisos.length;
     $("cuentaAvisos").textContent = avisos.length;
+    window.CDPSesion.guardarCuentaAvisos(avisos.length);
     $("cuentaPendientes").textContent = solicitudes.length || "";
     $("cuentaPedidos").textContent = solicitudes.length || "";
   }
@@ -538,7 +552,7 @@
       var suyos = avisos.filter(function (a) { return a.orgId === o.id; });
       if (suyos.length) {
         html += '<div class="det-sec"><h3>Sus avisos en el tablero</h3><ul class="matches">' + suyos.map(function (a) {
-          return "<li><strong>" + esc(etiquetaAviso(a.tipo)) + ":</strong> " + esc(a.titulo) + "</li>";
+          return "<li><strong>" + esc(etiquetaAviso(a.tipo)) + ":</strong> " + esc(a.titulo) + (a.cuando ? " (" + fecha(a.cuando) + ")" : "") + "</li>";
         }).join("") + "</ul></div>";
       }
     }
@@ -578,6 +592,23 @@
 
   /* ---------------- tablero ---------------- */
   function etiquetaAviso(t) { return { necesita: "Necesitan", ofrece: "Ofrecen", convoca: "Convocatoria" }[t]; }
+  function etiquetaRecurso(a) {
+    if (a.tipo === "convoca") return CONVOCATORIAS[a.recurso] || "Actividad";
+    return RECURSOS[a.recurso] || "Otra cosa";
+  }
+
+  function opcionesAviso(tipo) {
+    var t = TEXTOS_AVISO[tipo];
+    var fuente = t.opciones === "convocatorias" ? CONVOCATORIAS : RECURSOS;
+    $("avRecursoLabel").textContent = t.label;
+    $("avRecurso").innerHTML = Object.keys(fuente).map(function (k) {
+      return '<option value="' + k + '">' + esc(fuente[k]) + "</option>";
+    }).join("") + (tipo === "convoca" ? "" : '<option value="otro">Otra cosa (la aclaran en el título)</option>');
+    $("avTitulo").placeholder = t.titulo;
+    $("avDetalle").placeholder = t.detalle;
+    $("avConvoca").hidden = tipo !== "convoca";
+    $("avCuando").required = tipo === "convoca";
+  }
 
   function renderAvisos() {
     var ul = $("avisosList");
@@ -599,10 +630,11 @@
           (hecho ? "✓ Avisado" : txt) + "</button>";
       }
       return '<li class="aviso aviso--' + a.tipo + (a.nuevo ? " is-new" : "") + '">' +
-        '<div class="aviso-top"><span class="aviso-kind">' + etiquetaAviso(a.tipo) + '</span><span class="tag tag--neutral">' + esc(RECURSOS[a.recurso]) + "</span>" +
+        '<div class="aviso-top"><span class="aviso-kind">' + etiquetaAviso(a.tipo) + '</span><span class="tag tag--neutral">' + esc(etiquetaRecurso(a)) + "</span>" +
         (propio ? '<span class="tag tag--ofrece">Tu aviso</span>' : "") +
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
+        (a.cuando ? '<p class="aviso-evento">📅 ' + fecha(a.cuando) + (a.lugar ? " · 📍 " + esc(a.lugar) : "") + "</p>" : "") +
         (a.detalle ? "<p>" + esc(a.detalle) + "</p>" : "") +
         '<div class="aviso-foot"><span class="aviso-org">' +
         (o ? '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button> · " + esc(o.localidad) : "") +
@@ -614,9 +646,10 @@
   }
 
   function initTablero() {
-    var sel = $("avRecurso");
-    Object.keys(RECURSOS).forEach(function (k) {
-      sel.insertAdjacentHTML("beforeend", '<option value="' + k + '">' + esc(RECURSOS[k]) + "</option>");
+    opcionesAviso("necesita");
+    $("avCuando").min = HOY;
+    document.querySelectorAll('input[name="avTipo"]').forEach(function (r) {
+      r.addEventListener("change", function () { opcionesAviso(r.value); });
     });
     document.querySelectorAll("[data-av-filtro]").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -651,14 +684,23 @@
     $("formAviso").addEventListener("submit", function (e) {
       e.preventDefault();
       var titulo = $("avTitulo").value.trim();
-      if (!titulo) { $("avTitulo").setAttribute("aria-invalid", "true"); $("avTitulo").focus(); return; }
-      $("avTitulo").removeAttribute("aria-invalid");
       var tipo = this.querySelector('input[name="avTipo"]:checked').value;
-      avisos.push({
+      var cuando = tipo === "convoca" ? $("avCuando").value : "";
+      var faltan = [];
+      if (tipo === "convoca" && !cuando) faltan.push("avCuando");
+      if (!titulo) faltan.push("avTitulo");
+      ["avCuando", "avTitulo"].forEach(function (id) {
+        if (faltan.indexOf(id) !== -1) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid");
+      });
+      if (faltan.length) { $(faltan[0]).focus(); return; }
+      var aviso = {
         id: "av-" + Date.now(), orgId: sesion.orgId, tipo: tipo, recurso: $("avRecurso").value,
         fecha: HOY, titulo: titulo, detalle: $("avDetalle").value.trim(), interesados: 0, nuevo: true,
-      });
+      };
+      if (tipo === "convoca") { aviso.cuando = cuando; aviso.lugar = $("avLugar").value.trim(); }
+      avisos.push(aviso);
       this.reset();
+      opcionesAviso("necesita");
       avisoFiltro = "";
       document.querySelectorAll("[data-av-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-av-filtro") === "" ? "true" : "false"); });
       renderAvisos();

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/marca.css?v=7">
+<link rel="stylesheet" href="css/marca.css?v=8">
 <style>
   /* la paleta viene de css/marca.css; estos alias mantienen los nombres usados abajo */
   :root{
@@ -319,7 +319,7 @@
       <div class="nav-links">
         <a href="index.html" aria-current="page">Historia</a>
         <a href="red.html">Mapa de la red</a>
-        <a href="red.html#tablero">Tablero</a>
+        <a href="red.html#tablero" class="nav-vista">Tablero <span class="tab-count num" id="cuentaAvisos"></span></a>
         <a href="red.html#acceso" data-rol-link="visitante">Solicitar acceso</a>
         <a href="red.html#ficha" data-rol-link="org" hidden>Mi organización</a>
         <a href="red.html#coord" data-rol-link="coord" hidden>Coordinación</a>
@@ -653,7 +653,8 @@
   </div>
 </footer>
 
-<script src="js/sesion.js?v=7"></script>
+<script src="js/red-datos.js?v=8"></script>
+<script src="js/sesion.js?v=8"></script>
 <script>
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

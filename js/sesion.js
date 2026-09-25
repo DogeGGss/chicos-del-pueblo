@@ -7,6 +7,7 @@
   "use strict";
 
   var CLAVE = "cdp_sesion";
+  var CLAVE_AVISOS = "cdp_avisos";
 
   function leer() {
     try {
@@ -19,6 +20,17 @@
       if (s) window.sessionStorage.setItem(CLAVE, JSON.stringify(s));
       else window.sessionStorage.removeItem(CLAVE);
     } catch (e) { /* sin almacenamiento: la sesión dura hasta recargar */ }
+  }
+  // cantidad de avisos del tablero, para mostrarla también en Historia
+  function guardarCuentaAvisos(n) {
+    try { window.sessionStorage.setItem(CLAVE_AVISOS, String(n)); } catch (e) { /* sin almacenamiento */ }
+  }
+  function leerCuentaAvisos() {
+    try {
+      var v = window.sessionStorage.getItem(CLAVE_AVISOS);
+      if (v !== null) return +v;
+    } catch (e) { /* sin almacenamiento */ }
+    return window.RED_AVISOS ? window.RED_AVISOS.length : null;
   }
   function esc(s) {
     return String(s == null ? "" : s)
@@ -36,7 +48,8 @@
       '<button type="button" class="btn-salir" id="btnSalir">Salir</button>';
   }
 
-  window.CDPSesion = { leer: leer, guardar: guardar, iniciales: iniciales, htmlSesion: htmlSesion, esc: esc };
+  window.CDPSesion = { leer: leer, guardar: guardar, iniciales: iniciales, htmlSesion: htmlSesion, esc: esc,
+    guardarCuentaAvisos: guardarCuentaAvisos, leerCuentaAvisos: leerCuentaAvisos };
 
   /* En las páginas que no son el mapa (Historia), la barra celeste muestra
      el botón del rol y la sesión; red.js maneja la suya. */
@@ -45,6 +58,9 @@
 
   function render() {
     var s = leer();
+    var cuenta = document.getElementById("cuentaAvisos");
+    var n = leerCuentaAvisos();
+    if (cuenta && n !== null) cuenta.textContent = n;
     var rol = s ? s.rol : "visitante";
     document.querySelectorAll("[data-rol-link]").forEach(function (a) {
       a.hidden = a.getAttribute("data-rol-link") !== rol;

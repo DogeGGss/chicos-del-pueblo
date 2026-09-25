@@ -131,6 +131,8 @@
 .seg input:checked + span{ background:var(--ink); border-color:var(--ink); color:#fff; }
 .seg input:focus-visible + span{ outline:3px solid var(--focus); outline-offset:2px; }
 
+.av-convoca{ gap:.6rem; }
+.aviso-evento{ font-size:.85rem; font-weight:600; color:var(--celeste-900); margin:0 0 .45rem !important; }
 .avisos-filtros{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.8rem; }
 .avisos{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.75rem; }
 .aviso{
