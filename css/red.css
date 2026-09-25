@@ -3,37 +3,37 @@
    ========================================================== */
 .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 1.5rem; }
 
-/* ---------- sub-navegación (pestañas + rol) ---------- */
-.subnav{ background:var(--paper); border-bottom:1px solid var(--line); box-shadow:0 2px 10px var(--shadow); }
-.subnav-inner{
-  max-width:var(--wrap); margin:0 auto; padding:.45rem 1.5rem;
-  display:flex; align-items:center; gap:.8rem 1.2rem; flex-wrap:wrap;
-}
-.tabs{ display:flex; gap:.3rem; flex:1; min-width:0; overflow-x:auto; scrollbar-width:none; }
-.tabs::-webkit-scrollbar{ display:none; }
-.tab{
-  font-family:var(--f-head); font-weight:700; font-size:.8rem; letter-spacing:.03em;
-  padding:.5rem .85rem; border-radius:999px; border:1.5px solid transparent;
-  background:none; color:var(--ink-soft); cursor:pointer; white-space:nowrap;
-  display:inline-flex; align-items:center; gap:.4rem;
-}
-.tab:hover{ background:var(--celeste-50); color:var(--ink); }
-.tab[aria-selected="true"]{ background:var(--celeste-100); border-color:var(--celeste); color:var(--ink); }
+/* ---------- barra celeste: vistas según el rol + sesión ---------- */
+.site-nav-inner--app{ overflow:visible; gap:.6rem; }
+.nav-links{ display:flex; align-items:stretch; min-width:0; flex:1; overflow-x:auto; scrollbar-width:none; }
+.nav-links::-webkit-scrollbar{ display:none; }
+.site-nav .nav-vista{ display:inline-flex; align-items:center; gap:.4rem; }
+.nav-links > a{ display:inline-flex; align-items:center; }
 .tab-count{
-  font-size:.68rem; min-width:1.35rem; padding:.05rem .35rem; border-radius:999px;
-  background:var(--ink); color:#fff; text-align:center;
+  font-family:var(--f-head); font-size:.66rem; font-weight:800; letter-spacing:0;
+  min-width:1.35rem; padding:.05rem .35rem; border-radius:999px;
+  background:var(--ink); color:#fff; text-align:center; line-height:1.4;
 }
 .tab-count:empty{ display:none; }
-.tab-count--alert{ background:var(--celeste-700); }
-.rol{ display:flex; align-items:center; gap:.5rem; }
-.rol-label{
-  font-family:var(--f-head); font-weight:700; font-size:.68rem;
-  text-transform:uppercase; letter-spacing:.08em; color:var(--ink-mute);
+.site-nav .nav-vista[aria-current="true"] .tab-count{ background:var(--celeste); color:var(--ink); }
+
+.nav-sesion{ display:flex; align-items:center; gap:.45rem; flex-shrink:0; padding:.35rem 0; }
+.site-nav .nav-sesion button{
+  font-family:var(--f-head); font-weight:700; font-size:.78rem; text-transform:none; letter-spacing:.01em;
+  display:inline-flex; align-items:center; gap:.45rem; padding:.38rem .8rem .38rem .4rem;
+  border:2px solid var(--ink); border-radius:999px; background:var(--paper); color:var(--ink); cursor:pointer;
 }
-.rol-select{
-  font:inherit; font-size:.85rem; padding:.38rem .6rem; border-radius:999px;
-  border:1.5px solid var(--ink); background:var(--paper); color:var(--ink); max-width:62vw;
+.site-nav .nav-sesion button:hover{ background:var(--celeste-50); }
+.site-nav .nav-sesion .btn-salir{ padding:.38rem .75rem; background:transparent; }
+.g-dot, .avatar{
+  width:1.55rem; height:1.55rem; border-radius:50%; flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--f-head); font-weight:800; font-size:.78rem;
 }
+.g-dot{ background:var(--paper); border:1.5px solid var(--line-strong); color:#4285F4; }
+.avatar{ background:var(--ink); color:var(--celeste); }
+.sesion-quien{ display:flex; flex-direction:column; line-height:1.1; text-align:left; }
+.sesion-quien small{ font-family:var(--f-body); font-weight:600; font-size:.66rem; color:var(--ink-soft); }
 
 .demo-banner{
   background:var(--celeste-50); border-bottom:1px solid var(--celeste-100);
@@ -72,7 +72,7 @@
 
 /* ---------- listado + mapa ---------- */
 .split{ display:grid; grid-template-columns:minmax(0, 5fr) minmax(0, 7fr); gap:1.2rem; align-items:start; }
-.split-map{ position:sticky; top:8.4rem; }
+.split-map{ position:sticky; top:4.6rem; }
 .mapa{
   height:min(68vh, 640px); border-radius:var(--radius); border:2px solid var(--ink);
   background:var(--celeste-50); z-index:0;
@@ -149,7 +149,7 @@
 
 /* ---------- tablero ---------- */
 .tablero{ display:grid; grid-template-columns:minmax(0, 4fr) minmax(0, 8fr); gap:1.4rem; align-items:start; }
-.publicar{ position:sticky; top:8.4rem; box-shadow:5px 5px 0 var(--celeste); }
+.publicar{ position:sticky; top:4.6rem; box-shadow:5px 5px 0 var(--celeste); }
 .form-stack{ display:flex; flex-direction:column; gap:.8rem; }
 .seg{ display:flex; flex-wrap:wrap; gap:.35rem; }
 .seg label{ cursor:pointer; }
@@ -221,6 +221,72 @@
 .solicitud-actions{ display:flex; gap:.5rem; margin-top:.5rem; flex-wrap:wrap; }
 .cambios{ font-size:.82rem; margin:.2rem 0 0; padding-left:1.1rem; color:var(--ink-soft); }
 
+/* ---------- solicitar acceso ---------- */
+.acceso-grid{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:1.4rem; align-items:start; }
+.acceso-info{ display:flex; flex-direction:column; gap:1rem; }
+.card--nota{ background:var(--celeste-50); border-style:dashed; }
+.tabla-wrap{ overflow-x:auto; }
+table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88rem; }
+.roles th, .roles td, .cuentas th, .cuentas td{ text-align:left; vertical-align:top; padding:.55rem .6rem; border-bottom:1px solid var(--line); }
+.roles thead th, .cuentas thead th{
+  font-family:var(--f-head); font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-soft);
+  border-bottom:2px solid var(--ink);
+}
+.roles tbody th{ font-family:var(--f-head); font-weight:800; white-space:nowrap; }
+.roles tbody tr:last-child th, .roles tbody tr:last-child td{ border-bottom:0; }
+.pasos{ margin:0 0 .8rem; padding-left:1.2rem; font-size:.9rem; }
+.pasos li{ margin-bottom:.35rem; }
+
+/* ---------- coordinación ---------- */
+.bloque-title{ font-size:1.05rem; text-transform:uppercase; letter-spacing:.03em; margin:2rem 0 .8rem; display:flex; align-items:center; gap:.5rem; }
+.bloque-title:first-of-type{ margin-top:.4rem; }
+.cuentas-buscar{ max-width:420px; margin-bottom:.7rem; }
+.cuentas-card{ padding:.3rem .6rem; }
+.cuentas td:first-child{ min-width:12rem; }
+.cuentas td:last-child{ text-align:right; white-space:nowrap; }
+.cuentas .org-meta{ display:block; }
+.mails{ display:flex; flex-wrap:wrap; gap:.35rem; align-items:center; }
+.mail{
+  display:inline-flex; align-items:center; gap:.3rem; font-size:.8rem; font-weight:600;
+  padding:.18rem .3rem .18rem .6rem; border-radius:999px; background:var(--celeste-100); border:1.5px solid var(--celeste);
+}
+.mail--solo{ padding-right:.6rem; }
+.mail button{
+  width:1.3rem; height:1.3rem; border-radius:50%; border:0; background:transparent; cursor:pointer;
+  font-size:.8rem; line-height:1; color:var(--ink);
+}
+.mail button:hover{ background:var(--paper); }
+.mail-add{ display:inline-flex; gap:.3rem; }
+.mail-add input{ font:inherit; font-size:.8rem; padding:.25rem .55rem; border-radius:999px; border:1.5px solid var(--line-strong); width:13rem; max-width:52vw; }
+.sin-cuentas{ font-size:.8rem; color:var(--warn); font-weight:600; }
+.solicitud .pedido-mail{ font-size:.86rem; }
+.solicitud blockquote{ margin:.2rem 0 0; padding:.45rem .7rem; background:var(--celeste-50); border-left:3px solid var(--celeste); font-size:.86rem; font-style:italic; }
+
+/* ---------- selector simulado de Google ---------- */
+.g-head{ display:flex; align-items:center; gap:.6rem; padding-right:2.6rem; margin-bottom:.3rem; }
+.g-head .g-dot{ width:2rem; height:2rem; font-size:1rem; }
+.g-head h2{ margin:0; font-size:1.15rem; text-transform:none; }
+.g-sub{ margin:0 0 1rem; color:var(--ink-soft); font-size:.9rem; }
+.g-cuentas{ list-style:none; margin:0 0 1rem; padding:0; border:1.5px solid var(--line); border-radius:var(--radius); }
+.g-cuentas li + li{ border-top:1px solid var(--line); }
+.g-cuentas button{
+  width:100%; display:flex; align-items:center; gap:.7rem; padding:.7rem .8rem; text-align:left;
+  background:none; border:0; cursor:pointer; font:inherit; color:inherit;
+}
+.g-cuentas button:hover{ background:var(--celeste-50); }
+.g-cuentas .avatar{ width:2.1rem; height:2.1rem; font-size:.9rem; }
+.g-cuentas strong{ display:block; font-size:.92rem; }
+.g-cuentas small{ color:var(--ink-soft); font-size:.8rem; }
+.g-nota{ margin-left:auto; font-size:.72rem; font-weight:700; color:var(--ink-soft); text-align:right; }
+.g-otra{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:flex-end; margin-bottom:1rem; }
+.g-otra .field{ flex:1; min-width:12rem; }
+.g-aviso{ font-size:.78rem; color:var(--ink-mute); margin:0; padding-top:.8rem; border-top:1px dashed var(--line-strong); }
+.rechazo{ text-align:center; padding:.6rem 0 .2rem; }
+.rechazo .big{ font-size:2.4rem; line-height:1; }
+.rechazo h2{ margin:.5rem 0; font-size:1.3rem; text-transform:none; }
+.rechazo p{ color:var(--ink-soft); margin:0 auto 1rem; max-width:42ch; }
+.rechazo .det-actions{ justify-content:center; }
+
 /* ---------- modal ---------- */
 .modal{
   border:2px solid var(--ink); border-radius:.7rem; padding:0; width:min(640px, calc(100vw - 2rem));
@@ -271,9 +337,10 @@
 }
 @media (max-width:640px){
   .wrap{ padding:0 1rem; }
-  .subnav-inner{ padding:.4rem 1rem; }
-  .rol{ width:100%; }
-  .rol-select{ flex:1; max-width:none; }
+  .sesion-quien, .g-texto{ display:none; }
+  .site-nav .nav-sesion button{ padding:.32rem; }
+  .site-nav .nav-sesion .btn-salir{ padding:.32rem .6rem; }
+  .acceso-grid{ grid-template-columns:1fr; }
   .vista{ padding-top:1.3rem; }
   .stats{ grid-template-columns:repeat(2, minmax(0,1fr)); }
   .filtros{ grid-template-columns:1fr; }

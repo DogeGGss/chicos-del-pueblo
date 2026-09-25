@@ -237,26 +237,47 @@
       descripcion: "Comedor en barrio de la zona norte. Ropero y peluquería social una vez por mes.",
       necesita: ["alimentos", "abrigo"], ofrece: ["ropa"] }),
 
-    /* solicitudes pendientes de revisión (aparecen en el panel de Coordinación) */
+    /* pedidos de acceso pendientes (aparecen en el panel de Coordinación) */
     org({ nombre: "Biblioteca Popular Letras al Viento", tipo: "apoyo", localidad: "Avellaneda",
       referente: "Hernán Lucero", edades: "5 a 15 años", chicos: 30,
       horarios: "Sábados de 10 a 13",
       descripcion: "Biblioteca popular con cuentacuentos y apoyo escolar los sábados.",
-      necesita: ["libros"], ofrece: ["espacio"], estado: "pendiente" }),
+      necesita: ["libros"], ofrece: ["espacio"], estado: "pendiente",
+      emailSolicitud: "hernan.lucero@example.com",
+      mensaje: "Participamos de los encuentros de zona sur desde 2024. Nos conoce Casa del Niño Semillitas." }),
     org({ nombre: "Olla Popular Barrio Obrero", tipo: "comedor", localidad: "Rosario",
       referente: "Carla Benítez", edades: "Todas las edades", chicos: 90,
       horarios: "Martes y viernes, cena",
       descripcion: "Olla popular que arrancó en 2024. Queremos sumarnos a la red.",
-      necesita: ["alimentos", "cocina"], ofrece: [], estado: "pendiente" }),
+      necesita: ["alimentos", "cocina"], ofrece: [], estado: "pendiente",
+      emailSolicitud: "olla.barrioobrero@example.com",
+      mensaje: "Fuimos a la marcha de noviembre con el Centro Comunitario Los Pibes del Sur y queremos sumarnos a la red." }),
     org({ nombre: "Escuelita de Fútbol Los Cóndores", tipo: "deporte", localidad: "Mendoza",
       referente: "Raúl Aguirre", edades: "6 a 14 años", chicos: 60,
       horarios: "Lunes, miércoles y viernes de 18 a 20",
       descripcion: "Escuela de fútbol infantil gratuita con merienda.",
-      necesita: ["ropa", "transporte"], ofrece: ["espacio"], estado: "pendiente" }),
+      necesita: ["ropa", "transporte"], ofrece: ["espacio"], estado: "pendiente",
+      emailSolicitud: "raul.aguirre@example.com",
+      mensaje: "Somos una escuelita de fútbol gratuita. Todavía no participamos de ningún encuentro de la red." }),
   ];
 
-  /* organización con la que se "inicia sesión" en la demo */
-  window.RED_ORG_DEMO_ID = "org-2";
+  /* Cuentas de Google habilitadas: qué mail pertenece a qué organización (o a la coordinación).
+     En la versión real esta lista vive en el servidor y es el servidor el que la controla. */
+  window.RED_USUARIOS = [
+    { email: "graciela.ortiz@example.com", nombre: "Graciela Ortiz", rol: "org", orgId: "org-2" },
+    { email: "merendero.losgurises@example.com", nombre: "Merendero Los Gurises", rol: "org", orgId: "org-2" },
+    { email: "marta.gimenez@example.com", nombre: "Marta Giménez", rol: "org", orgId: "org-1" },
+    { email: "lucia.paredes@example.com", nombre: "Lucía Paredes", rol: "org", orgId: "org-4" },
+    { email: "coordinacion.red@example.com", nombre: "Coordinación de la red", rol: "coord" },
+  ];
+
+  /* Cuentas que aparecen en el selector simulado de "Ingresar con Google". */
+  window.RED_CUENTAS_DEMO = [
+    { email: "graciela.ortiz@example.com", nombre: "Graciela Ortiz", nota: "Merendero Los Gurises" },
+    { email: "marta.gimenez@example.com", nombre: "Marta Giménez", nota: "Casa del Niño Semillitas" },
+    { email: "coordinacion.red@example.com", nombre: "Coordinación de la red", nota: "Coordinación" },
+    { email: "juan.perez@example.com", nombre: "Juan Pérez", nota: "Cuenta no habilitada" },
+  ];
 
   window.RED_AVISOS = [
     { id: "av-1", orgId: "org-2", tipo: "necesita", recurso: "abrigo", fecha: "2026-09-23",

@@ -24,11 +24,12 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 - **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia, qué necesitan u ofrecen) sincronizado con un mapa Leaflet. Las casas que no quieren mostrar su dirección aparecen como una zona aproximada.
 - **Ficha de cada organización**: qué hacen, edades, horarios y el cruce automático con otras casas que pueden ayudarles o a las que pueden ayudar.
 - **Tablero de la red**: avisos de "necesitamos", "ofrecemos" y convocatorias entre organizaciones.
-- **Sumar organización / Mi organización**: formulario de autoalta y edición con vista previa y punto en el mapa.
-- **Coordinación**: aprobación o rechazo de altas y cambios antes de publicarlos.
-- Selector "Ver como" (Visitante, Organización, Coordinación) para mostrar los tres roles en la demo.
+- **Acceso solo para la red**: mirar es público; publicar es solo para organizaciones con una cuenta de Google habilitada por la coordinación. El ingreso con Google está **simulado** con cuentas de ejemplo (una de ellas no habilitada, para mostrar el rechazo).
+- **Mi organización** (rol organización): edición de la ficha propia con vista previa y punto en el mapa; los cambios se publican al instante.
+- **Solicitar acceso** (visitantes): pedido para que la coordinación habilite una cuenta, junto con la explicación de quién puede hacer qué.
+- **Coordinación**: aprobación de pedidos de acceso, gestión de qué mails pertenecen a cada organización, baja de organizaciones y moderación del tablero.
 
-> Todos los datos del prototipo son **ficticios** (`js/red-datos.js`) y los cambios viven en memoria: se pierden al recargar. El guardado real es el paso siguiente.
+> Todos los datos del prototipo son **ficticios** (`js/red-datos.js`) y los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
 
 La interfaz del mapa se basa en el prototipo "Portal de Talleres" de Ingeniería de Software (UNGS), adaptado a organizaciones sociales.
 
