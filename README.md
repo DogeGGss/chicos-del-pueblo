@@ -17,7 +17,7 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 - Estadísticas animadas (organizaciones, países, kilómetros recorridos, años de trayectoria)
 - Tarjetas con las consignas históricas del movimiento (flip on click), con autor y fuente
 - Títulos propios diferenciados de las citas; cada cita remite a una fuente numerada
-- Fuentes divididas en primarias (testimonio de Paula Salinas) y secundarias, y créditos al pie
+- Fuentes divididas en primarias (charla de Paula Salinas en la materia) y secundarias, y créditos al pie
 
 ### Mapa de la red (prototipo)
 
