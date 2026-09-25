@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de la red · Chicxs del Pueblo</title>
+<meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con tablero para pedir y ofrecer recursos entre ellas.">
+<link rel="icon" href="img/logo-chicxs.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
+<link rel="stylesheet" href="css/marca.css">
+<link rel="stylesheet" href="css/red.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand-row" href="index.html">
+    <img class="brand-logo" src="img/logo-chicxs-grande.png" alt="Logo de Organizaciones de lxs Chicxs del Pueblo" width="170" height="174">
+    <div>
+      <p class="brand-title">Organizaciones de lxs Chicxs del Pueblo</p>
+      <span class="brand-tag">Con ternura venceremos</span>
+    </div>
+  </a>
+</header>
+
+<div class="sticky-top">
+  <nav class="site-nav" aria-label="Secciones del sitio">
+    <div class="site-nav-inner">
+      <a href="index.html">Historia</a>
+      <a href="red.html" aria-current="page">Mapa de la red</a>
+    </div>
+  </nav>
+  <div class="subnav">
+    <div class="subnav-inner">
+      <div class="tabs" role="tablist" aria-label="Herramientas de la red">
+        <button class="tab" role="tab" id="tab-mapa" aria-controls="vista-mapa" aria-selected="true" data-vista="mapa" type="button">Mapa y directorio</button>
+        <button class="tab" role="tab" id="tab-tablero" aria-controls="vista-tablero" aria-selected="false" data-vista="tablero" type="button">Tablero de la red <span class="tab-count num" id="cuentaAvisos"></span></button>
+        <button class="tab" role="tab" id="tab-ficha" aria-controls="vista-ficha" aria-selected="false" data-vista="ficha" type="button"><span id="tabFichaLabel">Sumar organización</span></button>
+        <button class="tab" role="tab" id="tab-coord" aria-controls="vista-coord" aria-selected="false" data-vista="coord" type="button" hidden>Coordinación <span class="tab-count tab-count--alert num" id="cuentaPendientes"></span></button>
+      </div>
+      <label class="rol">
+        <span class="rol-label">Ver como</span>
+        <select id="rolSelect" class="rol-select">
+          <option value="visitante">Visitante</option>
+          <option value="org">Organización (Merendero Los Gurises)</option>
+          <option value="coord">Coordinación de la red</option>
+        </select>
+      </label>
+    </div>
+  </div>
+</div>
+
+<div class="demo-banner" role="note">
+  <strong>Prototipo:</strong> las organizaciones, contactos y avisos son <strong>ficticios</strong> y los cambios no se guardan al recargar.
+</div>
+
+<main>
+
+  <!-- ============ MAPA Y DIRECTORIO ============ -->
+  <section class="vista" id="vista-mapa" role="tabpanel" aria-labelledby="tab-mapa">
+    <div class="wrap">
+      <div class="intro">
+        <div>
+          <div class="eyebrow">Somos una comunidad de comunidades</div>
+          <h1 class="vista-title">Las organizaciones de la red, en el mapa</h1>
+          <p class="vista-lead">Buscá quién trabaja cerca, qué hace cada casa y qué necesita o puede ofrecer a las demás.</p>
+        </div>
+        <dl class="stats" aria-label="La red en números">
+          <div class="stat"><dt>Organizaciones</dt><dd class="num" id="statOrgs">0</dd></div>
+          <div class="stat"><dt>Provincias</dt><dd class="num" id="statProv">0</dd></div>
+          <div class="stat"><dt>Chicxs acompañadxs</dt><dd class="num" id="statChicos">0</dd></div>
+          <div class="stat"><dt>Avisos activos</dt><dd class="num" id="statAvisos">0</dd></div>
+        </dl>
+      </div>
+
+      <div class="filtros" aria-label="Filtros del directorio">
+        <label class="field filtro-buscar">
+          <span class="sr-only">Buscar</span>
+          <input type="search" id="fBuscar" class="field-control" placeholder="Buscar por nombre, localidad, actividad…" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="sr-only">Provincia</span>
+          <select id="fProvincia" class="field-control"><option value="">Todas las provincias</option></select>
+        </label>
+        <label class="field">
+          <span class="sr-only">Recurso</span>
+          <select id="fRecurso" class="field-control">
+            <option value="">Cualquier necesidad u oferta</option>
+          </select>
+        </label>
+        <div class="chips-tipo" id="fTipos" role="group" aria-label="Filtrar por tipo de organización"></div>
+      </div>
+
+      <div class="split">
+        <div class="split-list">
+          <div class="list-head">
+            <span class="list-count num" id="listCount" aria-live="polite">0 organizaciones</span>
+            <button class="linkish" type="button" id="btnLimpiar" hidden>Limpiar filtros</button>
+          </div>
+          <ul class="org-list" id="orgList" aria-label="Listado de organizaciones"></ul>
+        </div>
+        <div class="split-map">
+          <div id="mapa" class="mapa" role="region" aria-label="Mapa de organizaciones"></div>
+          <p class="map-note">Las casas que prefieren no mostrar su dirección aparecen como una zona aproximada (círculo).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TABLERO ============ -->
+  <section class="vista" id="vista-tablero" role="tabpanel" aria-labelledby="tab-tablero" hidden>
+    <div class="wrap">
+      <div class="intro intro--simple">
+        <div class="eyebrow">Lo que sobra en una casa, falta en otra</div>
+        <h1 class="vista-title">Tablero de la red</h1>
+        <p class="vista-lead">Pedidos, ofrecimientos y convocatorias entre organizaciones. Si podés ayudar, avisá con un toque.</p>
+      </div>
+
+      <div class="tablero">
+        <aside class="publicar card" id="publicarCard">
+          <h2 class="card-title">Publicar un aviso</h2>
+          <div id="publicarBloqueado" class="card-text">
+            Para publicar tenés que entrar como organización. En la demo, elegí <strong>“Ver como: Organización”</strong> arriba.
+          </div>
+          <form id="formAviso" class="form-stack" hidden>
+            <div class="seg" role="radiogroup" aria-label="Tipo de aviso">
+              <label><input type="radio" name="avTipo" value="necesita" checked><span>Necesitamos</span></label>
+              <label><input type="radio" name="avTipo" value="ofrece"><span>Ofrecemos</span></label>
+              <label><input type="radio" name="avTipo" value="convoca"><span>Convocamos</span></label>
+            </div>
+            <label class="field">
+              <span class="field-label">Recurso</span>
+              <select id="avRecurso" class="field-control" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Título</span>
+              <input id="avTitulo" class="field-control" maxlength="80" required placeholder="Ej.: Necesitamos 2 ollas grandes">
+            </label>
+            <label class="field">
+              <span class="field-label">Detalle</span>
+              <textarea id="avDetalle" class="field-control" rows="3" maxlength="400" placeholder="Cantidades, plazos, si pueden pasar a buscar…"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Publicar en el tablero</button>
+          </form>
+        </aside>
+
+        <div class="avisos-col">
+          <div class="avisos-filtros" role="group" aria-label="Filtrar avisos">
+            <button class="pill" type="button" data-av-filtro="" aria-pressed="true">Todos</button>
+            <button class="pill" type="button" data-av-filtro="necesita" aria-pressed="false">Necesitan</button>
+            <button class="pill" type="button" data-av-filtro="ofrece" aria-pressed="false">Ofrecen</button>
+            <button class="pill" type="button" data-av-filtro="convoca" aria-pressed="false">Convocatorias</button>
+          </div>
+          <ul class="avisos" id="avisosList" aria-label="Avisos de la red"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FICHA (alta / mi organización) ============ -->
+  <section class="vista" id="vista-ficha" role="tabpanel" aria-labelledby="tab-ficha" hidden>
+    <div class="wrap">
+      <div class="intro intro--simple">
+        <div class="eyebrow" id="fichaEyebrow">Sumate a la red</div>
+        <h1 class="vista-title" id="fichaTitulo">Sumá tu organización</h1>
+        <p class="vista-lead" id="fichaLead">Completá la ficha de tu casa. La coordinación de la red la revisa antes de publicarla en el mapa.</p>
+        <p class="estado-ficha" id="fichaEstado" hidden></p>
+      </div>
+
+      <form id="formFicha" class="ficha" novalidate>
+        <fieldset class="card ficha-bloque">
+          <legend class="card-title">1 · La organización</legend>
+          <div class="grid-2">
+            <label class="field col-2">
+              <span class="field-label">Nombre de la organización *</span>
+              <input id="oNombre" class="field-control" required maxlength="80">
+            </label>
+            <label class="field">
+              <span class="field-label">Tipo *</span>
+              <select id="oTipo" class="field-control" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Referente *</span>
+              <input id="oReferente" class="field-control" required maxlength="60">
+            </label>
+            <label class="field col-2">
+              <span class="field-label">¿Qué hacen? *</span>
+              <textarea id="oDescripcion" class="field-control" rows="3" required maxlength="400" placeholder="Actividades, proyectos, cómo trabajan con lxs chicxs…"></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Edades que acompañan</span>
+              <input id="oEdades" class="field-control" placeholder="Ej.: 6 a 14 años" maxlength="40">
+            </label>
+            <label class="field">
+              <span class="field-label">Cantidad aproximada de chicxs</span>
+              <input id="oChicos" class="field-control" type="number" min="0" max="5000" inputmode="numeric">
+            </label>
+            <label class="field col-2">
+              <span class="field-label">Días y horarios</span>
+              <input id="oHorarios" class="field-control" maxlength="80" placeholder="Ej.: Lunes a viernes de 16 a 19">
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="card ficha-bloque">
+          <legend class="card-title">2 · Dónde están</legend>
+          <div class="grid-2">
+            <label class="field">
+              <span class="field-label">Localidad *</span>
+              <select id="oLocalidad" class="field-control" required></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Dirección</span>
+              <input id="oDireccion" class="field-control" maxlength="80" placeholder="Calle y número (opcional)">
+            </label>
+            <div class="field col-2">
+              <span class="field-label">¿Qué se muestra en el mapa?</span>
+              <div class="seg" role="radiogroup" aria-label="Visibilidad de la ubicación">
+                <label><input type="radio" name="oVisibilidad" value="zona" checked><span>Solo la zona aproximada</span></label>
+                <label><input type="radio" name="oVisibilidad" value="exacta"><span>La dirección exacta</span></label>
+              </div>
+              <span class="field-hint">Para cuidar a lxs chicxs, recomendamos mostrar solo la zona si son un hogar o casa convivencial.</span>
+            </div>
+            <div class="field col-2">
+              <span class="field-label">Marcá el lugar en el mapa</span>
+              <div id="mapaFicha" class="mapa mapa--ficha" role="region" aria-label="Mapa para marcar la ubicación"></div>
+              <span class="field-hint" id="mapaFichaHint">Elegí la localidad y después tocá el mapa para ajustar el punto.</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="card ficha-bloque">
+          <legend class="card-title">3 · Qué necesitan y qué pueden ofrecer</legend>
+          <p class="card-text">Esto es lo que cruza la red: cuando una casa necesita algo que otra ofrece, las dos lo ven en su ficha.</p>
+          <div class="grid-2">
+            <div class="field">
+              <span class="field-label">Necesitamos</span>
+              <div class="check-chips check-chips--necesita" id="oNecesita"></div>
+            </div>
+            <div class="field">
+              <span class="field-label">Podemos ofrecer</span>
+              <div class="check-chips check-chips--ofrece" id="oOfrece"></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="card ficha-bloque">
+          <legend class="card-title">4 · Contacto</legend>
+          <div class="grid-3">
+            <label class="field">
+              <span class="field-label">WhatsApp / teléfono *</span>
+              <input id="oTelefono" class="field-control" required maxlength="30" inputmode="tel">
+            </label>
+            <label class="field">
+              <span class="field-label">Correo</span>
+              <input id="oCorreo" class="field-control" type="email" maxlength="80">
+            </label>
+            <label class="field">
+              <span class="field-label">Redes</span>
+              <input id="oRedes" class="field-control" maxlength="40" placeholder="@usuario">
+            </label>
+          </div>
+          <p class="field-hint" style="margin:.8rem 0 0">Estos datos solo los ven otras organizaciones de la red. Nunca publiques datos personales de lxs chicxs.</p>
+        </fieldset>
+
+        <div class="ficha-acciones">
+          <p class="form-error" id="fichaError" role="alert" hidden></p>
+          <button class="btn" type="button" id="btnVistaPrevia">Vista previa</button>
+          <button class="btn btn-primary" type="submit" id="btnEnviarFicha">Enviar a revisión</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ COORDINACIÓN ============ -->
+  <section class="vista" id="vista-coord" role="tabpanel" aria-labelledby="tab-coord" hidden>
+    <div class="wrap">
+      <div class="intro intro--simple">
+        <div class="eyebrow">Panel de coordinación</div>
+        <h1 class="vista-title">Solicitudes para revisar</h1>
+        <p class="vista-lead">Altas nuevas y cambios de fichas. Al aprobar, la organización aparece (o se actualiza) en el mapa.</p>
+      </div>
+      <ul class="solicitudes" id="solicitudesList"></ul>
+      <p class="vacio" id="solicitudesVacio" hidden>No hay solicitudes pendientes. ¡Todo al día!</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ficha de organización / vista previa -->
+<dialog class="modal" id="modalOrg" aria-labelledby="modalOrgTitulo">
+  <div class="modal-inner" id="modalOrgBody"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <img src="img/logo-chicxs-grande.png" alt="" width="170" height="174">
+    <div>
+      <p class="hand">Con ternura venceremos</p>
+      <p>Prototipo elaborado para la materia <strong>Laboratorio Interdisciplinario: Redes sociales y condiciones de vida — las organizaciones sociales en acción</strong> (UNGS).</p>
+      <p><strong>Grupo 2:</strong> Jonathan Berazza, Juan Tula, Ulises Fonseca y Valentina Arri.</p>
+      <p>Mapa: © colaboradores de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, estilo © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/markercluster/leaflet.markercluster.js"></script>
+<script src="js/red-datos.js"></script>
+<script src="js/red.js"></script>
+</body>
+</html>
