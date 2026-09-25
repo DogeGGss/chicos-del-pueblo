@@ -155,7 +155,12 @@
 .aviso-org{ font-size:.84rem; color:var(--ink-soft); }
 .aviso-org button{ font:inherit; font-weight:700; color:var(--celeste-700); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; }
 .aviso-actions{ display:flex; gap:.5rem; align-items:center; }
-.aviso-int{ font-size:.78rem; color:var(--ink-mute); }
+.aviso-resp{ font-size:.84rem !important; color:var(--ink-soft); margin:0 0 .6rem !important; }
+.aviso-resp button{ font:inherit; font-weight:700; color:var(--celeste-700); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; }
+.aviso-resp--vacio{ font-style:italic; color:var(--ink-mute); }
+.aviso-hint{ font-size:.74rem; color:var(--ink-mute); }
+.btn-bloqueado{ opacity:.6; border-style:dashed; cursor:not-allowed; background:var(--paper); }
+.btn-bloqueado:hover{ background:var(--paper); }
 
 /* ---------- ficha ---------- */
 .ficha{ display:flex; flex-direction:column; gap:1.1rem; }
