@@ -69,6 +69,7 @@
 }
 .org-meta{ font-size:.8rem; color:var(--ink-soft); }
 .org-desc{ font-size:.86rem; margin:.15rem 0 0; color:var(--ink); }
+.org-actions{ grid-column:2; display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; }
 .org-tags{ grid-column:2; display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.35rem; }
 .tag{
   font-size:.72rem; font-weight:600; padding:.12rem .5rem; border-radius:999px;
