@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
 <meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con tablero para pedir y ofrecer recursos entre ellas.">
-<script src="js/tema.js?v=16"></script>
+<script src="js/tema.js?v=17"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=16">
-<link rel="stylesheet" href="css/red.css?v=16">
+<link rel="stylesheet" href="css/marca.css?v=17">
+<link rel="stylesheet" href="css/red.css?v=17">
 </head>
 <body data-app>
 
@@ -69,7 +69,7 @@
         <dl class="stats" aria-label="La red en números">
           <div class="stat"><dt>Organizaciones</dt><dd class="num" id="statOrgs">0</dd></div>
           <div class="stat"><dt>Provincias</dt><dd class="num" id="statProv">0</dd></div>
-          <div class="stat"><dt>Chicxs acompañadxs</dt><dd class="num" id="statChicos">0</dd></div>
+          <div class="stat"><dt>Niñxs y jóvenes</dt><dd class="num" id="statChicos">0</dd></div>
           <div class="stat"><dt>Avisos activos</dt><dd class="num" id="statAvisos">0</dd></div>
         </dl>
       </div>
@@ -185,11 +185,13 @@
       <div class="intro intro--simple">
         <div class="eyebrow">Tu ficha en la red</div>
         <h1 class="vista-title" id="fichaTitulo">Mi organización</h1>
-        <p class="vista-lead">Mantené tus datos al día: horarios, qué necesitan y qué pueden ofrecer. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
+        <p class="vista-lead">Mantené tus datos al día: son las preguntas del cuestionario de la red, más qué necesitan y qué pueden ofrecer. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
         <p class="estado-ficha" id="fichaEstado" hidden></p>
       </div>
 
       <form id="formFicha" class="ficha" novalidate>
+        <p class="leyenda-datos"><span class="dato-badge dato-badge--publico">👀 Se publica</span> lo ven todas las personas que entran al mapa · <span class="dato-badge dato-badge--coord">🔒 Solo coordinación</span> lo ven solo la coordinación y tu organización.</p>
+
         <fieldset class="card ficha-bloque">
           <legend class="card-title">1 · La organización</legend>
           <div class="grid-2">
@@ -198,28 +200,39 @@
               <input id="oNombre" class="field-control" required maxlength="80">
             </label>
             <label class="field">
-              <span class="field-label">Tipo *</span>
+              <span class="field-label">Tipo de organización *</span>
               <select id="oTipo" class="field-control" required></select>
             </label>
+            <label class="field" id="oTipoOtroCampo" hidden>
+              <span class="field-label">¿Qué tipo? *</span>
+              <input id="oTipoOtro" class="field-control" maxlength="40" placeholder="Ej.: Merendero">
+            </label>
             <label class="field">
-              <span class="field-label">Referente *</span>
-              <input id="oReferente" class="field-control" required maxlength="60">
+              <span class="field-label">Personería jurídica</span>
+              <select id="oPersoneria" class="field-control"></select>
+            </label>
+            <label class="field" id="oPersoneriaDetalleCampo" hidden>
+              <span class="field-label">Contanos cuál o en qué situación</span>
+              <input id="oPersoneriaDetalle" class="field-control" maxlength="80">
             </label>
             <label class="field col-2">
               <span class="field-label">¿Qué hacen? *</span>
               <textarea id="oDescripcion" class="field-control" rows="3" required maxlength="400" placeholder="Actividades, proyectos, cómo trabajan con lxs chicxs…"></textarea>
             </label>
-            <label class="field">
-              <span class="field-label">Edades que acompañan</span>
-              <input id="oEdades" class="field-control" placeholder="Ej.: 6 a 14 años" maxlength="40">
-            </label>
-            <label class="field">
-              <span class="field-label">Cantidad aproximada de chicxs</span>
-              <input id="oChicos" class="field-control" type="number" min="0" max="5000" inputmode="numeric">
-            </label>
             <label class="field col-2">
               <span class="field-label">Días y horarios</span>
               <input id="oHorarios" class="field-control" maxlength="80" placeholder="Ej.: Lunes a viernes de 16 a 19">
+            </label>
+          </div>
+          <div class="grid-2 bloque-coord">
+            <p class="col-2 bloque-coord-tit"><span class="dato-badge dato-badge--coord">🔒 Solo coordinación</span></p>
+            <label class="field">
+              <span class="field-label">Nombre y apellido de quien responde *</span>
+              <input id="oReferente" class="field-control" required maxlength="60">
+            </label>
+            <label class="field">
+              <span class="field-label">Rol dentro de la organización</span>
+              <input id="oReferenteRol" class="field-control" maxlength="60" placeholder="Ej.: Coordinación general">
             </label>
           </div>
         </fieldset>
@@ -253,7 +266,7 @@
                   </div>
                 </div>
               </div>
-              <span class="field-hint" id="visHint">Para cuidar a lxs chicxs, recomendamos mostrar solo la zona si son un hogar o casa convivencial. Si los visitantes ven la dirección, la red también la ve.</span>
+              <span class="field-hint" id="visHint">Si por alguna razón no quieren compartir la dirección, no hace falta completarla. Para cuidar a lxs chicxs, recomendamos mostrar solo la zona si son un hogar convivencial. Si los visitantes ven la dirección, la red también la ve.</span>
             </div>
             <div class="field col-2">
               <span class="field-label">Marcá el lugar en el mapa</span>
@@ -264,7 +277,43 @@
         </fieldset>
 
         <fieldset class="card ficha-bloque">
-          <legend class="card-title">3 · Qué necesitan y qué pueden ofrecer</legend>
+          <legend class="card-title">3 · Actividades y personas</legend>
+          <div class="grid-2">
+            <div class="field col-2">
+              <span class="field-label">¿Qué actividades realizan? <small>(marcá todas las que correspondan)</small></span>
+              <div class="check-chips" id="oActividades"></div>
+              <label class="field otro-campo">
+                <span class="field-hint">¿Otras actividades? Escribilas.</span>
+                <input id="oActividadesOtras" class="field-control" maxlength="120" placeholder="Ej.: huerta comunitaria">
+              </label>
+            </div>
+            <div class="field col-2">
+              <span class="field-label">Cantidad aproximada de personas que participan, según su edad</span>
+              <div class="grid-4">
+                <label class="field"><span class="field-hint">Niñxs (1 a 12 años)</span><input id="oNinxs" class="field-control" type="number" min="0" max="9999" inputmode="numeric"></label>
+                <label class="field"><span class="field-hint">Jóvenes (13 a 18 años)</span><input id="oJovenes" class="field-control" type="number" min="0" max="9999" inputmode="numeric"></label>
+                <label class="field"><span class="field-hint">Adultxs (más de 18)</span><input id="oAdultxs" class="field-control" type="number" min="0" max="9999" inputmode="numeric"></label>
+                <div class="field total-campo"><span class="field-hint">Total</span><output id="oTotalPersonas" class="total-num">0</output></div>
+              </div>
+            </div>
+            <label class="field">
+              <span class="field-label">Alcance geográfico <small>(de dónde vienen quienes participan)</small></span>
+              <select id="oAlcance" class="field-control"></select>
+            </label>
+            <div class="field col-2">
+              <span class="field-label">¿Cuántxs educadorxs trabajan? <small>(todas las personas del equipo de trabajo)</small></span>
+              <div class="grid-4">
+                <label class="field"><span class="field-hint">Total</span><input id="oEducTotal" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
+                <label class="field"><span class="field-hint">Mujeres</span><input id="oEducMujeres" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
+                <label class="field"><span class="field-hint">Varones</span><input id="oEducVarones" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
+                <label class="field"><span class="field-hint">Otrxs</span><input id="oEducOtrxs" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="card ficha-bloque">
+          <legend class="card-title">4 · Qué necesitan y qué pueden ofrecer</legend>
           <p class="card-text">Esto es lo que cruza la red: cuando una casa necesita algo que otra ofrece, las dos lo ven en su ficha.</p>
           <div class="grid-2">
             <div class="field">
@@ -287,22 +336,76 @@
         </fieldset>
 
         <fieldset class="card ficha-bloque">
-          <legend class="card-title">4 · Contacto</legend>
-          <div class="grid-3">
+          <legend class="card-title">5 · Contacto y redes</legend>
+          <div class="grid-2">
             <label class="field">
-              <span class="field-label">WhatsApp / teléfono *</span>
+              <span class="field-label">Número de WhatsApp *</span>
               <input id="oTelefono" class="field-control" required maxlength="30" inputmode="tel">
             </label>
             <label class="field">
               <span class="field-label">Correo</span>
               <input id="oCorreo" class="field-control" type="email" maxlength="80">
             </label>
-            <label class="field">
-              <span class="field-label">Redes</span>
-              <input id="oRedes" class="field-control" maxlength="40" placeholder="@usuario">
-            </label>
+            <div class="field col-2">
+              <span class="field-label">¿Quién ve el WhatsApp?</span>
+              <div class="seg" role="radiogroup" aria-label="Quién ve el número de WhatsApp">
+                <label><input type="radio" name="oWaVis" value="red" checked><span>🤝 Solo la red</span></label>
+                <label><input type="radio" name="oWaVis" value="publico"><span>👀 También los visitantes</span></label>
+              </div>
+              <span class="field-hint">El correo lo ven solo las organizaciones de la red. Nunca publiques datos personales de lxs chicxs.</span>
+            </div>
+            <div class="field col-2">
+              <span class="field-label">Redes <small>(se publican)</small></span>
+              <div class="grid-3" id="oRedes"></div>
+            </div>
           </div>
-          <p class="field-hint" style="margin:.8rem 0 0">Estos datos solo los ven otras organizaciones de la red. Nunca publiques datos personales de lxs chicxs.</p>
+        </fieldset>
+
+        <fieldset class="card ficha-bloque ficha-bloque--coord">
+          <legend class="card-title">6 · Para la coordinación <span class="dato-badge dato-badge--coord">🔒 No se publica</span></legend>
+          <p class="card-text">Estos datos ayudan a la coordinación a conocer cómo está cada casa. Los ven solo la coordinación y tu organización.</p>
+          <div class="grid-2">
+            <label class="field">
+              <span class="field-label">¿Sumaron alguna actividad en el último período?</span>
+              <input id="oActNuevas" class="field-control" maxlength="120" placeholder="¿Cuál o cuáles? (vacío si no)">
+            </label>
+            <label class="field">
+              <span class="field-label">¿Dejaron de hacer alguna actividad?</span>
+              <input id="oActBaja" class="field-control" maxlength="160" placeholder="¿Cuál y por qué? (vacío si no)">
+            </label>
+            <label class="field">
+              <span class="field-label">Espacio físico donde realizan las actividades</span>
+              <select id="oEspacio" class="field-control"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Algo más sobre el espacio</span>
+              <input id="oEspacioInfo" class="field-control" maxlength="120">
+            </label>
+            <label class="field">
+              <span class="field-label">¿Cuántxs educadorxs reciben un sueldo en dinero?</span>
+              <select id="oSueldos" class="field-control"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Algo más sobre los sueldos</span>
+              <input id="oSueldosInfo" class="field-control" maxlength="120">
+            </label>
+            <div class="field col-2">
+              <span class="field-label">¿De qué fuentes públicas reciben recursos hoy?</span>
+              <div class="check-chips" id="oFondosPublicos"></div>
+              <label class="field otro-campo">
+                <span class="field-hint">¿Qué recursos (de universidades o de Capital Humano)? ¿Otras fuentes públicas importantes?</span>
+                <input id="oFondosPublicosDetalle" class="field-control" maxlength="160">
+              </label>
+            </div>
+            <div class="field col-2">
+              <span class="field-label">Si reciben financiamiento privado, ¿de dónde proviene?</span>
+              <div class="check-chips" id="oFondosPrivados"></div>
+              <label class="field otro-campo">
+                <span class="field-hint">¿Otros? Contanos cuáles.</span>
+                <input id="oFondosPrivadosDetalle" class="field-control" maxlength="120">
+              </label>
+            </div>
+          </div>
         </fieldset>
 
         <div class="ficha-acciones">
@@ -331,9 +434,9 @@
               <table class="roles">
                 <thead><tr><th scope="col">Quién</th><th scope="col">Cómo entra</th><th scope="col">Qué puede hacer</th></tr></thead>
                 <tbody>
-                  <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, las fichas y qué necesita u ofrece cada organización. No ve teléfonos ni mails.</td></tr>
+                  <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, las fichas y qué necesita u ofrece cada organización, y sus redes. No ve mails, ni el WhatsApp salvo que la casa elija mostrarlo.</td></tr>
                   <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar avisos, responder los de otras y ver los contactos de la red.</td></tr>
-                  <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar.</td></tr>
+                  <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar. Es la única que ve, junto con cada casa, los datos internos del cuestionario (espacio, sueldos, financiamiento).</td></tr>
                 </tbody>
               </table>
             </div>
@@ -446,8 +549,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=16"></script>
-<script src="js/red-datos.js?v=16"></script>
-<script src="js/red.js?v=16"></script>
+<script src="js/sesion.js?v=17"></script>
+<script src="js/red-datos.js?v=17"></script>
+<script src="js/red.js?v=17"></script>
 </body>
 </html>
