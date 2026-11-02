@@ -187,23 +187,12 @@
   .hito p{ margin:0; max-width:60ch; }
 
   /* ---------- crecimiento ---------- */
-  .growth{
-    display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap;
-    background:var(--celeste-50); border:2px solid var(--ink); border-radius:.6rem;
-    padding:2rem 1.6rem; margin-bottom:1.8rem; box-shadow:5px 5px 0 var(--celeste);
+  .cinta{
+    margin:0 0 1.8rem; background:#F6F6F6; border:2px solid var(--ink); border-radius:.6rem;
+    padding:1rem 1rem .9rem; box-shadow:5px 5px 0 var(--celeste);
   }
-  .growth-num{ text-align:center; }
-  .growth-num .big{ font-family:var(--f-head); font-weight:800; font-size:clamp(2.6rem,8vw,4rem); line-height:1; }
-  .growth-num .cap{ font-family:var(--f-head); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); max-width:16ch; margin:.4rem auto 0; }
-  .growth-num.from .big{ color:var(--ink-soft); }
-  .growth-num.to .big{ color:var(--brick); }
-  .growth-arrow{ flex:1; min-width:60px; height:2px; background:repeating-linear-gradient(to right, var(--teal) 0 10px, transparent 10px 16px); position:relative; }
-  .growth-arrow::after{
-    content:""; position:absolute; right:-2px; top:50%; width:0; height:0;
-    border-top:6px solid transparent; border-bottom:6px solid transparent; border-left:9px solid var(--teal);
-    transform:translateY(-50%);
-  }
-  .growth-caption{ width:100%; font-family:var(--f-head); font-size:.8rem; color:var(--ink-soft); text-align:center; }
+  .cinta img{ display:block; width:100%; height:auto; }
+  .cinta figcaption{ font-family:var(--f-head); font-size:.8rem; color:#4B5256; text-align:center; margin-top:.6rem; }
 
   /* 6 estadísticas: dos filas parejas de 3, sin ítems sueltos */
   .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
@@ -233,25 +222,28 @@
   .placard:nth-child(2) .placard-front{ background:var(--paper); color:var(--ink); }
   .placard:nth-child(3) .placard-front{ background:#1E201F; color:var(--celeste); }
   .placard:nth-child(4) .placard-front{ background:var(--celeste-100); color:var(--ink); }
+  .placard:nth-child(5) .placard-front{ background:var(--celeste-700); color:#fff; }
+  .placard:nth-child(6) .placard-front{ background:var(--card-bg); color:var(--celeste-700); }
   .placard-front .lema{ font-family:var(--f-hand); font-size:1.65rem; line-height:1.15; transform:rotate(-2deg); }
   .placard-back{ background:var(--card-bg); transform:rotateY(180deg); flex-direction:column; gap:.4rem; }
   .placard-back p{ font-size:.85rem; color:var(--ink-soft); margin:0; }
   .placard-back .when{ font-family:var(--f-head); font-weight:700; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--brick); }
   .placard-hint{ font-family:var(--f-head); font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; opacity:.7; margin-top:.5rem; }
 
-  /* ---------- fundadores: 3 arriba, 2 abajo centrados en los huecos ---------- */
-  .founders{ display:grid; grid-template-columns:repeat(6,1fr); gap:1.1rem 1rem; }
+  /* ---------- fundadores y referentes: grilla pareja de 3 x 3 ---------- */
+  .founders{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem 1rem; }
   .founder{
     background:var(--card-bg);
     border:2px solid var(--ink); border-radius:.5rem; padding:1.1rem;
   }
-  .founder:nth-child(1){ grid-column:1 / 3; grid-row:1; }
-  .founder:nth-child(2){ grid-column:3 / 5; grid-row:1; }
-  .founder:nth-child(3){ grid-column:5 / 7; grid-row:1; }
-  .founder:nth-child(4){ grid-column:2 / 4; grid-row:2; }
-  .founder:nth-child(5){ grid-column:4 / 6; grid-row:2; }
-  .founder .avatar{ width:3rem; height:3rem; border-radius:50%; overflow:hidden; margin-bottom:.7rem; border:2px solid var(--ink); }
-  .founder .avatar svg{ width:100%; height:100%; display:block; }
+  .founder .avatar{ width:3.6rem; height:3.6rem; border-radius:50%; overflow:hidden; margin-bottom:.7rem; border:2px solid var(--ink); }
+  .founder .avatar svg, .founder .avatar img{ width:100%; height:100%; display:block; object-fit:cover; }
+  .founders-mas{ font-family:var(--f-hand); font-size:1.5rem; margin:1.2rem 0 0; text-align:center; color:var(--ink-soft); }
+  .elaboracion{
+    margin:2.5rem 0 0; padding:1rem 1.2rem; background:var(--celeste-50); color:var(--ink);
+    border:2px solid var(--ink); border-left:8px solid var(--celeste); border-radius:.5rem;
+  }
+  .elaboracion p{ margin:0; max-width:70ch; }
   .founder h4{ font-family:var(--f-head); font-size:.95rem; font-weight:700; margin:0 0 .15rem; }
   .founder .role{ font-size:.78rem; color:var(--ink-soft); }
 
@@ -288,11 +280,12 @@
   .cta-red p{ margin:0 0 1rem; max-width:52ch; }
   .cta-red .eyebrow{ color:var(--on-celeste); }
 
+  @media (max-width:900px){
+    .founders{ grid-template-columns:repeat(2,1fr); }
+  }
   @media (max-width:640px){
     .timeline{ grid-template-columns:1.4rem 1fr; }
     .founders{ grid-template-columns:1fr; }
-    .founder:nth-child(1), .founder:nth-child(2), .founder:nth-child(3),
-    .founder:nth-child(4), .founder:nth-child(5){ grid-column:1 / -1; grid-row:auto; }
     .stats{ grid-template-columns:1fr 1fr; }
     .cta-red{ grid-template-columns:1fr; }
   }
@@ -340,19 +333,22 @@
     <div class="topbar-inner">
       <button class="nav-arrow" id="navPrev" aria-label="Etapas anteriores" type="button">‹</button>
       <nav class="chipnav" aria-label="Navegar por etapas">
-        <span class="chip-group">Contexto</span>
+        <span class="chip-group">Antecedentes</span>
         <a class="chip" data-nav href="#era-1">Patronato</a>
         <a class="chip" data-nav href="#era-2">Peronismo</a>
-        <a class="chip" data-nav href="#era-3">Casas aisladas</a>
+        <a class="chip" data-nav href="#era-3">Dictaduras</a>
+        <a class="chip" data-nav href="#era-4">Casas aisladas</a>
         <span class="chip-group chip-group--mov">Movimiento</span>
-        <a class="chip" data-nav href="#era-4">Fundación</a>
-        <a class="chip" data-nav href="#era-5">Primeros años</a>
-        <a class="chip" data-nav href="#era-6">Red nacional</a>
-        <a class="chip" data-nav href="#era-7">1999-2001</a>
-        <a class="chip" data-nav href="#era-8">Marchas</a>
-        <a class="chip" data-nav href="#era-9">AUH</a>
-        <a class="chip" data-nav href="#era-10">Pandemia</a>
-        <a class="chip" data-nav href="#era-11">Hoy</a>
+        <a class="chip" data-nav href="#era-5">Fundación</a>
+        <a class="chip" data-nav href="#era-6">Primeros encuentros</a>
+        <a class="chip" data-nav href="#era-7">El barrio</a>
+        <a class="chip" data-nav href="#era-8">Reforma 1994</a>
+        <a class="chip" data-nav href="#era-9">CTA</a>
+        <a class="chip" data-nav href="#era-10">2001</a>
+        <a class="chip" data-nav href="#era-11">AUH</a>
+        <a class="chip" data-nav href="#era-12">La herencia</a>
+        <a class="chip" data-nav href="#era-13">Pandemia</a>
+        <a class="chip" data-nav href="#era-14">Hoy</a>
       </nav>
       <button class="nav-arrow" id="navNext" aria-label="Etapas siguientes" type="button">›</button>
     </div>
@@ -377,10 +373,9 @@
   <section id="contexto" class="etapa etapa--contexto">
     <div class="section-head">
       <div class="eyebrow">Parte 1 · 1919 – 1986 · antes del Movimiento</div>
-      <h2>El contexto</h2>
+      <h2>Antecedentes</h2>
     </div>
-    <p class="etapa-lead">El Movimiento todavía no existía. Estos tres tramos cuentan cómo trataba el Estado a la niñez pobre, cuándo aparecieron sus primeros derechos y cómo surgieron, cada una por su lado, las casas que después lo fundarían.</p>
-    <p class="titulos-nota">Los títulos de cada tramo son de elaboración propia. Cuando un título o una frase va <strong>entre comillas</strong>, es una cita textual y se indica quién la dijo y la fuente, con un número que remite a la lista del final.</p>
+    <p class="etapa-lead">El Movimiento todavía no existía. Estos cuatro tramos cuentan cómo trataba el Estado a la niñez pobre, cuándo se ampliaron sus derechos, qué dejaron las dictaduras y cómo surgieron, cada una por su lado, las casas que después lo fundarían.</p>
 
     <div class="timeline">
       <div class="rail" aria-hidden="true">
@@ -393,26 +388,34 @@
 
         <article class="era" id="era-1">
           <div class="era-top"><span class="era-date num">Desde 1919</span></div>
-          <h3>Antes de todo: los chicos como objeto de tutela</h3>
-          <p>Desde 1919, la Ley 10.903 —conocida como Ley Agote<sup><a class="ref" href="#ref-11" aria-label="Fuente 11">[11]</a></sup>— le daba al Estado el "patronato" sobre la niñez pobre o abandonada: un juez podía disponer de un chico igual que de un delincuente e internarlo en un instituto sin que mediara ningún delito. Era la doctrina de la "situación irregular": el chico pobre no era sujeto de derechos, sino un problema a corregir.</p>
-          <p>Ese fue el sistema contra el que, más de sesenta años después, un grupo de educadores del conurbano empezó a organizarse.</p>
-          <p>Esto se da en el largo proceso de industrialización por sustitución de importaciones en el que Argentina y sobre todo Buenos Aires recibieron una de las grandes oleadas de inmigrantes provenientes de Europa y aqui se dan los primeros pasos por parte del Estado para intentar resolver esta demanda.</p>
+          <h3>La niñez en la Argentina de principios del siglo XX</h3>
+          <p>En 1919 el país atravesaba una etapa de profunda tensión social: la presencia de extranjeros que habían llegado con la Gran Inmigración (y una década más tarde, migrantes que llegaban a Buenos Aires desde el resto del país) era vivida como fuente de conflicto social y agitación política por la clase gobernante.</p>
+          <p>En ese contexto se impulsa la Ley de Patronato de Menores, conocida como Ley Agote.<sup><a class="ref" href="#ref-2" aria-label="Fuente 2">[2]</a></sup> Esta ley le otorgaba al Estado la tutela sobre la niñez pobre o abandonada: los niños mendigos, canillitas y vendedores ambulantes eran una preocupación y podían ser internados como delincuentes en un instituto, sin que mediara ningún delito.</p>
+          <p>Un niño pobre no era más que un adulto pequeño, sin derecho al juego ni al estudio. No era sujeto de derecho sino un problema a corregir.</p>
         </article>
 
         <article class="era" id="era-2">
-          <div class="era-top"><span class="era-date num">1946 – 1955</span></div>
-          <h3>Peronismo: los primeros derechos de la niñez</h3>
-          <p>En pleno auge del peronismo aparecen los primeros derechos de la niñez con rango constitucional: la Constitución de 1949 establece que "la atención y asistencia de la madre y del niño gozarán de la especial y privilegiada consideración del Estado".<sup><a class="ref" href="#ref-16" aria-label="Fuente 16">[16]</a></sup></p>
-          <p>En 1954, la Ley 14.367 suprime las distinciones oficiales entre hijos nacidos dentro y fuera del matrimonio: se terminan las categorías de hijos "naturales", "adulterinos" e "incestuosos", y todos pasan a tener el mismo estatus. La igualdad todavía era parcial —recién en 1985 se equiparan todos los derechos—, pero instala una idea nueva: ningún chico vale menos por cómo nació.<sup><a class="ref" href="#ref-17" aria-label="Fuente 17">[17]</a></sup><sup><a class="ref" href="#ref-18" aria-label="Fuente 18">[18]</a></sup></p>
-          <p>A partir de esa idea, la Fundación Eva Perón construye hogares de tránsito y hogares-escuela en todo el país.<sup><a class="ref" href="#ref-19" aria-label="Fuente 19">[19]</a></sup> Esa misma concepción de la niñez es la que, décadas después, fundamenta el movimiento político de los Chicos del Pueblo.</p>
+          <div class="era-top"><span class="era-date num">1945</span></div>
+          <h3>Ampliación de derechos de los niños</h3>
+          <p>Con la llegada del peronismo y la creación de la Fundación Eva Perón, la niñez deja de ser objeto de caridad o de sanción y pasa a convertirse en sujeto pleno de derecho y afecto.</p>
+          <p>La Fundación inauguró un sistema transformador que sentó las bases políticas y pedagógicas que el Movimiento retomaría más tarde: hogares como espacio de dignidad, “más hogar que escuela”; el fortalecimiento del vínculo familiar; la pedagogía de la ternura, y la niñez como centro de disfrute, propiciado por el acceso a deportes, vacaciones y cultura.</p>
+          <p>En 1949 se sanciona la Constitución Nacional, que reconoce derechos vinculados a la familia, la infancia y la maternidad.<sup><a class="ref" href="#ref-3" aria-label="Fuente 3">[3]</a></sup> La protección de la niñez queda incorporada al marco constitucional de la época.</p>
         </article>
 
         <article class="era" id="era-3">
+          <div class="era-top"><span class="era-date num">1955 · 1976 · 1982</span></div>
+          <h3>Infancias en la Argentina del Terror</h3>
+          <p>En 1955 el golpe que derroca a Juan Domingo Perón interrumpe las conquistas sociales y políticas vinculadas con la infancia. Posteriormente, en 1976, el golpe de Estado produce la destrucción de numerosas experiencias comunitarias. Se desarrolla un plan sistemático de violencia institucional sobre trabajadores y familias, representantes gremiales, políticos, docentes y estudiantes.</p>
+          <p>Como parte del plan, la apropiación de bebés vulnera sus derechos a la identidad y la familia. Esta gran tragedia marca el país para siempre. La dictadura deja además otras secuelas trágicas: los soldados/niños enviados a morir a la guerra de Malvinas y el fenómeno conocido como los “chicos de la calle”.</p>
+        </article>
+
+        <article class="era" id="era-4">
           <div class="era-top"><span class="era-date num">1974 – 1986</span></div>
           <h3>Casas aisladas frente a la misma pobreza</h3>
-          <p>Alberto Morlachetti, hijo de un canillita de Gerli, estudiaba sociología en la UBA cuando la pobreza de los chicos de la calle lo empujó a actuar: en 1974 hipotecó su propia casa para sostener un primer proyecto, la Casa de los Niños. Perseguido y expulsado de la docencia durante la dictadura por su militancia comunista, no abandonó el trabajo territorial.</p>
-          <p>En 1982 fundó el Hogar Pelota de Trapo sobre unos terrenos ferroviarios de Piñeyro, Avellaneda, alrededor de una cancha de fútbol. En 1986 sumó el Hogar Juan Salvador Gaviota. En paralelo, el padre Carlos Cajade (La Plata), el padre Luis Farinello (Quilmes), el padre Elvio Mettone (Paso del Rey) y Enrique Spinetta (Berazategui) abrían casas similares, cada uno por su cuenta, frente a la misma realidad.</p>
-          <p>Estos casos, que en principio parecen aislados, hablan de una problematica a nivel nacional, y lo que destacan en todos los casos es la necesidad de dar cuidados a nuestros chicos ese es el espiritu del movimiento.</p>
+          <p>Alberto Morlachetti, hijo de un canillita de Gerli, estudiaba sociología en la UBA cuando la pobreza de los chicos de la calle lo empujó a actuar: en 1974 hipotecó su propia casa para sostener un primer proyecto, la Casa de los Niños. En 1982 fundó el Hogar Pelota de Trapo sobre unos terrenos ferroviarios en Avellaneda, y en 1986 sumó el Hogar Juan Salvador Gaviota.</p>
+          <p>En paralelo, el padre Carlos Cajade y Susana Gómez en La Plata; el padre Luis Farinello en Quilmes; el padre Elvio Mettone en Paso del Rey; Enrique Spinetta y Claudia Bernazza en Berazategui; Juan Von Engels y Ana Bieza en Villa Ballester, y Teresa Rodas en Moreno abrían casas similares, cada uno por su cuenta, frente a la misma situación.</p>
+          <p>Estos proyectos, que en principio funcionaban como respuestas aisladas, pronto descubrieron que compartían no solo la misma lectura de la realidad, sino también las mismas necesidades materiales y afectivas para sostener el plato de comida, el abrigo y el acompañamiento de los pibes y pibas. Fue precisamente en la conciencia de esa reciprocidad y en la urgencia de ayudarse mutuamente entre organizaciones donde germinó la necesidad de encontrarse y articularse: al igual que en nuestros pueblos originarios, la crianza de un niño se sostiene en comunidad.</p>
+          <p>En 1983, con la recuperación de la democracia, comienza una nueva etapa de recomposición del tejido social. Ante el crecimiento de los chicos de la calle, se multiplican las respuestas comunitarias, las casas abiertas y las experiencias territoriales de cuidado.</p>
         </article>
 
       </div>
@@ -435,61 +438,74 @@
 
       <div class="eras">
 
-        <article class="era" id="era-4">
-          <div class="era-top"><span class="era-date num">30 de septiembre de 1987</span></div>
-          <h3>Una capilla en Florencio Varela</h3>
-          <p>Esos referentes se reúnen en una humilde capilla y firman el acta fundacional del <strong>Movimiento Nacional de los Chicos del Pueblo</strong>. Se declaran independientes de partidos políticos e iglesias, con formas organizativas propias y representación elegida democráticamente en asamblea.</p>
-          <button class="era-toggle" data-toggle="q3" aria-expanded="false">¿Por qué "chicos del pueblo"?</button>
-          <blockquote class="era-quote" id="q3">Eligieron llamarse "chicos del pueblo" y no "chicos de la calle" para no estigmatizarlos: la calle era una circunstancia, no una identidad.<sup><a class="ref" href="#ref-4" aria-label="Fuente 4">[4]</a></sup></blockquote>
-        </article>
-
         <article class="era" id="era-5">
-          <div class="era-top"><span class="era-date num">1988 – 1994</span></div>
-          <h3>Primeros encuentros, primeras denuncias</h3>
-          <p>En 1988 organizan su primer encuentro en la sede de la CGT. El Movimiento denuncia tempranamente la violencia contra la niñez pobre: las matanzas de Formosa (1989), Tigre (1992) y Canning (1994) —esta última acompañados por el cantante Joan Manuel Serrat—.</p>
-          <p>En 1990 realizan el <strong>Primer Encuentro Latinoamericano de los Chicos del Pueblo</strong>, con presencia de 18 países.</p>
-          <p>Hoy en dia tambien se suman para dar respaldo al movimiento las dos CTA junto con la CGT, esto manifiesta la importancia del movimiento obrero en respaldo del movimientode los chicos del pueblo.</p>
+          <div class="era-top"><span class="era-date num">1987</span></div>
+          <h3>Nacimiento del Movimiento Nacional de los Chicos del Pueblo</h3>
+          <p>Referentes de distintas casas comunitarias firman el acta fundacional del <strong>Movimiento Nacional de los Chicos del Pueblo</strong>. Eligen este nombre para rechazar el término “chicos de la calle”, afirmando que la calle es una circunstancia y no una identidad.</p>
+          <p>La firma del acta no supone la pérdida de autonomía de las organizaciones; por otra parte, se declaran independientes de partidos políticos e iglesias. En el acta<sup><a class="ref" href="#ref-4" aria-label="Fuente 4">[4]</a></sup> se reivindica la convivencia cotidiana, afirmando que los chicos y chicas son “responsabilidad de su propia familia, de la comunidad organizada, y del Estado que los protege y no los castiga”.</p>
         </article>
 
         <article class="era" id="era-6">
-          <div class="era-top"><span class="era-date num">1997</span></div>
-          <h3>De un puñado de educadores a una red nacional</h3>
-          <p>En 1997, lo que era un pequeño grupo se transforma en un Encuentro de Educadores de 2.000 personas en Mar del Plata. Ahí deciden incorporarse a la CTA (Central de Trabajadores de la Argentina), ya nucleando a cientos de organizaciones de todo el país, bajo el lema que los definiría: <em>"El hambre es un crimen"</em>, acuñado por Alberto Morlachetti.<sup><a class="ref" href="#ref-12" aria-label="Fuente 12">[12]</a></sup></p>
+          <div class="era-top"><span class="era-date num">1988</span></div>
+          <h3>Primeros encuentros y reclamos</h3>
+          <p>En 1988 organizan su primer encuentro en la sede de la CGT bajo la consigna “Ellos son nuestros hijos”, acuñada por Saúl Ubaldini.</p>
+          <p>Con este impulso, el Movimiento comienza a consolidarse como referencia en los temas de infancia y adolescencia. Asume un rol activo denunciando tempranamente la violencia contra la niñez pobre, y alza la voz frente a los trágicos episodios de represión estatal en las matanzas de Formosa (1989), Tigre (1992) y Canning (1994).</p>
+          <p>En 1990 se realiza el <strong>Primer Encuentro Latinoamericano de los Chicos del Pueblo</strong>, con presencia de 18 países. En este período se crean las consignas “El hambre es un crimen” y “Con ternura venceremos”, dos de las banderas fundamentales del Movimiento.</p>
         </article>
 
         <article class="era" id="era-7">
-          <div class="era-top"><span class="era-date num">1999 – 2001</span></div>
-          <h3>Un reconocimiento y una nueva crisis</h3>
-          <p>En 1999, la Organización de las Naciones Unidas distingue a Pelota de Trapo con el Premio a la Vida y a la Obra.</p>
-          <p>En 2001, en la crisis social más profunda de la Argentina reciente, comienzan las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>, junto a la CTA, bajo "El hambre es un crimen". En esos años también atraviesan persecución: el Movimiento denunció ocho atentados en un solo año, incluyendo la toma armada de la imprenta de Pelota de Trapo y el secuestro de educadores.</p>
+          <div class="era-top"><span class="era-date num">1990</span></div>
+          <h3>La respuesta del barrio</h3>
+          <p>Con el impacto de la hiperinflación y el modelo neoliberal en los años noventa, la realidad en los barrios populares se vuelve muy dura. Frente a la ausencia del Estado, es la propia comunidad la que se pone al hombro la respuesta. Las vecinas y los vecinos empiezan a juntarse para resolver lo cotidiano.</p>
+          <p>Nacen así ollas populares, jardines comunitarios, redes de apoyo escolar y radios del barrio creadas y sostenidas por la misma gente que hoy forma parte del Movimiento. Este cambio es clave: las familias pasan de ser asistidas a organizarse colectivamente para defender el pan, el cuidado y el futuro de sus pibes y pibas.</p>
         </article>
 
         <article class="era" id="era-8">
-          <div class="era-top"><span class="era-date num">2002 – 2005</span></div>
-          <h3>Las Marchas por la Vida</h3>
-          <p>El 28 de octubre de 2002, cientos de chicos parten desde Iguazú, Misiones, hacia Plaza de Mayo en la primera Marcha por la Vida, con el respaldo del escritor Ernesto Sábato, el cantante Joan Manuel Serrat y el Nobel de la Paz Adolfo Pérez Esquivel.</p>
-          <p>En 2005 la Tercera Marcha por la Vida recorre 4.500 km desde Tucumán con unos 400 chicos y 100 educadores, y llega a Plaza de Mayo el 1° de julio. Ese mismo año, el 28 de septiembre, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong><sup><a class="ref" href="#ref-10" aria-label="Fuente 10">[10]</a></sup>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
+          <div class="era-top"><span class="era-date num">1994</span></div>
+          <h3>Reforma constitucional</h3>
+          <p>En la nueva Constitución Nacional se incluye, en el artículo 75, inciso 22, la Convención sobre los Derechos del Niño<sup><a class="ref" href="#ref-5" aria-label="Fuente 5">[5]</a></sup>, que retoma la Declaración de los Derechos del Niño aprobada el 20 de noviembre de 1959 por la Asamblea General de las Naciones Unidas.</p>
         </article>
 
         <article class="era" id="era-9">
-          <div class="era-top"><span class="era-date num">2009 – 2015</span></div>
-          <h3>La Asignación Universal y la despedida</h3>
-          <p>Morlachetti fue uno de los impulsores de la Asignación Universal por Hijo, creada en 2009. El 21 de abril de 2015 muere, dejando el movimiento en manos de sus compañeros y compañeras, con Pelota de Trapo sosteniendo una Casa del Niño, hogares, una imprenta, una panadería y una agencia de noticias de infancia.</p>
+          <div class="era-top"><span class="era-date num">1997</span></div>
+          <h3>La alianza con la CTA</h3>
+          <p>En el quinto encuentro de educadores populares del Movimiento, en Mar del Plata, participan dirigentes de la CTA (Central de Trabajadores de la Argentina). Allí se afianza el vínculo que termina en la primera acción conjunta, en septiembre de 1997: una bicicleteada en Plaza de Mayo.</p>
+          <p>El problema de la niñez pasa a entenderse como parte de la realidad de la clase trabajadora: los pibes y pibas del Movimiento se unen a la lucha de los trabajadores, y los trabajadores a la defensa de los pibes.</p>
         </article>
 
         <article class="era" id="era-10">
-          <div class="era-top"><span class="era-date num">2020</span></div>
-          <h3>Sostener la comida en la pandemia</h3>
-          <p>Durante la pandemia de COVID-19, las organizaciones del Movimiento reorganizan su trabajo territorial: reparten alcohol en gel, barbijos y viandas en tupper en distintos barrios, sosteniendo la asistencia alimentaria pese al aislamiento.</p>
+          <div class="era-top"><span class="era-date num">2001 – 2005</span></div>
+          <h3>Una nueva crisis</h3>
+          <p>En 2001, en la crisis social más profunda de la Argentina reciente, se intensifican las históricas <strong>Marchas Nacionales de los Chicos del Pueblo</strong>.<sup><a class="ref" href="#ref-6" aria-label="Fuente 6">[6]</a></sup> Las organizaciones territoriales cobran especial relevancia frente al deterioro de las condiciones de vida y la vulneración de derechos.</p>
+          <p>En 2002, cientos de chicos parten desde Iguazú, Misiones, hacia Plaza de Mayo, en la primera Marcha por la Vida. En 2005, la tercera Marcha por la Vida recorre 4.500 km desde Tucumán a Plaza de Mayo con unos 400 chicos y 100 educadores.</p>
+          <p>Ese mismo año, el Congreso sanciona la <strong>Ley 26.061 de Protección Integral</strong><sup><a class="ref" href="#ref-7" aria-label="Fuente 7">[7]</a></sup>: 86 años después de la Ley Agote, la niñez pobre deja de ser, al menos en el papel, objeto de patronato.</p>
         </article>
 
         <article class="era" id="era-11">
-          <div class="era-top"><span class="era-date num">2025 – hoy</span></div>
-          <h3>"La patria son lxs pibxs"</h3>
-          <p class="era-cite">Consigna de las Organizaciones de lxs Chicxs del Pueblo, declaración de 2019<sup><a class="ref" href="#ref-3" aria-label="Fuente 3">[3]</a></sup></p>
-          <p>El Movimiento sigue activo, denunciando que la "criminalidad del hambre" que señalaban hace más de 40 años sigue vigente en un contexto de altísima pobreza infantil. En noviembre de 2025, miles de chicos y organizaciones volvieron a marchar en la República de los Niños, en La Plata, bajo la consigna "El hambre es una decisión política", reclamando comida garantizada, más plazas y más escuelas.<sup><a class="ref" href="#ref-9" aria-label="Fuente 9">[9]</a></sup><sup><a class="ref" href="#ref-15" aria-label="Fuente 15">[15]</a></sup></p>
-          <p>La Fundación Pelota de Trapo sigue funcionando en Avellaneda con una Casa del Niño que asiste a unos 200 chicos.</p>
-          <p>Hoy la red se presenta con un lenguaje más inclusivo, como "Organizaciones de lxs Chicxs del Pueblo": mismo origen de 1987, mismas casas, nombre puesto al día. "Somos una gran comunidad de comunidades en donde cada una conserva su total autonomía", resume Paula Salinas, responsable de la comunicación institucional del Movimiento.<sup><a class="ref" href="#ref-2" aria-label="Fuente 2">[2]</a></sup></p>
+          <div class="era-top"><span class="era-date num">2009</span></div>
+          <h3>La Asignación Universal por Hijo</h3>
+          <p>El Movimiento Nacional de los Chicos del Pueblo fue uno de los impulsores de la Asignación Universal por Hijo, creada formalmente en octubre de 2009, cuando la entonces presidenta Cristina Fernández de Kirchner firma el Decreto 1602/09 que habilita este derecho. Luego se incorpora como un subsistema dentro del régimen de Asignaciones Familiares regulado por la Ley 24.714.<sup><a class="ref" href="#ref-8" aria-label="Fuente 8">[8]</a></sup></p>
+        </article>
+
+        <article class="era" id="era-12">
+          <div class="era-top"><span class="era-date num">2015 – 2019</span></div>
+          <h3>La herencia del Movimiento: Organizaciones de lxs Chicxs del Pueblo</h3>
+          <p>Tras un período de ampliación de derechos y mayor presencia estatal en la infancia, el regreso de un modelo neoliberal a partir de 2015 genera un drástico deterioro en las condiciones de vida de los sectores vulnerables. Frente a esta nueva urgencia, las casas y centros comunitarios que habían mantenido una dinámica más local vuelven a articularse colectivamente.</p>
+          <p>Nace así el espacio <strong>Organizaciones de lxs Chicxs del Pueblo</strong>, recuperando la herencia del histórico Movimiento para hacer frente al ajuste y reasumir la defensa territorial de los pibes y las pibas.<sup><a class="ref" href="#ref-9" aria-label="Fuente 9">[9]</a></sup></p>
+        </article>
+
+        <article class="era" id="era-13">
+          <div class="era-top"><span class="era-date num">2020</span></div>
+          <h3>Primera línea en la pandemia de COVID-19</h3>
+          <p>Muchas organizaciones se transformaron en centros de emergencia para elaborar y distribuir viandas, barbijos y alcohol en gel. Lxs educadorxs comunitarixs arriesgaron su salud y expusieron sus vidas diariamente para garantizar que a ningún pibx le faltara el plato de comida ni el abrigo afectivo. El compromiso territorial no se detuvo, dejando como huella el dolor de las pérdidas de compañerxs, pero también la confirmación histórica de que la salida y el cuidado siempre son colectivos.</p>
+          <p>Durante la pandemia, lxs educadorxs siguieron encontrándose virtualmente para formarse y fortalecer vínculos a través de <strong>Las Charlas de Cuarentena</strong>.<sup><a class="ref" href="#ref-10" aria-label="Fuente 10">[10]</a></sup></p>
+        </article>
+
+        <article class="era" id="era-14">
+          <div class="era-top"><span class="era-date num">2022 – hoy</span></div>
+          <h3>El reencuentro</h3>
+          <p>La salida de la pandemia, en diciembre de 2021, se celebra con un gran <strong>Encuentro Nacional de los Chicos del Pueblo</strong><sup><a class="ref" href="#ref-11" aria-label="Fuente 11">[11]</a></sup>, en el marco del Programa Jóvenes y Memoria impulsado por la Comisión Provincial por la Memoria.</p>
+          <p>En abril de 2022 se realiza la primera edición de la <strong>Escuela de Educación Popular</strong><sup><a class="ref" href="#ref-12" aria-label="Fuente 12">[12]</a></sup>, que desde entonces sigue formando y propiciando el encuentro y el intercambio de saberes entre educadores de toda la red. Asimismo, se retoman las Marchas<sup><a class="ref" href="#ref-13" aria-label="Fuente 13">[13]</a></sup> y el plan de lucha por la vida bajo la consigna permanente de “El hambre es un crimen”.</p>
         </article>
 
       </div>
@@ -502,25 +518,17 @@
       <h2>La historia en números</h2>
     </div>
 
-    <div class="growth">
-      <div class="growth-num from">
-        <div class="big num" data-count="5" data-duration="900">5</div>
-        <div class="cap">casas fundadoras · 1987</div>
-      </div>
-      <div class="growth-arrow" aria-hidden="true"></div>
-      <div class="growth-num to">
-        <div class="big"><span class="num" data-count="400" data-duration="1400">0</span><span aria-hidden="true">+</span></div>
-        <div class="cap">organizaciones hoy, en todo el país</div>
-      </div>
-      <div class="growth-caption">De un acta firmada en una capilla a una red nacional: hoy la integran más de 400 organizaciones ("casas"), según Paula Salinas, responsable de comunicación de Chicxs del Pueblo.<sup><a class="ref" href="#ref-2" aria-label="Fuente 2">[2]</a></sup></div>
-    </div>
+    <figure class="cinta">
+      <img src="img/cinta-casas.jpg" width="1200" height="578" alt="Una cinta celeste que empieza en 1987 con 5 casas dibujadas y se ensancha hasta 2026, llena de casas y con el logo de Organizaciones de lxs Chicxs del Pueblo: más de 400 casas.">
+      <figcaption>De 5 casas en 1987 a más de 400 en 2026: hoy la red reúne organizaciones de todo el país.<sup><a class="ref" href="#ref-1" aria-label="Fuente 1">[1]</a></sup><sup><a class="ref" href="#ref-14" aria-label="Fuente 14">[14]</a></sup></figcaption>
+    </figure>
 
     <div class="stats">
       <div class="stat"><div class="big num" data-count="18" data-duration="900">0</div><div class="cap">países en el Primer Encuentro Latinoamericano, 1990</div></div>
-      <div class="stat"><div class="big num" data-count="8" data-duration="700">0</div><div class="cap">atentados denunciados en un solo año, post-2001</div></div>
-      <div class="stat"><div class="big num" data-count="4500" data-duration="1400">0</div><div class="cap">km recorridos en la Tercera Marcha por la Vida, 2005</div></div>
+      <div class="stat"><div class="big num" data-count="400" data-duration="1100">0</div><div class="cap">chicos y chicas en la Tercera Marcha por la Vida, 2005</div></div>
+      <div class="stat"><div class="big num" data-count="4500" data-duration="1400">0</div><div class="cap">km recorridos en esa Marcha, de Tucumán a Plaza de Mayo</div></div>
       <div class="stat"><div class="big num" data-count="86" data-duration="1000">0</div><div class="cap">años de patronato de menores, de la Ley Agote (1919) a la Ley 26.061 (2005)</div></div>
-      <div class="stat"><div class="big num" data-count="38" data-duration="900">0</div><div class="cap">años de trayectoria del Movimiento desde 1987</div></div>
+      <div class="stat"><div class="big num" data-count="39" data-duration="900">0</div><div class="cap">años de trayectoria del Movimiento desde 1987</div></div>
       <div class="stat"><div class="big num" data-count="10" data-duration="800">0</div><div class="cap">provincias con organizaciones de la red hoy, de Chubut a Chaco</div></div>
     </div>
   </section>
@@ -539,7 +547,7 @@
           <div class="placard-face placard-back">
             <span class="when">Consigna de Alberto Morlachetti</span>
             <p>Resume la denuncia central del Movimiento y se repite en cada Marcha Nacional, hasta hoy.</p>
-            <span class="fuente">Fuentes [12] y [5]</span>
+            <span class="fuente">Fuente [15]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -551,7 +559,7 @@
           <div class="placard-face placard-back">
             <span class="when">Lema del padre Carlos Cajade</span>
             <p>Su respuesta a la institucionalización: reconstruir vínculos de cuidado en lugar de encerrar a la infancia pobre.</p>
-            <span class="fuente">Fuente [13]</span>
+            <span class="fuente">Fuente [16]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -559,11 +567,10 @@
 
       <button class="placard" data-placard aria-expanded="false">
         <div class="placard-inner">
-          <div class="placard-face placard-front"><div class="lema">"Ni un pibe menos"</div></div>
+          <div class="placard-face placard-front"><div class="lema">"Ni un pibe menos por las drogas"</div></div>
           <div class="placard-face placard-back">
-            <span class="when">Marcha Nacional de 2007</span>
-            <p>De Puerto Iguazú a Plaza de Mayo, junto a la CTA: "El hambre es un crimen. Ni un pibe menos".</p>
-            <span class="fuente">Fuente [14]</span>
+            <span class="when">Desde 2022</span>
+            <p>Las Organizaciones de lxs Chicxs del Pueblo la asumen como propia cuando se suma la organización No Seas Pavote, integrante de la Familia Grande de los Hogares de Cristo.</p>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -575,7 +582,29 @@
           <div class="placard-face placard-back">
             <span class="when">Declaración de las organizaciones, 2019</span>
             <p>Lxs chicxs como parte central del pueblo y como sujetos políticos, no como un problema a corregir.</p>
-            <span class="fuente">Fuentes [3] y [5]</span>
+            <span class="fuente">Fuente [17]</span>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"Ellos son nuestros hijos"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Legada por Saúl Ubaldini</span>
+            <p>En el primer congreso de los Chicos de la Calle, el sindicalista dijo: “Ellos no son chicos de la calle, ellos son nuestros hijos, hijos de trabajadores y trabajadoras sin trabajo”.</p>
+            <span class="placard-hint">Tocar para volver</span>
+          </div>
+        </div>
+      </button>
+
+      <button class="placard" data-placard aria-expanded="false">
+        <div class="placard-inner">
+          <div class="placard-face placard-front"><div class="lema">"Un abrazo a la medida"</div></div>
+          <div class="placard-face placard-back">
+            <span class="when">Principio del educador Damián Bravo</span>
+            <p>A lxs niñxs se lxs abraza “a la medida”, atendiendo sus particularidades y sus necesidades subjetivas.</p>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
@@ -586,32 +615,57 @@
 
   <section id="fundadores">
     <div class="section-head">
-      <div class="eyebrow">Cinco Fundadores principales, un mismo acta</div>
-      <h2>Quiénes lo fundaron</h2>
+      <div class="eyebrow">Fundadores y referentes</div>
+      <h2>Quienes dieron vida a esta historia</h2>
     </div>
-    <p style="max-width:62ch;color:var(--ink-soft);margin:0 0 1.4rem;font-size:.95rem;">Estas cinco casas del conurbano bonaerense entre muchas otras firmaron el acta original en 1987. Hoy la red que fundaron ya no es solo esas cinco ciudades: creció en provincias como Buenos Aires, Santa Fe, Córdoba, Mendoza, San Juan, San Luis, Chaco, La Pampa, Río Negro y Chubut, y ya son más de 400 organizaciones.</p>
     <div class="founders">
       <div class="founder">
-        <div class="avatar" style="background:var(--celeste)"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#1E201F"/><circle cx="30" cy="24" r="11" fill="#1E201F"/></svg></div>
-        <h4>Alberto Morlachetti</h4><div class="role">Sociólogo · Avellaneda<br>Fundador de Pelota de Trapo (1982)</div>
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#1E201F"/><circle cx="30" cy="24" r="11" fill="#1E201F"/></svg></div>
+        <h4>Alberto Morlachetti</h4>
+        <div class="role">Sociólogo y dirigente, fundador de Pelota de Trapo, La Casa de los Niños y la Escuela Talleres Gráficos. Luego de su partida, el Honorable Senado de la Nación rindió homenaje a su trayectoria.<sup><a class="ref" href="#ref-18" aria-label="Fuente 18">[18]</a></sup></div>
       </div>
       <div class="founder">
-        <div class="avatar" style="background:var(--celeste-100)"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste-100)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#1E201F"/><circle cx="30" cy="24" r="11" fill="#1E201F"/></svg></div>
-        <h4>Carlos Cajade</h4><div class="role">Sacerdote · La Plata<br>Hogar de la Madre Tres Veces Admirable</div>
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="#1E201F"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--celeste)"/><circle cx="30" cy="24" r="11" fill="var(--celeste)"/></svg></div>
+        <h4>Quique Spinetta</h4>
+        <div class="role">Maestro y educador popular, cofundador del hogar y centro comunitario “Lugar del Sol”, en Berazategui. Continúa su labor como activista por los derechos de los niños, dando debates en diversos espacios públicos.</div>
       </div>
       <div class="founder">
-        <div class="avatar" style="background:var(--celeste-700)"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste-700)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#fff"/><circle cx="30" cy="24" r="11" fill="#fff"/></svg></div>
-        <h4>Luis Farinello</h4><div class="role">Sacerdote · Quilmes</div>
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste-100)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#1E201F"/><circle cx="30" cy="24" r="11" fill="#1E201F"/></svg></div>
+        <h4>Carlos Cajade</h4>
+        <div class="role">Sacerdote católico y militante de la Juventud Peronista, fundador del “Hogar de la Madre Tres Veces Admirable” y de la revista La Pulseada. Su obra continúa en manos de educadores que concurrieron al Hogar en su infancia.</div>
       </div>
       <div class="founder">
-        <div class="avatar" style="background:#fff"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="#fff"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--celeste-700)"/><circle cx="30" cy="24" r="11" fill="var(--celeste-700)"/></svg></div>
-        <h4>Elvio Mettone</h4><div class="role">Sacerdote · Paso del Rey</div>
+        <div class="avatar avatar--foto"><img src="img/elvio-mettone.jpg" width="240" height="240" alt="Retrato de Elvio Mettone"></div>
+        <h4>Elvio Mettone</h4>
+        <div class="role">Sacerdote y fundador del Hogar “La Casita” de Moreno.</div>
       </div>
       <div class="founder">
-        <div class="avatar" style="background:#1E201F"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="#1E201F"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--celeste)"/><circle cx="30" cy="24" r="11" fill="var(--celeste)"/></svg></div>
-        <h4>Enrique Spinetta</h4><div class="role">Referente · Berazategui</div>
+        <div class="avatar avatar--foto"><img src="img/luis-farinello.jpg" width="240" height="240" alt="Retrato de Luis Farinello"></div>
+        <h4>Luis Farinello</h4>
+        <div class="role">Cura obrero, integrante del Movimiento de Sacerdotes para el Tercer Mundo, fundador de la “Casa del Niño” en Quilmes.</div>
+      </div>
+      <div class="founder">
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste-700)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#fff"/><circle cx="30" cy="24" r="11" fill="#fff"/></svg></div>
+        <h4>Claudia Bernazza</h4>
+        <div class="role">Maestra y educadora popular, cofundadora de “Lugar del Sol” en Berazategui y primera referente que, surgida directamente del Movimiento, ocupó una banca legislativa nacional.<sup><a class="ref" href="#ref-19" aria-label="Fuente 19">[19]</a></sup></div>
+      </div>
+      <div class="founder">
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="#fff"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--celeste-700)"/><circle cx="30" cy="24" r="11" fill="var(--celeste-700)"/></svg></div>
+        <h4>Teresa Rodas</h4>
+        <div class="role">Referente comunitaria, fundadora de “La Casa de Teresa” en Moreno e impulsora de la convivencia diaria como refugio afectivo para los pibes.</div>
+      </div>
+      <div class="founder">
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste-900)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="var(--celeste-100)"/><circle cx="30" cy="24" r="11" fill="var(--celeste-100)"/></svg></div>
+        <h4>Marité Vila</h4>
+        <div class="role">Trabajadora social y educadora que acompañó los inicios de “La Casita”, en Paso del Rey.</div>
+      </div>
+      <div class="founder">
+        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#fff"/><circle cx="30" cy="24" r="11" fill="#fff"/></svg></div>
+        <h4>Olga Madrazo</h4>
+        <div class="role">Educadora del “Hogar de la Madre Tres Veces Admirable” en La Plata, una de las experiencias comunitarias vinculadas al Movimiento.</div>
       </div>
     </div>
+    <p class="founders-mas">Y tantos más…</p>
   </section>
 
   <section id="la-red-hoy">
@@ -626,9 +680,13 @@
     </div>
   </section>
 
+  <aside class="elaboracion">
+    <p>Este recorrido histórico fue elaborado a partir del libro <em>Con ternura venceremos</em><sup><a class="ref" href="#ref-20" aria-label="Fuente 20">[20]</a></sup> y de testimonios compartidos en charlas con referentes del Movimiento.</p>
+  </aside>
+
   <section class="fuentes" id="fuentes">
     <div class="eyebrow">Fuentes</div>
-    <p>Resumen histórico elaborado a partir de una fuente primaria —la charla que Paula Salinas dio en nuestra materia— y de fuentes secundarias consultadas en internet. Última revisión: septiembre de 2026.</p>
+    <p>Documentos, normativa y videos citados a lo largo del recorrido. Última revisión: noviembre de 2026.</p>
 
     <h3 class="fuentes-tit">Fuentes primarias</h3>
     <p class="fuentes-def">Testimonio directo de una integrante de la organización, recibido por el grupo.</p>
@@ -637,30 +695,29 @@
     </ol>
 
     <h3 class="fuentes-tit">Fuentes secundarias</h3>
-    <p class="fuentes-def">Documentos del Movimiento, entrevistas publicadas, normativa oficial y notas periodísticas consultadas en internet.</p>
+    <p class="fuentes-def">Documentos del Movimiento, normativa oficial, registros audiovisuales y notas periodísticas.</p>
     <ol class="sources" start="2">
-      <li id="ref-2"><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: un pilar fundamental para sostener los cuidados en los barrios populares (con declaraciones de Paula Salinas)</a></li>
-      <li id="ref-3"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
-      <li id="ref-4"><a href="https://pelotadetrapo.org.ar/una-historia-larga-y-sostenida-en-el-tiempo/" target="_blank" rel="noopener">Pelota de Trapo — Una historia larga y sostenida en el tiempo</a></li>
-      <li id="ref-5"><a href="https://chicxsdelpueblo.com.ar/quienes-somos/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Quiénes somos</a></li>
-      <li id="ref-6"><a href="https://www.boletinsalesiano.com.ar/fallecio-alberto-morlachetti/" target="_blank" rel="noopener">Boletín Salesiano — Falleció Alberto Morlachetti</a></li>
-      <li id="ref-7"><a href="https://www.revistacabal.coop/actualidad/movimiento-nacional-los-chicos-del-pueblo" target="_blank" rel="noopener">Revista Cabal — Movimiento Nacional Los Chicos del Pueblo</a></li>
-      <li id="ref-8"><a href="https://www.uncuyo.edu.ar/prensa/cuando-los-chicos-del-pueblo-se-ponen-en-marcha" target="_blank" rel="noopener">Prensa UNCUYO — Cuando los chicos del pueblo se ponen en marcha</a></li>
-      <li id="ref-9"><a href="https://agencia.farco.org.ar/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Agencia FARCO — Marcha en La Plata, noviembre 2025</a></li>
-      <li id="ref-10"><a href="https://www.argentina.gob.ar/normativa/nacional/ley-26061-110778" target="_blank" rel="noopener">Argentina.gob.ar — Ley 26.061</a></li>
-      <li id="ref-11"><a href="http://patagoniarebelde.undav.edu.ar/ley-n-10903-de-patronato-de-menores-o-ley-agote/" target="_blank" rel="noopener">UNDAV — Ley N.º 10.903 de Patronato de Menores (Ley Agote)</a></li>
-      <li id="ref-12"><a href="https://www.ctacapital.org/alberto-morlachetti-el-hombre-que-torcio-el-destino-de-los-mas-debiles/" target="_blank" rel="noopener">CTA Capital — Alberto Morlachetti: el hombre que torció el destino de los más débiles</a></li>
-      <li id="ref-13"><a href="https://www.0221.com.ar/la-plata/el-dia-que-murio-carlos-cajade-y-la-plata-perdio-al-protector-los-chicos-la-calle-n117823" target="_blank" rel="noopener">0221 — El día que murió Carlos Cajade (lema "Con ternura venceremos")</a></li>
-      <li id="ref-14"><a href="https://misionesonline.net/2007/05/08/la-marcha-de-los-chicos-del-pueblo-se-hizo-sentir-en-posadas/" target="_blank" rel="noopener">MisionesOnline — La marcha de los Chicos del Pueblo se hizo sentir en Posadas (2007)</a></li>
-      <li id="ref-15"><a href="https://argentina.indymedia.org/2025/11/17/la-plata-las-organizaciones-de-los-chicos-y-chicas-del-pueblo-marcharon-contra-el-hambre/" target="_blank" rel="noopener">Indymedia Argentina — Marcha contra el hambre en La Plata, noviembre 2025</a></li>
-      <li id="ref-16"><a href="https://www.saij.gob.ar/docs-f/ediciones/libros/CONST%20NACIONAL%201949%20digital.pdf" target="_blank" rel="noopener">SAIJ — Constitución de la Nación Argentina de 1949 (art. 37, II: De la familia)</a></li>
-      <li id="ref-17"><a href="https://www.argentina.gob.ar/normativa/nacional/ley-14367-296665" target="_blank" rel="noopener">Argentina.gob.ar — Ley 14.367 de filiación extramatrimonial (1954)</a></li>
-      <li id="ref-18"><a href="https://www.agenciapacourondo.com.ar/dossier/infancia-y-peronismo-ningun-nino-sera-ilegitimo" target="_blank" rel="noopener">Agencia Paco Urondo — Infancia y peronismo: ningún niño será ilegítimo</a></li>
-      <li id="ref-19"><a href="https://www.academia.edu/9075558/Los_hogares_de_transito_de_la_Fundacion_Eva_Per%C3%B2n" target="_blank" rel="noopener">Carolina Barry — Los hogares de tránsito de la Fundación Eva Perón</a></li>
+      <li id="ref-2"><a href="https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=103606" target="_blank" rel="noopener">InfoLEG — Ley 10.903 de Patronato de Menores (Ley Agote), 1919</a></li>
+      <li id="ref-3"><a href="https://www.saij.gob.ar/docs-f/ediciones/libros/CONST%20NACIONAL%201949%20digital.pdf" target="_blank" rel="noopener">SAIJ — Constitución de la Nación Argentina de 1949</a></li>
+      <li id="ref-4"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2023/03/Acta-Movimiento-Nacional-de-los-Chicos-del-Pueblo-1.pdf" target="_blank" rel="noopener">Acta fundacional del Movimiento Nacional de los Chicos del Pueblo, 1987</a></li>
+      <li id="ref-5"><a href="https://www.unicef.org/es/convencion-derechos-nino/texto-convencion" target="_blank" rel="noopener">UNICEF — Texto de la Convención sobre los Derechos del Niño</a></li>
+      <li id="ref-6"><a href="https://www.youtube.com/watch?v=FDLT3fVCMR0&amp;t=451s" target="_blank" rel="noopener">Video — Marchas Nacionales de los Chicos del Pueblo</a></li>
+      <li id="ref-7"><a href="https://www.argentina.gob.ar/normativa/nacional/norma-110778" target="_blank" rel="noopener">Argentina.gob.ar — Ley 26.061 de Protección Integral de los Derechos de las Niñas, Niños y Adolescentes, 2005</a></li>
+      <li id="ref-8"><a href="https://www.argentina.gob.ar/normativa/nacional/norma-39880/actualizacion" target="_blank" rel="noopener">Argentina.gob.ar — Ley 24.714 de Asignaciones Familiares (texto actualizado)</a></li>
+      <li id="ref-9"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/11/DECLARACION-AMPLIADA-Chicxs-del-Pueblo-nov-2021.pdf" target="_blank" rel="noopener">Declaración ampliada de las Organizaciones de lxs Chicxs del Pueblo, noviembre de 2021</a></li>
+      <li id="ref-10"><a href="https://www.youtube.com/live/ioj5KDJLzrk" target="_blank" rel="noopener">Video — Las Charlas de Cuarentena</a></li>
+      <li id="ref-11"><a href="https://www.youtube.com/watch?v=wE405zlQWF8&amp;t=1000s" target="_blank" rel="noopener">Video — Encuentro Nacional de los Chicos del Pueblo, diciembre de 2021</a></li>
+      <li id="ref-12"><a href="https://chicxsdelpueblo.com.ar/escuela-educacion-popular/" target="_blank" rel="noopener">Organizaciones de lxs Chicxs del Pueblo — Escuela de Educación Popular</a></li>
+      <li id="ref-13"><a href="https://youtu.be/BBoeFIKJUTM" target="_blank" rel="noopener">Video — Las Marchas de los Chicos del Pueblo hoy</a></li>
+      <li id="ref-14"><a href="https://asociacionlolamora.org.ar/organizaciones-comunitarias-chicxs-del-pueblo/" target="_blank" rel="noopener">Asociación Lola Mora — Las organizaciones comunitarias: un pilar fundamental para sostener los cuidados en los barrios populares (con declaraciones de Paula Salinas)</a></li>
+      <li id="ref-15"><a href="https://www.ctacapital.org/alberto-morlachetti-el-hombre-que-torcio-el-destino-de-los-mas-debiles/" target="_blank" rel="noopener">CTA Capital — Alberto Morlachetti: el hombre que torció el destino de los más débiles</a></li>
+      <li id="ref-16"><a href="https://www.0221.com.ar/la-plata/el-dia-que-murio-carlos-cajade-y-la-plata-perdio-al-protector-los-chicos-la-calle-n117823" target="_blank" rel="noopener">0221 — El día que murió Carlos Cajade (lema "Con ternura venceremos")</a></li>
+      <li id="ref-17"><a href="https://chicxsdelpueblo.com.ar/wp-content/uploads/2021/08/VI.pdf" target="_blank" rel="noopener">"Con ternura venceremos" — declaración de las organizaciones, 2019</a></li>
+      <li id="ref-18"><a href="https://share.google/cjpO5gsNB4oj16Et3" target="_blank" rel="noopener">Homenaje del Honorable Senado de la Nación a Alberto Morlachetti</a></li>
+      <li id="ref-19"><a href="https://youtu.be/ui1esbPKIe4" target="_blank" rel="noopener">Video — Claudia Bernazza</a></li>
+      <li id="ref-20">Libro <em>Con ternura venceremos</em>.</li>
     </ol>
-
   </section>
-
 </main>
 
 <footer class="site-footer">
