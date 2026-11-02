@@ -41,7 +41,7 @@
     facebook: "Facebook", instagram: "Instagram", waCanal: "Canal de WhatsApp",
     youtube: "YouTube", web: "Sitio web", otra: "Otra red",
   };
-  /* Solo para la coordinación */
+  /* Solo para la red: lo ven las cuentas que ingresan, no los visitantes */
   window.RED_ESPACIOS = {
     alquilado: "Espacio alquilado", prestado: "Espacio prestado", cedido: "Espacio cedido / comodato",
     propio: "Espacio propio de la organización", ocupado: "Espacio ocupado",
@@ -173,7 +173,7 @@
       redes: redes,
       whatsappPublico: n % 3 === 1,
       educadorxs: { total: educ, mujeres: mujeres, varones: educ - mujeres - otrxs, otrxs: otrxs },
-      // solo para la coordinación (y la propia organización)
+      // solo para la red: no lo ven los visitantes
       referenteRol: elegir(ROLES, n, 5),
       actividadesNuevas: n % 4 === 2 ? "Taller de huerta" : "",
       actividadesBaja: n % 7 === 3 ? "Torneo de fútbol de los sábados: no hay quien lo coordine" : "",

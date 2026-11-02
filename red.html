@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
 <meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con tablero para pedir y ofrecer recursos entre ellas.">
-<script src="js/tema.js?v=17"></script>
+<script src="js/tema.js?v=18"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=17">
-<link rel="stylesheet" href="css/red.css?v=17">
+<link rel="stylesheet" href="css/marca.css?v=18">
+<link rel="stylesheet" href="css/red.css?v=18">
 </head>
 <body data-app>
 
@@ -190,7 +190,7 @@
       </div>
 
       <form id="formFicha" class="ficha" novalidate>
-        <p class="leyenda-datos"><span class="dato-badge dato-badge--publico">👀 Se publica</span> lo ven todas las personas que entran al mapa · <span class="dato-badge dato-badge--coord">🔒 Solo coordinación</span> lo ven solo la coordinación y tu organización.</p>
+        <p class="leyenda-datos"><span class="dato-badge dato-badge--publico">👀 Se publica</span> lo ven todas las personas que entran al mapa · <span class="dato-badge dato-badge--coord">🔒 Solo la red</span> lo ven solo las organizaciones que ingresan con su cuenta; los visitantes no.</p>
 
         <fieldset class="card ficha-bloque">
           <legend class="card-title">1 · La organización</legend>
@@ -225,7 +225,7 @@
             </label>
           </div>
           <div class="grid-2 bloque-coord">
-            <p class="col-2 bloque-coord-tit"><span class="dato-badge dato-badge--coord">🔒 Solo coordinación</span></p>
+            <p class="col-2 bloque-coord-tit"><span class="dato-badge dato-badge--coord">🔒 Solo la red</span></p>
             <label class="field">
               <span class="field-label">Nombre y apellido de quien responde *</span>
               <input id="oReferente" class="field-control" required maxlength="60">
@@ -362,8 +362,8 @@
         </fieldset>
 
         <fieldset class="card ficha-bloque ficha-bloque--coord">
-          <legend class="card-title">6 · Para la coordinación <span class="dato-badge dato-badge--coord">🔒 No se publica</span></legend>
-          <p class="card-text">Estos datos ayudan a la coordinación a conocer cómo está cada casa. Los ven solo la coordinación y tu organización.</p>
+          <legend class="card-title">6 · Datos internos <span class="dato-badge dato-badge--coord">🔒 Solo la red</span></legend>
+          <p class="card-text">Estos datos ayudan a conocer cómo está cada casa. No se publican: los ven solo las organizaciones que ingresan con su cuenta.</p>
           <div class="grid-2">
             <label class="field">
               <span class="field-label">¿Sumaron alguna actividad en el último período?</span>
@@ -435,8 +435,8 @@
                 <thead><tr><th scope="col">Quién</th><th scope="col">Cómo entra</th><th scope="col">Qué puede hacer</th></tr></thead>
                 <tbody>
                   <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, las fichas y qué necesita u ofrece cada organización, y sus redes. No ve mails, ni el WhatsApp salvo que la casa elija mostrarlo.</td></tr>
-                  <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar avisos, responder los de otras y ver los contactos de la red.</td></tr>
-                  <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar. Es la única que ve, junto con cada casa, los datos internos del cuestionario (espacio, sueldos, financiamiento).</td></tr>
+                  <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar avisos, responder los de otras y ver los contactos y los datos internos de las casas de la red (espacio, sueldos, financiamiento).</td></tr>
+                  <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -549,8 +549,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=17"></script>
-<script src="js/red-datos.js?v=17"></script>
-<script src="js/red.js?v=17"></script>
+<script src="js/sesion.js?v=18"></script>
+<script src="js/red-datos.js?v=18"></script>
+<script src="js/red.js?v=18"></script>
 </body>
 </html>

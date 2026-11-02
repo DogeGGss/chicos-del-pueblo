@@ -92,8 +92,8 @@
   function tipoLabel(o) { return o.tipo === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[o.tipo] || TIPOS.otro).label; }
   function tipoIcono(o) { return (TIPOS[o.tipo] || TIPOS.otro).icono; }
   function totalPersonas(p) { p = p || {}; return (+p.ninxs || 0) + (+p.jovenes || 0) + (+p.adultxs || 0); }
-  // los datos marcados "solo coordinación" los ven la coordinación y la propia organización
-  function veDatosCoord(o) { return rol === "coord" || (rol === "org" && sesion && sesion.orgId === o.id); }
+  // los datos internos del cuestionario los ve toda cuenta de la red que ingresó (organizaciones y coordinación), nunca los visitantes
+  function veDatosRed() { return rol !== "visitante"; }
   function plural(n, uno, varios) { return n + " " + (n === 1 ? uno : varios); }
   function orgById(id) {
     for (var i = 0; i < orgs.length; i++) if (orgs[i].id === id) return orgs[i];
@@ -303,7 +303,7 @@
       if ((o[p[0]] || []).indexOf(p[1]) === -1) return false;
     }
     if (filtro.q) {
-      var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, rol === "coord" ? o.referente : "", tipoLabel(o),
+      var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, rol !== "visitante" ? o.referente : "", tipoLabel(o),
         (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).join(" "), o.actividadesOtras || "",
         (o.necesita || []).map(function (k) { return RECURSOS[k]; }).join(" "),
         (o.ofrece || []).map(function (k) { return RECURSOS[k]; }).join(" "),
@@ -641,7 +641,7 @@
     }
     if (redesTxt) html += '<div class="redes-lista">' + redesTxt + "</div>";
     html += "</div>";
-    if (veDatosCoord(o) || opts.preview) html += bloqueCoordHtml(o);
+    if (veDatosRed() || opts.preview) html += bloqueRedHtml(o);
     html += '<div class="det-actions">';
     if (opts.preview) {
       html += '<button type="button" class="btn btn-primary" data-enviar-ficha>Guardar y publicar</button>' +
@@ -657,16 +657,16 @@
     return html;
   }
 
-  // datos del cuestionario marcados "para la coordinación": no se publican
-  function bloqueCoordHtml(o) {
+  // datos internos del cuestionario: no se publican, los ven solo las cuentas de la red
+  function bloqueRedHtml(o) {
     function lista(keys, dic, detalle) {
       var t = (keys || []).map(function (k) { return dic[k]; }).filter(Boolean).join(", ");
       if (detalle) t += (t ? ". " : "") + detalle;
       return esc(t || "—");
     }
     function conInfo(v, info) { return esc(v || "—") + (info ? "<br><small>" + esc(info) + "</small>" : ""); }
-    return '<div class="det-sec det-coord"><h3>🔒 Solo para la coordinación</h3>' +
-      '<p class="card-text"><small>Lo ven la coordinación y la propia organización. No se publica.</small></p>' +
+    return '<div class="det-sec det-coord"><h3>🔒 Solo para la red</h3>' +
+      '<p class="card-text"><small>Lo ven solo las organizaciones que ingresan con su cuenta. Los visitantes no.</small></p>' +
       '<dl class="det-grid">' +
       "<div><dt>Quien responde</dt><dd>" + esc(o.referente || "—") + (o.referenteRol ? "<br><small>" + esc(o.referenteRol) + "</small>" : "") + "</dd></div>" +
       "<div><dt>Actividades nuevas</dt><dd>" + esc(o.actividadesNuevas || "No") + "</dd></div>" +
