@@ -361,3 +361,27 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
 :root[data-theme="dark"] .leaflet-control-attribution{ background:rgba(12,24,32,.82); color:var(--ink-soft); }
 :root[data-theme="dark"] .leaflet-control-attribution a{ color:var(--celeste-700); }
 :root[data-theme="dark"] .modal::backdrop{ background:rgba(0,0,0,.6); }
+
+/* ---------- cuestionario de la red: qué se publica y qué es solo para la coordinación ---------- */
+.check-chips:not(.check-chips--necesita):not(.check-chips--ofrece) input:checked + span{ background:var(--celeste-100); border-color:var(--solid); color:var(--ink); }
+.grid-4{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:.6rem .8rem; }
+.total-campo{ justify-content:flex-end; }
+.total-num{ font-family:var(--f-head); font-weight:800; font-size:1.4rem; line-height:2.4rem; color:var(--ink); }
+.leyenda-datos{ font-size:.85rem; color:var(--ink-soft); margin:0 0 1rem; line-height:1.9; }
+.dato-badge{
+  display:inline-block; font-family:var(--f-head); font-weight:700; font-size:.66rem; letter-spacing:.05em;
+  text-transform:uppercase; padding:.12rem .5rem; border-radius:999px; border:1.5px solid; vertical-align:middle;
+}
+.dato-badge--publico{ background:var(--celeste-100); border-color:var(--celeste-700); color:var(--ink); }
+.dato-badge--coord{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+.card-title .dato-badge{ margin-left:.4rem; }
+.bloque-coord{ margin-top:1rem; padding-top:.9rem; border-top:1.5px dashed var(--line-strong); }
+.bloque-coord-tit{ margin:0; }
+.ficha-bloque--coord{ border-style:dashed; background:var(--celeste-50); }
+.det-coord{ border:1.5px dashed var(--line-strong); border-radius:.5rem; padding:.8rem .9rem .2rem; background:var(--celeste-50); }
+.det-coord .card-text{ margin:0 0 .2rem; }
+.redes-lista{ display:flex; flex-wrap:wrap; gap:.3rem 1rem; margin-top:.4rem; font-size:.88rem; }
+.red-item small{ color:var(--ink-mute); }
+@media (max-width:640px){
+  .grid-4{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+}

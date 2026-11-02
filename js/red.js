@@ -7,6 +7,10 @@
   var TIPOS = window.RED_TIPOS;
   var RECURSOS = window.RED_RECURSOS;
   var CONVOCATORIAS = window.RED_CONVOCATORIAS;
+  // opciones del cuestionario de la red
+  var PERSONERIAS = window.RED_PERSONERIAS, ACTIVIDADES = window.RED_ACTIVIDADES, ALCANCES = window.RED_ALCANCES;
+  var REDES = window.RED_REDES, ESPACIOS = window.RED_ESPACIOS, SUELDOS = window.RED_SUELDOS;
+  var FONDOS_PUBLICOS = window.RED_FONDOS_PUBLICOS, FONDOS_PRIVADOS = window.RED_FONDOS_PRIVADOS;
   // el formulario del tablero cambia según el tipo de aviso
   var TEXTOS_AVISO = {
     necesita: { label: "¿Qué necesitan?", opciones: "recursos",
@@ -23,8 +27,13 @@
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   var CAMPOS_LABEL = {
-    nombre: "Nombre", tipo: "Tipo", referente: "Referente", descripcion: "Descripción",
-    edades: "Edades", chicos: "Cantidad de chicxs", horarios: "Horarios", localidad: "Localidad",
+    nombre: "Nombre", tipo: "Tipo", tipoOtro: "Tipo (otro)", personeria: "Personería", personeriaDetalle: "Personería (detalle)",
+    referente: "Referente", referenteRol: "Rol del referente", descripcion: "Descripción", horarios: "Horarios",
+    actividades: "Actividades", actividadesOtras: "Otras actividades", participantes: "Personas que participan",
+    alcance: "Alcance", educadorxs: "Educadorxs", whatsappPublico: "Quién ve el WhatsApp", localidad: "Localidad",
+    actividadesNuevas: "Actividades nuevas", actividadesBaja: "Actividades dadas de baja", espacio: "Espacio físico",
+    espacioInfo: "Espacio (detalle)", sueldos: "Sueldos", sueldosInfo: "Sueldos (detalle)", fondosPublicos: "Fondos públicos",
+    fondosPublicosDetalle: "Fondos públicos (detalle)", fondosPrivados: "Fondos privados", fondosPrivadosDetalle: "Fondos privados (detalle)",
     direccion: "Dirección", ubicacionPublica: "Ubicación para visitantes", ubicacionRed: "Ubicación para la red", lat: "Ubicación en el mapa",
     necesita: "Necesitan", ofrece: "Ofrecen", necesitaOtros: "Otras necesidades", ofreceOtros: "Otras ofertas", telefono: "Teléfono", correo: "Correo", redes: "Redes",
   };
@@ -80,6 +89,11 @@
         return true;
       }).slice(0, 6).map(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); });
   }
+  function tipoLabel(o) { return o.tipo === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[o.tipo] || TIPOS.otro).label; }
+  function tipoIcono(o) { return (TIPOS[o.tipo] || TIPOS.otro).icono; }
+  function totalPersonas(p) { p = p || {}; return (+p.ninxs || 0) + (+p.jovenes || 0) + (+p.adultxs || 0); }
+  // los datos marcados "solo coordinación" los ven la coordinación y la propia organización
+  function veDatosCoord(o) { return rol === "coord" || (rol === "org" && sesion && sesion.orgId === o.id); }
   function plural(n, uno, varios) { return n + " " + (n === 1 ? uno : varios); }
   function orgById(id) {
     for (var i = 0; i < orgs.length; i++) if (orgs[i].id === id) return orgs[i];
@@ -229,7 +243,7 @@
   function renderStats() {
     var provs = {};
     var chicos = 0;
-    orgs.forEach(function (o) { provs[o.provincia] = 1; chicos += +o.chicos || 0; });
+    orgs.forEach(function (o) { provs[o.provincia] = 1; chicos += (+(o.participantes || {}).ninxs || 0) + (+(o.participantes || {}).jovenes || 0); });
     $("statOrgs").textContent = orgs.length;
     $("statProv").textContent = Object.keys(provs).length;
     $("statChicos").textContent = chicos.toLocaleString("es-AR");
@@ -289,7 +303,8 @@
       if ((o[p[0]] || []).indexOf(p[1]) === -1) return false;
     }
     if (filtro.q) {
-      var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, o.referente, TIPOS[o.tipo].label,
+      var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, rol === "coord" ? o.referente : "", tipoLabel(o),
+        (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).join(" "), o.actividadesOtras || "",
         (o.necesita || []).map(function (k) { return RECURSOS[k]; }).join(" "),
         (o.ofrece || []).map(function (k) { return RECURSOS[k]; }).join(" "),
         (o.necesitaOtros || []).join(" "), (o.ofreceOtros || []).join(" ")].join(" "));
@@ -337,9 +352,9 @@
     }
     ul.innerHTML = lista.map(function (o) {
       return '<li class="org-card' + (o.id === seleccionId ? " is-selected" : "") + '" data-id="' + o.id + '">' +
-        '<div class="org-icon" aria-hidden="true">' + TIPOS[o.tipo].icono + "</div>" +
+        '<div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
         '<h3><button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button></h3>" +
-        '<div class="org-meta">' + esc(TIPOS[o.tipo].label) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
+        '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
         '<p class="org-desc">' + esc(o.descripcion) + "</p>" +
         '<div class="org-tags">' + tagsHtml(o, 3) + "</div>" +
         '<div class="org-actions">' +
@@ -370,14 +385,14 @@
   function iconoPin(o, sel) {
     return L.divIcon({
       className: "",
-      html: '<div class="pin' + (sel ? " is-selected" : "") + '"><span>' + TIPOS[o.tipo].icono + "</span></div>",
+      html: '<div class="pin' + (sel ? " is-selected" : "") + '"><span>' + tipoIcono(o) + "</span></div>",
       iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -32],
     });
   }
 
   function popupHtml(o) {
     return '<p class="popup-title">' + esc(o.nombre) + "</p>" +
-      '<p class="popup-meta">' + esc(TIPOS[o.tipo].label) + " · " + esc(o.localidad) + "</p>" +
+      '<p class="popup-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + "</p>" +
       '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '">Ver ficha</button>';
   }
 
@@ -571,18 +586,32 @@
     }
     var html = '<button type="button" class="modal-close" data-cerrar aria-label="Cerrar">✕</button>';
     if (opts.preview) html += '<span class="preview-flag">Vista previa · así se verá en el mapa</span>';
-    html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + TIPOS[o.tipo].icono + "</div>" +
+    html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
       '<div><h2 id="modalOrgTitulo">' + esc(o.nombre || "Sin nombre") + "</h2>" +
-      '<div class="org-meta">' + esc(TIPOS[o.tipo].label) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div></div></div>";
+      '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div></div></div>";
     html += "<p>" + esc(o.descripcion) + "</p>";
+    var p = o.participantes || {}, ed = o.educadorxs || {};
+    var personas = totalPersonas(p)
+      ? "≈ " + totalPersonas(p) + '<br><small>' + plural(+p.ninxs || 0, "niñx", "niñxs") + " · " + plural(+p.jovenes || 0, "joven", "jóvenes") + " · " + plural(+p.adultxs || 0, "adultx", "adultxs") + "</small>"
+      : "—";
+    var educ = +ed.total ? ed.total + '<br><small>' + plural(+ed.mujeres || 0, "mujer", "mujeres") + " · " + plural(+ed.varones || 0, "varón", "varones") + (+ed.otrxs ? " · " + plural(+ed.otrxs, "otrx", "otrxs") : "") + "</small>" : "—";
+    var pers = PERSONERIAS[o.personeria] ? esc(PERSONERIAS[o.personeria]) + (o.personeriaDetalle ? " (" + esc(o.personeriaDetalle) + ")" : "") : "—";
     html += '<dl class="det-grid">' +
-      "<div><dt>Referente</dt><dd>" + esc(o.referente || "—") + "</dd></div>" +
       "<div><dt>Ubicación</dt><dd>" + ubic + "</dd></div>" +
-      "<div><dt>Edades</dt><dd>" + esc(o.edades || "—") + "</dd></div>" +
-      "<div><dt>Chicxs que acompañan</dt><dd>" + (o.chicos ? "≈ " + esc(o.chicos) : "—") + "</dd></div>" +
       "<div><dt>Días y horarios</dt><dd>" + esc(o.horarios || "—") + "</dd></div>" +
+      "<div><dt>Personas que participan</dt><dd>" + personas + "</dd></div>" +
+      "<div><dt>Educadorxs</dt><dd>" + educ + "</dd></div>" +
+      "<div><dt>Alcance</dt><dd>" + esc(ALCANCES[o.alcance] || "—") + "</dd></div>" +
+      "<div><dt>Personería jurídica</dt><dd>" + pers + "</dd></div>" +
       "<div><dt>Ficha actualizada</dt><dd>" + fecha(o.actualizada || HOY) + "</dd></div>" +
       "</dl>";
+    var acts = (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).filter(Boolean);
+    if (o.actividadesOtras) acts.push(o.actividadesOtras);
+    if (acts.length) {
+      html += '<div class="det-sec"><h3>Actividades</h3><div class="org-tags" style="margin:0">' + acts.map(function (t) {
+        return '<span class="tag tag--neutral">' + esc(t) + "</span>";
+      }).join("") + "</div></div>";
+    }
     if ((o.necesita || []).length || (o.ofrece || []).length || (o.necesitaOtros || []).length || (o.ofreceOtros || []).length) {
       html += '<div class="det-sec"><h3>Necesitan y ofrecen</h3><div class="org-tags" style="margin:0">' + tagsHtml(o) + "</div></div>";
     }
@@ -597,25 +626,56 @@
         }).join("") + "</ul></div>";
       }
     }
-    html += '<div class="det-sec"><h3>Contacto</h3>';
-    if (rol === "visitante" && !opts.preview) {
-      html += '<p class="card-text" style="margin:0">Los datos de contacto solo los ven las organizaciones de la red. Si sos parte de una, tocá <strong>“Ingresar”</strong> con tu cuenta habilitada.</p></div>';
+    var redesTxt = Object.keys(REDES).filter(function (k) { return (o.redes || {})[k]; }).map(function (k) {
+      return '<span class="red-item"><small>' + esc(REDES[k]) + ":</small> " + esc(o.redes[k]) + "</span>";
+    }).join("");
+    var veTodo = rol !== "visitante" || opts.preview;
+    html += '<div class="det-sec"><h3>Contacto y redes</h3>';
+    if (veTodo) {
+      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + (o.correo ? " · ✉️ " + esc(o.correo) : "") + "</p>";
+      if (opts.preview) html += '<p class="card-text" style="margin:.3rem 0 0"><small>El WhatsApp lo ve ' + (o.whatsappPublico ? "cualquier persona" : "solo la red") + "; el correo, solo la red.</small></p>";
+    } else if (o.whatsappPublico) {
+      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + '</p><p class="card-text" style="margin:.3rem 0 0"><small>El correo lo ven solo las organizaciones de la red.</small></p>';
     } else {
-      html += '<p style="margin:0;font-size:.9rem">📞 ' + esc(o.telefono || "—") + (o.correo ? " · ✉️ " + esc(o.correo) : "") + (o.redes ? " · " + esc(o.redes) : "") + "</p></div>";
+      html += '<p class="card-text" style="margin:0">El WhatsApp y el correo los ven solo las organizaciones de la red. Si sos parte de una, tocá <strong>“Ingresar”</strong> con tu cuenta habilitada.</p>';
     }
+    if (redesTxt) html += '<div class="redes-lista">' + redesTxt + "</div>";
+    html += "</div>";
+    if (veDatosCoord(o) || opts.preview) html += bloqueCoordHtml(o);
     html += '<div class="det-actions">';
     if (opts.preview) {
       html += '<button type="button" class="btn btn-primary" data-enviar-ficha>Guardar y publicar</button>' +
         '<button type="button" class="btn" data-cerrar>Seguir editando</button>';
     } else {
-      if (rol !== "visitante") {
-        html += '<button type="button" class="btn btn-primary" data-contacto="WhatsApp">💬 WhatsApp</button>' +
-          '<button type="button" class="btn" data-contacto="el correo">✉️ Escribir</button>';
+      if (rol !== "visitante" || o.whatsappPublico) {
+        html += '<button type="button" class="btn btn-primary" data-contacto="WhatsApp">💬 WhatsApp</button>';
       }
+      if (rol !== "visitante") html += '<button type="button" class="btn" data-contacto="el correo">✉️ Escribir</button>';
       html += '<button type="button" class="btn" data-en-mapa="' + o.id + '">📍 Ver en el mapa</button>';
     }
     html += "</div>";
     return html;
+  }
+
+  // datos del cuestionario marcados "para la coordinación": no se publican
+  function bloqueCoordHtml(o) {
+    function lista(keys, dic, detalle) {
+      var t = (keys || []).map(function (k) { return dic[k]; }).filter(Boolean).join(", ");
+      if (detalle) t += (t ? ". " : "") + detalle;
+      return esc(t || "—");
+    }
+    function conInfo(v, info) { return esc(v || "—") + (info ? "<br><small>" + esc(info) + "</small>" : ""); }
+    return '<div class="det-sec det-coord"><h3>🔒 Solo para la coordinación</h3>' +
+      '<p class="card-text"><small>Lo ven la coordinación y la propia organización. No se publica.</small></p>' +
+      '<dl class="det-grid">' +
+      "<div><dt>Quien responde</dt><dd>" + esc(o.referente || "—") + (o.referenteRol ? "<br><small>" + esc(o.referenteRol) + "</small>" : "") + "</dd></div>" +
+      "<div><dt>Actividades nuevas</dt><dd>" + esc(o.actividadesNuevas || "No") + "</dd></div>" +
+      "<div><dt>Actividades dadas de baja</dt><dd>" + esc(o.actividadesBaja || "No") + "</dd></div>" +
+      "<div><dt>Espacio físico</dt><dd>" + conInfo(ESPACIOS[o.espacio], o.espacioInfo) + "</dd></div>" +
+      "<div><dt>Educadorxs con sueldo</dt><dd>" + conInfo(SUELDOS[o.sueldos], o.sueldosInfo) + "</dd></div>" +
+      "<div><dt>Fondos públicos</dt><dd>" + lista(o.fondosPublicos, FONDOS_PUBLICOS, o.fondosPublicosDetalle) + "</dd></div>" +
+      "<div><dt>Financiamiento privado</dt><dd>" + lista(o.fondosPrivados, FONDOS_PRIVADOS, o.fondosPrivadosDetalle) + "</dd></div>" +
+      "</dl></div>";
   }
 
   function mostrarModal(html) {
@@ -839,6 +899,30 @@
         return '<option value="' + esc(l) + '">' + esc(l) + "</option>";
       }).join("") + "</optgroup>");
     });
+    function opciones(id, dic, vacio) {
+      $(id).innerHTML = (vacio ? '<option value="">' + vacio + "</option>" : "") + Object.keys(dic).map(function (k) {
+        return '<option value="' + k + '">' + esc(dic[k]) + "</option>";
+      }).join("");
+    }
+    function chips(id, name, dic) {
+      $(id).innerHTML = Object.keys(dic).map(function (k) {
+        return '<label><input type="checkbox" name="' + name + '" value="' + k + '"><span>' + esc(dic[k]) + "</span></label>";
+      }).join("");
+    }
+    opciones("oPersoneria", PERSONERIAS, "Elegí…");
+    opciones("oAlcance", ALCANCES, "Elegí…");
+    opciones("oEspacio", ESPACIOS, "Elegí…");
+    opciones("oSueldos", SUELDOS, "Elegí…");
+    chips("oActividades", "actividades", ACTIVIDADES);
+    chips("oFondosPublicos", "fondosPublicos", FONDOS_PUBLICOS);
+    chips("oFondosPrivados", "fondosPrivados", FONDOS_PRIVADOS);
+    $("oRedes").innerHTML = Object.keys(REDES).map(function (k) {
+      return '<label class="field"><span class="field-hint">' + esc(REDES[k]) + '</span><input class="field-control" data-red="' + k + '" maxlength="80" placeholder="' +
+        (k === "web" ? "www…" : k === "facebook" ? "Nombre de la página" : "@usuario o link") + '"></label>';
+    }).join("");
+    ["oNinxs", "oJovenes", "oAdultxs"].forEach(function (id) { $(id).addEventListener("input", actualizarTotal); });
+    $("oTipo").addEventListener("change", mostrarOtros);
+    $("oPersoneria").addEventListener("change", mostrarOtros);
     ["oNecesita", "oOfrece"].forEach(function (id) {
       var name = id === "oNecesita" ? "necesita" : "ofrece";
       $(id).innerHTML = Object.keys(RECURSOS).map(function (k) {
@@ -904,6 +988,21 @@
   });
 
   function set(id, v) { $(id).value = v == null ? "" : v; }
+  function actualizarTotal() {
+    $("oTotalPersonas").textContent = totalPersonas({ ninxs: $("oNinxs").value, jovenes: $("oJovenes").value, adultxs: $("oAdultxs").value });
+  }
+  function mostrarOtros() {
+    $("oTipoOtroCampo").hidden = $("oTipo").value !== "otro";
+    var pers = $("oPersoneria").value;
+    $("oPersoneriaDetalleCampo").hidden = pers !== "otra" && pers !== "otrasit";
+  }
+  function marcar(f, name, valores) {
+    f.querySelectorAll('input[name="' + name + '"]').forEach(function (c) { c.checked = (valores || []).indexOf(c.value) !== -1; });
+  }
+  function marcados(f, name) {
+    return Array.prototype.map.call(f.querySelectorAll('input[name="' + name + '"]:checked'), function (c) { return c.value; });
+  }
+  function num(id) { return $(id).value === "" ? "" : Math.max(0, Math.round(+$(id).value)); }
 
   function cargarFicha() {
     var f = $("formFicha");
@@ -913,10 +1012,22 @@
     f.querySelectorAll("[aria-invalid]").forEach(function (x) { x.removeAttribute("aria-invalid"); });
     $("fichaError").hidden = true;
     $("fichaTitulo").textContent = o.nombre;
-    set("oNombre", o.nombre); set("oTipo", o.tipo); set("oReferente", o.referente);
-    set("oDescripcion", o.descripcion); set("oEdades", o.edades); set("oChicos", o.chicos);
-    set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
-    set("oTelefono", o.telefono); set("oCorreo", o.correo); set("oRedes", o.redes);
+    set("oNombre", o.nombre); set("oTipo", o.tipo); set("oTipoOtro", o.tipoOtro); set("oReferente", o.referente);
+    set("oReferenteRol", o.referenteRol); set("oPersoneria", o.personeria); set("oPersoneriaDetalle", o.personeriaDetalle);
+    set("oDescripcion", o.descripcion); set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
+    set("oTelefono", o.telefono); set("oCorreo", o.correo);
+    var p = o.participantes || {}, ed = o.educadorxs || {};
+    set("oNinxs", p.ninxs); set("oJovenes", p.jovenes); set("oAdultxs", p.adultxs); actualizarTotal();
+    set("oEducTotal", ed.total); set("oEducMujeres", ed.mujeres); set("oEducVarones", ed.varones); set("oEducOtrxs", ed.otrxs);
+    set("oAlcance", o.alcance); set("oActividadesOtras", o.actividadesOtras);
+    marcar(f, "actividades", o.actividades);
+    f.querySelectorAll("[data-red]").forEach(function (inp) { inp.value = (o.redes || {})[inp.getAttribute("data-red")] || ""; });
+    f.querySelector('input[name="oWaVis"][value="' + (o.whatsappPublico ? "publico" : "red") + '"]').checked = true;
+    set("oActNuevas", o.actividadesNuevas); set("oActBaja", o.actividadesBaja);
+    set("oEspacio", o.espacio); set("oEspacioInfo", o.espacioInfo); set("oSueldos", o.sueldos); set("oSueldosInfo", o.sueldosInfo);
+    marcar(f, "fondosPublicos", o.fondosPublicos); set("oFondosPublicosDetalle", o.fondosPublicosDetalle);
+    marcar(f, "fondosPrivados", o.fondosPrivados); set("oFondosPrivadosDetalle", o.fondosPrivadosDetalle);
+    mostrarOtros();
     f.querySelector('input[name="oVisPublica"][value="' + (o.ubicacionPublica === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     f.querySelector('input[name="oVisRed"][value="' + (o.ubicacionRed === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     ajustarVisibilidad();
@@ -942,11 +1053,18 @@
       id: base.id || null,
       nombre: $("oNombre").value.trim(),
       tipo: $("oTipo").value,
+      tipoOtro: $("oTipo").value === "otro" ? $("oTipoOtro").value.trim() : "",
+      personeria: $("oPersoneria").value,
+      personeriaDetalle: $("oPersoneriaDetalleCampo").hidden ? "" : $("oPersoneriaDetalle").value.trim(),
       referente: $("oReferente").value.trim(),
+      referenteRol: $("oReferenteRol").value.trim(),
       descripcion: $("oDescripcion").value.trim(),
-      edades: $("oEdades").value.trim(),
-      chicos: $("oChicos").value ? +$("oChicos").value : "",
       horarios: $("oHorarios").value.trim(),
+      actividades: marcados(f, "actividades"),
+      actividadesOtras: $("oActividadesOtras").value.trim(),
+      participantes: { ninxs: num("oNinxs"), jovenes: num("oJovenes"), adultxs: num("oAdultxs") },
+      alcance: $("oAlcance").value,
+      educadorxs: { total: num("oEducTotal"), mujeres: num("oEducMujeres"), varones: num("oEducVarones"), otrxs: num("oEducOtrxs") },
       localidad: loc,
       provincia: LOCALIDADES[loc] ? LOCALIDADES[loc].prov : "",
       direccion: $("oDireccion").value.trim(),
@@ -959,7 +1077,16 @@
       ofreceOtros: separarOtros($("oOfreceOtros").value),
       telefono: $("oTelefono").value.trim(),
       correo: $("oCorreo").value.trim(),
-      redes: $("oRedes").value.trim(),
+      whatsappPublico: f.querySelector('input[name="oWaVis"]:checked').value === "publico",
+      redes: Array.prototype.reduce.call(f.querySelectorAll("[data-red]"), function (acc, inp) {
+        acc[inp.getAttribute("data-red")] = inp.value.trim(); return acc;
+      }, {}),
+      actividadesNuevas: $("oActNuevas").value.trim(),
+      actividadesBaja: $("oActBaja").value.trim(),
+      espacio: $("oEspacio").value, espacioInfo: $("oEspacioInfo").value.trim(),
+      sueldos: $("oSueldos").value, sueldosInfo: $("oSueldosInfo").value.trim(),
+      fondosPublicos: marcados(f, "fondosPublicos"), fondosPublicosDetalle: $("oFondosPublicosDetalle").value.trim(),
+      fondosPrivados: marcados(f, "fondosPrivados"), fondosPrivadosDetalle: $("oFondosPrivadosDetalle").value.trim(),
       actualizada: HOY,
     };
   }
@@ -967,7 +1094,7 @@
   function validarFicha(d) {
     var faltan = [];
     [["oNombre", d.nombre], ["oTipo", d.tipo], ["oReferente", d.referente], ["oDescripcion", d.descripcion],
-      ["oLocalidad", d.localidad], ["oTelefono", d.telefono]].forEach(function (p) {
+      ["oLocalidad", d.localidad], ["oTelefono", d.telefono]].concat(d.tipo === "otro" ? [["oTipoOtro", d.tipoOtro]] : []).forEach(function (p) {
       if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
       else $(p[0]).removeAttribute("aria-invalid");
     });
@@ -1010,6 +1137,10 @@
       if (k === "lat") return Math.abs((a.lat || 0) - (b.lat || 0)) > 1e-5 || Math.abs((a.lng || 0) - (b.lng || 0)) > 1e-5;
       var x = a[k], y = b[k];
       if (Array.isArray(x) || Array.isArray(y)) return (x || []).slice().sort().join() !== (y || []).slice().sort().join();
+      if ((x && typeof x === "object") || (y && typeof y === "object")) {
+        var ks = Object.keys(Object.assign({}, x, y));
+        return ks.some(function (q) { return String((x || {})[q] == null ? "" : x[q]) !== String((y || {})[q] == null ? "" : y[q]); });
+      }
       return String(x == null ? "" : x) !== String(y == null ? "" : y);
     });
   }
@@ -1076,8 +1207,8 @@
       var d = s.datos;
       return '<li class="card solicitud">' +
         '<div class="org-tags" style="margin:0"><span class="tag tag--ofrece">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
-        "<h3>" + TIPOS[d.tipo].icono + " " + esc(d.nombre) + "</h3>" +
-        '<p class="org-meta">' + esc(TIPOS[d.tipo].label) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
+        "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + "</h3>" +
+        '<p class="org-meta">' + esc(tipoLabel(d)) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
         '<p class="pedido-mail">Cuenta a habilitar: <strong>' + esc(s.email) + "</strong></p>" +
         (s.mensaje ? "<blockquote>" + esc(s.mensaje) + "</blockquote>" : "") +
         '<div class="solicitud-actions">' +
@@ -1121,7 +1252,13 @@
       var loc = LOCALIDADES[d.localidad];
       nOrg += 1;
       var nueva = Object.assign({
-        edades: "", chicos: "", horarios: "", direccion: "", redes: "", telefono: "", necesita: [], ofrece: [], necesitaOtros: [], ofreceOtros: [],
+        horarios: "", direccion: "", telefono: "", necesita: [], ofrece: [], necesitaOtros: [], ofreceOtros: [],
+        tipoOtro: "", personeria: "", personeriaDetalle: "", referenteRol: "", actividades: [], actividadesOtras: "",
+        participantes: { ninxs: "", jovenes: "", adultxs: "" }, alcance: "", whatsappPublico: false,
+        educadorxs: { total: "", mujeres: "", varones: "", otrxs: "" },
+        redes: { facebook: "", instagram: "", waCanal: "", youtube: "", web: "", otra: "" },
+        actividadesNuevas: "", actividadesBaja: "", espacio: "", espacioInfo: "", sueldos: "", sueldosInfo: "",
+        fondosPublicos: [], fondosPublicosDetalle: "", fondosPrivados: [], fondosPrivadosDetalle: "",
         lat: +(loc.lat + Math.sin(nOrg) * 0.015).toFixed(5), lng: +(loc.lng + Math.cos(nOrg) * 0.02).toFixed(5),
         ubicacionPublica: "zona", ubicacionRed: "zona",
       }, clone(d), { id: "org-" + nOrg, estado: "aprobada", actualizada: HOY, correo: d.correo || s.email });

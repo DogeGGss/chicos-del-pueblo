@@ -4,15 +4,63 @@
  * sirven solo para mostrar cómo funcionaría la herramienta.
  */
 (function () {
+  /* Tipos de organización: los mismos del cuestionario de la red. */
   window.RED_TIPOS = {
-    comedor:  { label: "Comedor",                 icono: "🍲" },
-    merendero:{ label: "Merendero",               icono: "🥛" },
-    hogar:    { label: "Hogar / casa convivencial", icono: "🏠" },
-    apoyo:    { label: "Apoyo escolar",           icono: "📚" },
-    cultura:  { label: "Centro cultural",         icono: "🎨" },
-    deporte:  { label: "Club / deporte",          icono: "⚽" },
-    salud:    { label: "Salud comunitaria",       icono: "🩺" },
-    oficios:  { label: "Oficios y trabajo",       icono: "🧰" },
+    jardin:    { label: "Jardín comunitario",              icono: "🧸" },
+    club:      { label: "Club de fútbol",                  icono: "⚽" },
+    casaninx:  { label: "Casa del niñx",                   icono: "🏡" },
+    centrodia: { label: "Centro de día / espacio comunitario", icono: "🤝" },
+    hogar:     { label: "Hogar convivencial",              icono: "🏠" },
+    biblioteca:{ label: "Biblioteca",                      icono: "📚" },
+    cultural:  { label: "Centro cultural",                 icono: "🎨" },
+    murga:     { label: "Murga",                           icono: "🥁" },
+    comedor:   { label: "Comedor",                         icono: "🍲" },
+    radio:     { label: "Radio",                           icono: "📻" },
+    educativo: { label: "Centro educativo",                icono: "✏️" },
+    otro:      { label: "Otro",                            icono: "📌" },
+  };
+
+  /* Opciones del cuestionario de la red (29/10). */
+  window.RED_PERSONERIAS = {
+    fundacion: "Fundación", asociacion: "Asociación civil", cooperativa: "Cooperativa",
+    otra: "Otra personería", ninguna: "No tenemos", tramite: "En trámite", otrasit: "Otra situación",
+  };
+  window.RED_ACTIVIDADES = {
+    deportivas: "Actividades deportivas", artisticas: "Actividades artísticas",
+    apoyo: "Apoyo escolar y propuestas educativas", fines: "Terminalidad educativa (Plan FinEs)",
+    oficios: "Capacitación laboral / oficios", biblioteca: "Biblioteca",
+    medica: "Atención médica individual", terapeutico: "Espacio terapéutico individual o grupal",
+    consumo: "Acompañamiento en consumo problemático", generos: "Géneros y diversidades",
+    comunicacion: "Comunicación", habitat: "Hábitat y vivienda",
+  };
+  window.RED_ALCANCES = {
+    barrial: "Barrial", local: "Local", intermunicipal: "Intermunicipal",
+    municipal: "Municipal", provincial: "Provincial", nacional: "Nacional",
+  };
+  window.RED_REDES = {
+    facebook: "Facebook", instagram: "Instagram", waCanal: "Canal de WhatsApp",
+    youtube: "YouTube", web: "Sitio web", otra: "Otra red",
+  };
+  /* Solo para la coordinación */
+  window.RED_ESPACIOS = {
+    alquilado: "Espacio alquilado", prestado: "Espacio prestado", cedido: "Espacio cedido / comodato",
+    propio: "Espacio propio de la organización", ocupado: "Espacio ocupado",
+    compartido: "Espacio compartido con otras organizaciones",
+  };
+  window.RED_SUELDOS = {
+    todxs: "Todxs", masmitad: "Más de la mitad", mitad: "La mitad", algunxs: "Solo algunxs", ningunx: "Ningunx",
+  };
+  window.RED_FONDOS_PUBLICOS = {
+    ninguno: "No recibimos recursos de fuentes públicas",
+    udi: "Becas Unidad de Desarrollo Infantil",
+    opnya: "Becas del organismo provincial de niñez y adolescencia (PBA)",
+    envion: "Programa Envión", sedronar: "SEDRONAR", universidades: "Universidades",
+    capitalhumano: "Ministerio de Capital Humano", alimprov: "Alimentos de la provincia",
+    alimmuni: "Alimentos del municipio",
+  };
+  window.RED_FONDOS_PRIVADOS = {
+    empresas: "Empresas", individuos: "Individuos / personas", fundaciones: "Fundaciones / asociaciones civiles",
+    religiosas: "Instituciones religiosas", otros: "Otros", ninguno: "No recibimos",
   };
 
   /* Vocabulario común de recursos: lo que una organización necesita
@@ -83,13 +131,70 @@
   };
 
   var n = 0;
+  /* Datos de ejemplo del cuestionario: se completan solos y siempre igual
+     (a partir del número de cada organización), salvo que la ficha los traiga. */
+  var ACT_POR_TIPO = {
+    jardin: ["artisticas", "apoyo"], club: ["deportivas"], casaninx: ["apoyo", "artisticas", "deportivas"],
+    centrodia: ["apoyo", "oficios", "terapeutico"], hogar: ["apoyo", "terapeutico", "oficios"],
+    biblioteca: ["biblioteca", "apoyo"], cultural: ["artisticas", "comunicacion"], murga: ["artisticas"],
+    comedor: ["apoyo"], radio: ["comunicacion", "artisticas"], educativo: ["apoyo", "fines"], otro: [],
+  };
+  var ROLES = ["Coordinación general", "Fundadorx", "Educadorx a cargo", "Presidencia de la asociación civil", "Equipo de conducción"];
+  function elegir(lista, n, k) { return lista[(n * 7 + k * 13) % lista.length]; }
+  function participantes(o, n) {
+    var total = +o.chicos || 40;
+    var m = String(o.edades || "").match(/(\d+)\D+(\d+)/);
+    var min = m ? +m[1] : 0, max = m ? +m[2] : 30;
+    var hastaDoce = Math.max(0, Math.min(max, 12) - min + 1), trece = Math.max(0, Math.min(max, 18) - Math.max(min, 13) + 1);
+    var parteN = hastaDoce + trece ? hastaDoce / (hastaDoce + trece) : 0.5;
+    var adultxs = m ? Math.round(total * (0.08 + (n % 4) * 0.03)) : Math.round(total * 0.3);
+    var ninxs = Math.round(total * parteN);
+    return { ninxs: ninxs, jovenes: total - ninxs, adultxs: adultxs };
+  }
+  function cuestionario(o, n) {
+    var tipo = o.tipo;
+    var acts = (ACT_POR_TIPO[tipo] || []).slice();
+    var extra = ["generos", "consumo", "comunicacion", "habitat", "medica", "deportivas"][n % 6];
+    if (n % 3 === 0 && acts.indexOf(extra) === -1) acts.push(extra);
+    var educ = 3 + (n * 5) % 14, mujeres = Math.round(educ * 0.65), otrxs = n % 5 === 0 ? 1 : 0;
+    var redes = { facebook: "", instagram: "", waCanal: "", youtube: "", web: "", otra: "" };
+    if (o.redes) redes.instagram = o.redes;
+    if (n % 4 === 1) redes.facebook = o.nombre;
+    if (tipo === "radio") redes.youtube = "@" + o.nombre.toLowerCase().replace(/[^a-z]+/g, "");
+    var publicos = ["udi", "opnya", "envion", "alimprov", "alimmuni", "sedronar", "universidades"];
+    var fp = n % 6 === 0 ? ["ninguno"] : [elegir(publicos, n, 1), elegir(publicos, n, 4)].filter(function (v, i, a) { return a.indexOf(v) === i; });
+    return {
+      personeria: elegir(["asociacion", "asociacion", "fundacion", "tramite", "ninguna", "cooperativa"], n, 2),
+      personeriaDetalle: "",
+      actividades: acts,
+      actividadesOtras: "",
+      participantes: participantes(o, n),
+      alcance: elegir(["barrial", "barrial", "local", "municipal", "intermunicipal"], n, 3),
+      redes: redes,
+      whatsappPublico: n % 3 === 1,
+      educadorxs: { total: educ, mujeres: mujeres, varones: educ - mujeres - otrxs, otrxs: otrxs },
+      // solo para la coordinación (y la propia organización)
+      referenteRol: elegir(ROLES, n, 5),
+      actividadesNuevas: n % 4 === 2 ? "Taller de huerta" : "",
+      actividadesBaja: n % 7 === 3 ? "Torneo de fútbol de los sábados: no hay quien lo coordine" : "",
+      espacio: elegir(["propio", "prestado", "cedido", "alquilado", "compartido", "propio"], n, 6),
+      espacioInfo: "",
+      sueldos: elegir(["ningunx", "algunxs", "algunxs", "ningunx", "mitad"], n, 7),
+      sueldosInfo: "",
+      fondosPublicos: fp,
+      fondosPublicosDetalle: "",
+      fondosPrivados: n % 5 === 2 ? ["ninguno"] : [elegir(["individuos", "fundaciones", "religiosas", "empresas"], n, 8)],
+      fondosPrivadosDetalle: "",
+    };
+  }
+
   function org(o) {
     n += 1;
     var loc = window.RED_LOCALIDADES[o.localidad];
     // desplazamiento chico y determinístico para que las casas de una misma localidad no se pisen
     var dLat = (Math.sin(n * 12.9898) * 0.018);
     var dLng = (Math.cos(n * 78.233) * 0.022);
-    return Object.assign({
+    var base = Object.assign({
       id: "org-" + n,
       provincia: loc.prov,
       lat: +(loc.lat + dLat).toFixed(5),
@@ -99,26 +204,30 @@
       ubicacionPublica: "zona",
       ubicacionRed: "zona",
       direccion: "",
+      tipoOtro: "",
       telefono: "(0" + (10 + (n % 80)) + ") 15-0000-" + String(1000 + n).slice(-4),
       correo: "contacto@ejemplo-" + n + ".org.ar",
-      redes: "",
       necesita: [],
       ofrece: [],
       necesitaOtros: [],   // lo que escriben a mano, fuera de la lista de recursos
       ofreceOtros: [],
       estado: "aprobada",
       actualizada: "2026-09-" + String(1 + (n * 7) % 24).padStart(2, "0"),
-    }, o);
+    }, cuestionario(o, n), o);
+    if (typeof o.redes === "string") base.redes = cuestionario(o, n).redes;
+    delete base.chicos; delete base.edades;
+    return base;
   }
 
+
   window.RED_ORGS = [
-    org({ nombre: "Casa del Niño Semillitas", tipo: "hogar", localidad: "Avellaneda",
+    org({ nombre: "Casa del Niño Semillitas", tipo: "casaninx", localidad: "Avellaneda",
       referente: "Marta Giménez", edades: "4 a 14 años", chicos: 85,
       horarios: "Lunes a viernes de 8 a 18", redes: "@casasemillitas",
       descripcion: "Casa del niño con desayuno, almuerzo y merienda. Apoyo escolar a la tarde y taller de huerta los sábados.",
       necesita: ["utiles", "voluntarixs"], ofrece: ["espacio", "capacitacion"] ,
       direccion: "Pasaje Los Aromos 245", ubicacionRed: "exacta" }),
-    org({ nombre: "Merendero Los Gurises", tipo: "merendero", localidad: "José C. Paz",
+    org({ nombre: "Merendero Los Gurises", tipo: "comedor", localidad: "José C. Paz",
       referente: "Graciela Ortiz", edades: "2 a 12 años", chicos: 60,
       horarios: "Lunes, miércoles y viernes de 16 a 19", redes: "@merendero.losgurises",
       descripcion: "Merendero barrial que funciona en la casa de una vecina. Leche, pan casero y juegos después de la escuela.",
@@ -129,7 +238,7 @@
       horarios: "Lunes a sábado, almuerzo de 12 a 14",
       descripcion: "Comedor comunitario que da almuerzo a familias del barrio. Olla popular los sábados.",
       necesita: ["alimentos", "cocina"], ofrece: ["transporte"] }),
-    org({ nombre: "Centro Cultural La Ronda", tipo: "cultura", localidad: "Quilmes",
+    org({ nombre: "Centro Cultural La Ronda", tipo: "cultural", localidad: "Quilmes",
       referente: "Lucía Paredes", edades: "8 a 18 años", chicos: 70,
       horarios: "Martes a sábado de 15 a 20", redes: "@laronda.cultural",
       descripcion: "Murga, teatro, radio y serigrafía. Los chicos arman su propio programa de radio cada viernes.",
@@ -141,12 +250,12 @@
       horarios: "Convivencial, 24 horas",
       descripcion: "Casa convivencial para chicos y chicas. Panadería y huerta como proyectos productivos.",
       necesita: ["ropa", "legal"], ofrece: ["alimentos", "capacitacion"] }),
-    org({ nombre: "Apoyo Escolar Pizarrón Abierto", tipo: "apoyo", localidad: "Berazategui",
+    org({ nombre: "Apoyo Escolar Pizarrón Abierto", tipo: "educativo", localidad: "Berazategui",
       referente: "Noelia Sosa", edades: "6 a 15 años", chicos: 45,
       horarios: "Lunes a jueves de 14 a 17",
       descripcion: "Apoyo escolar primaria y secundaria. Biblioteca popular abierta al barrio.",
       necesita: ["voluntarixs", "utiles"], ofrece: ["libros"] }),
-    org({ nombre: "Club Social El Potrero", tipo: "deporte", localidad: "Moreno",
+    org({ nombre: "Club Social El Potrero", tipo: "club", localidad: "Moreno",
       referente: "Walter Benítez", edades: "5 a 17 años", chicos: 120,
       horarios: "Martes, jueves y sábados de 17 a 20",
       descripcion: "Fútbol mixto, hockey y merienda después del entrenamiento. Torneos con otros clubes de barrio.",
@@ -157,12 +266,12 @@
       horarios: "Lunes a viernes de 7 a 17",
       descripcion: "Jardín comunitario y casa del niño. Acompañamiento a las familias en trámites.",
       necesita: ["libros", "abrigo"], ofrece: ["legal"] }),
-    org({ nombre: "Merendero Pancitas Felices", tipo: "merendero", localidad: "Los Polvorines",
+    org({ nombre: "Merendero Pancitas Felices", tipo: "comedor", localidad: "Los Polvorines",
       referente: "Rosa Villalba", edades: "3 a 12 años", chicos: 55,
       horarios: "Martes y jueves de 16 a 18:30",
       descripcion: "Merienda y taller de lectura. Funciona en el salón de la parroquia del barrio.",
       necesita: ["alimentos", "libros"], ofrece: [] }),
-    org({ nombre: "Taller de Oficios Manos del Barrio", tipo: "oficios", localidad: "San Miguel",
+    org({ nombre: "Taller de Oficios Manos del Barrio", tipo: "centrodia", localidad: "San Miguel",
       referente: "Jorge Almada", edades: "14 a 21 años", chicos: 35,
       horarios: "Lunes a viernes de 9 a 13",
       descripcion: "Carpintería, electricidad y herrería para adolescentes. Emprendimiento de muebles a pedido.",
@@ -173,22 +282,22 @@
       descripcion: "Comedor con más de 200 raciones diarias. Ropero comunitario los miércoles.",
       necesita: ["alimentos", "voluntarixs", "cocina"], ofrece: ["ropa"],
       ofreceOtros: ["Pañales"] }),
-    org({ nombre: "Salita Comunitaria Ternura", tipo: "salud", localidad: "Lomas de Zamora",
+    org({ nombre: "Salita Comunitaria Ternura", tipo: "centrodia", localidad: "Lomas de Zamora",
       referente: "Dra. Paula Ferreyra", edades: "0 a 18 años", chicos: 300,
       horarios: "Lunes a viernes de 9 a 15",
       descripcion: "Controles de niño sano, vacunación y talleres de salud sexual integral junto a promotoras del barrio.",
       necesita: ["transporte"], ofrece: ["salud", "capacitacion"] }),
-    org({ nombre: "Casa de Jóvenes Mar y Arena", tipo: "cultura", localidad: "Mar del Plata",
+    org({ nombre: "Casa de Jóvenes Mar y Arena", tipo: "centrodia", localidad: "Mar del Plata",
       referente: "Federico Lagos", edades: "12 a 20 años", chicos: 40,
       horarios: "Lunes a viernes de 14 a 20",
       descripcion: "Espacio de encuentro para adolescentes: música, surf social y terminalidad educativa.",
       necesita: ["abrigo"], ofrece: ["talleristas", "espacio"] }),
-    org({ nombre: "Merendero Vientos del Sur", tipo: "merendero", localidad: "Bahía Blanca",
+    org({ nombre: "Merendero Vientos del Sur", tipo: "comedor", localidad: "Bahía Blanca",
       referente: "Andrea Molina", edades: "3 a 14 años", chicos: 48,
       horarios: "Lunes a viernes de 16 a 18",
       descripcion: "Merienda, apoyo escolar y juegos. Hacemos colecta de abrigo todos los inviernos.",
       necesita: ["alimentos", "utiles"], ofrece: [] }),
-    org({ nombre: "Centro Comunitario Los Pibes del Sur", tipo: "apoyo", localidad: "Rosario",
+    org({ nombre: "Centro Comunitario Los Pibes del Sur", tipo: "centrodia", localidad: "Rosario",
       referente: "Matías Correa", edades: "6 a 17 años", chicos: 90,
       horarios: "Lunes a viernes de 14 a 19",
       descripcion: "Apoyo escolar, biblioteca y taller de rap. Articulamos con la escuela del barrio.",
@@ -203,27 +312,27 @@
       horarios: "Lunes a sábado de 11:30 a 14",
       descripcion: "Comedor y copa de leche. Taller de costura para las mamás del barrio.",
       necesita: ["alimentos", "cocina"], ofrece: ["ropa", "capacitacion"] }),
-    org({ nombre: "Club de Barrio Los Algarrobos", tipo: "deporte", localidad: "Villa María",
+    org({ nombre: "Club de Barrio Los Algarrobos", tipo: "club", localidad: "Villa María",
       referente: "Diego Luna", edades: "6 a 16 años", chicos: 75,
       horarios: "Lunes a viernes de 17 a 20",
       descripcion: "Básquet, fútbol y vóley. Merienda después de cada entrenamiento.",
       necesita: ["ropa"], ofrece: ["espacio", "transporte"] }),
-    org({ nombre: "Casa de la Niñez Cerro Arco", tipo: "hogar", localidad: "Las Heras",
+    org({ nombre: "Casa de la Niñez Cerro Arco", tipo: "casaninx", localidad: "Las Heras",
       referente: "Estela Pérez", edades: "3 a 12 años", chicos: 65,
       horarios: "Lunes a viernes de 8 a 16",
       descripcion: "Casa de día con desayuno, almuerzo y talleres de arte.",
       necesita: ["talleristas", "utiles"], ofrece: ["alimentos"] }),
-    org({ nombre: "Centro Cultural Acequia", tipo: "cultura", localidad: "Mendoza",
+    org({ nombre: "Centro Cultural Acequia", tipo: "radio", localidad: "Mendoza",
       referente: "Tomás Videla", edades: "10 a 18 años", chicos: 55,
       horarios: "Martes a viernes de 16 a 20",
       descripcion: "Folclore, audiovisual y radio comunitaria.",
       necesita: ["herramientas"], ofrece: ["talleristas", "capacitacion"] }),
-    org({ nombre: "Merendero Sol de Zonda", tipo: "merendero", localidad: "San Juan",
+    org({ nombre: "Merendero Sol de Zonda", tipo: "comedor", localidad: "San Juan",
       referente: "Liliana Castro", edades: "2 a 12 años", chicos: 42,
       horarios: "Lunes a viernes de 17 a 19",
       descripcion: "Merienda y ludoteca. Festejamos juntos los cumpleaños del mes.",
       necesita: ["alimentos", "libros"], ofrece: ["voluntarixs"] }),
-    org({ nombre: "Apoyo Escolar Las Chacras", tipo: "apoyo", localidad: "San Luis",
+    org({ nombre: "Apoyo Escolar Las Chacras", tipo: "educativo", localidad: "San Luis",
       referente: "Mauricio Funes", edades: "6 a 14 años", chicos: 38,
       horarios: "Lunes a jueves de 14:30 a 17:30",
       descripcion: "Apoyo escolar y alfabetización digital con computadoras donadas.",
@@ -233,22 +342,22 @@
       horarios: "Lunes a viernes, almuerzo",
       descripcion: "Comedor comunitario en barrio toba. Taller de lengua qom y artesanía.",
       necesita: ["alimentos", "salud", "abrigo"], ofrece: ["talleristas"] }),
-    org({ nombre: "Casa del Niño Caldenes", tipo: "hogar", localidad: "Santa Rosa",
+    org({ nombre: "Casa del Niño Caldenes", tipo: "casaninx", localidad: "Santa Rosa",
       referente: "Ana Berardi", edades: "4 a 13 años", chicos: 52,
       horarios: "Lunes a viernes de 8 a 17",
       descripcion: "Casa de día, huerta agroecológica y cría de gallinas.",
       necesita: ["transporte"], ofrece: ["alimentos", "capacitacion"] }),
-    org({ nombre: "Centro Juvenil Cordillera", tipo: "cultura", localidad: "Bariloche",
+    org({ nombre: "Centro Juvenil Cordillera", tipo: "cultural", localidad: "Bariloche",
       referente: "Nahuel Epulef", edades: "12 a 20 años", chicos: 45,
       horarios: "Lunes a sábado de 15 a 21",
       descripcion: "Espacio joven en el Alto: música, murales y preparación para el primer empleo.",
       necesita: ["abrigo", "espacio"], ofrece: ["talleristas"] }),
-    org({ nombre: "Merendero Chacra y Manzana", tipo: "merendero", localidad: "General Roca",
+    org({ nombre: "Merendero Chacra y Manzana", tipo: "comedor", localidad: "General Roca",
       referente: "Soledad Pino", edades: "2 a 12 años", chicos: 50,
       horarios: "Lunes a viernes de 16:30 a 18:30",
       descripcion: "Merienda con fruta del Alto Valle y taller de cocina con las familias.",
       necesita: ["cocina", "utiles"], ofrece: ["alimentos"] }),
-    org({ nombre: "Casa de Chicxs Valle Inferior", tipo: "apoyo", localidad: "Trelew",
+    org({ nombre: "Casa de Chicxs Valle Inferior", tipo: "casaninx", localidad: "Trelew",
       referente: "Gwen Roberts", edades: "6 a 16 años", chicos: 36,
       horarios: "Lunes a viernes de 14 a 18",
       descripcion: "Apoyo escolar, merienda y taller de ajedrez.",
@@ -260,7 +369,7 @@
       necesita: ["alimentos", "abrigo"], ofrece: ["ropa"] }),
 
     /* pedidos de acceso pendientes (aparecen en el panel de Coordinación) */
-    org({ nombre: "Biblioteca Popular Letras al Viento", tipo: "apoyo", localidad: "Avellaneda",
+    org({ nombre: "Biblioteca Popular Letras al Viento", tipo: "biblioteca", localidad: "Avellaneda",
       referente: "Hernán Lucero", edades: "5 a 15 años", chicos: 30,
       horarios: "Sábados de 10 a 13",
       descripcion: "Biblioteca popular con cuentacuentos y apoyo escolar los sábados.",
@@ -274,7 +383,7 @@
       necesita: ["alimentos", "cocina"], ofrece: [], estado: "pendiente",
       emailSolicitud: "olla.barrioobrero@example.com",
       mensaje: "Fuimos a la marcha de noviembre con el Centro Comunitario Los Pibes del Sur y queremos sumarnos a la red." }),
-    org({ nombre: "Escuelita de Fútbol Los Cóndores", tipo: "deporte", localidad: "Mendoza",
+    org({ nombre: "Escuelita de Fútbol Los Cóndores", tipo: "club", localidad: "Mendoza",
       referente: "Raúl Aguirre", edades: "6 a 14 años", chicos: 60,
       horarios: "Lunes, miércoles y viernes de 18 a 20",
       descripcion: "Escuela de fútbol infantil gratuita con merienda.",
