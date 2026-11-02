@@ -362,7 +362,7 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
 :root[data-theme="dark"] .leaflet-control-attribution a{ color:var(--celeste-700); }
 :root[data-theme="dark"] .modal::backdrop{ background:rgba(0,0,0,.6); }
 
-/* ---------- cuestionario de la red: qué se publica y qué es solo para la coordinación ---------- */
+/* ---------- cuestionario de la red: qué se publica y qué ven solo las cuentas de la red ---------- */
 .check-chips:not(.check-chips--necesita):not(.check-chips--ofrece) input:checked + span{ background:var(--celeste-100); border-color:var(--solid); color:var(--ink); }
 .grid-4{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:.6rem .8rem; }
 .total-campo{ justify-content:flex-end; }
