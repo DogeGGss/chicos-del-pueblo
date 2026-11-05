@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chicxs del Pueblo · Historia del movimiento</title>
 <meta name="description" content="La historia del Movimiento Nacional de los Chicos del Pueblo, de la Ley Agote (1919) a la red de más de 400 organizaciones de hoy.">
-<script src="js/tema.js?v=18"></script>
+<script src="js/tema.js?v=19"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/marca.css?v=18">
+<link rel="stylesheet" href="css/marca.css?v=19">
 <style>
   /* la paleta viene de css/marca.css; estos alias mantienen los nombres usados abajo */
   :root{
@@ -100,9 +100,12 @@
     font-style:italic; font-size:clamp(1.05rem,2.6vw,1.35rem);
     color:var(--ink-soft); max-width:42ch; margin:1.1rem 0 0;
   }
-  .hero-art{ width:100%; height:auto; margin-top:1.6rem; display:block; }
-  .hero-art .hdot{ opacity:0; animation:hdot .5s ease forwards; }
-  @keyframes hdot{ from{ opacity:0; transform:translateY(4px); } to{ opacity:.9; transform:none; } }
+  .hero-cinta{ margin:1.6rem 0 0; display:grid; grid-template-columns:1fr; }
+  .hero-cinta img{ width:100%; height:auto; display:block; }
+  .cinta-lbl{ font-family:var(--f-head); font-weight:700; font-size:clamp(.72rem,1.6vw,.9rem); letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); }
+  .cinta-lbl--desde{ margin-bottom:.4rem; }
+  .cinta-lbl--hoy{ text-align:right; margin-top:.3rem; }
+  :root[data-theme="dark"] .hero-cinta img{ filter:drop-shadow(0 0 1px rgba(255,255,255,.6)); }
 
   /* ---------- manifiesto ---------- */
   .manifiesto{
@@ -187,12 +190,23 @@
   .hito p{ margin:0; max-width:60ch; }
 
   /* ---------- crecimiento ---------- */
-  .cinta{
-    margin:0 0 1.8rem; background:#F6F6F6; border:2px solid var(--ink); border-radius:.6rem;
-    padding:1rem 1rem .9rem; box-shadow:5px 5px 0 var(--celeste);
+  .growth{
+    display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap;
+    background:var(--celeste-50); border:2px solid var(--ink); border-radius:.6rem;
+    padding:2rem 1.6rem; margin-bottom:1.8rem; box-shadow:5px 5px 0 var(--celeste);
   }
-  .cinta img{ display:block; width:100%; height:auto; }
-  .cinta figcaption{ font-family:var(--f-head); font-size:.8rem; color:#4B5256; text-align:center; margin-top:.6rem; }
+  .growth-num{ text-align:center; }
+  .growth-num .big{ font-family:var(--f-head); font-weight:800; font-size:clamp(2.6rem,8vw,4rem); line-height:1; }
+  .growth-num .cap{ font-family:var(--f-head); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); max-width:16ch; margin:.4rem auto 0; }
+  .growth-num.from .big{ color:var(--ink-soft); }
+  .growth-num.to .big{ color:var(--brick); }
+  .growth-arrow{ flex:1; min-width:60px; height:2px; background:repeating-linear-gradient(to right, var(--teal) 0 10px, transparent 10px 16px); position:relative; }
+  .growth-arrow::after{
+    content:""; position:absolute; right:-2px; top:50%; width:0; height:0;
+    border-top:6px solid transparent; border-bottom:6px solid transparent; border-left:9px solid var(--teal);
+    transform:translateY(-50%);
+  }
+  .growth-caption{ width:100%; font-family:var(--f-head); font-size:.8rem; color:var(--ink-soft); text-align:center; }
 
   /* 6 estadísticas: dos filas parejas de 3, sin ítems sueltos */
   .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
@@ -346,6 +360,7 @@
         <a class="chip" data-nav href="#era-9">CTA</a>
         <a class="chip" data-nav href="#era-10">2001</a>
         <a class="chip" data-nav href="#era-11">AUH</a>
+        <span class="chip-group chip-group--mov">Organizaciones</span>
         <a class="chip" data-nav href="#era-12">La herencia</a>
         <a class="chip" data-nav href="#era-13">Pandemia</a>
         <a class="chip" data-nav href="#era-14">Hoy</a>
@@ -360,10 +375,12 @@
   <section class="hero" id="hero">
     <div class="hero-badge"><span class="dot"></span> Movimiento Nacional · fundado el 30 de septiembre de 1987</div>
     <h1 class="masthead"><span class="l1">CHICXS</span><span class="l2">DEL PUEBLO</span></h1>
-    <p class="hero-sub">Del patronato de menores a reconocer a lxs chicxs como sujetos políticos: la historia del movimiento, desde sus orígenes hasta hoy.</p>
-    <svg class="hero-art" id="heroArt" viewBox="0 0 800 220" width="800" height="220" role="img" aria-label="Ilustración de un sol sobre una red de casas comunitarias unidas por un hilo, creciendo de cinco puntos a cientos">
-      <title>De cinco casas a una red nacional, bajo el mismo sol</title>
-    </svg>
+    <p class="hero-sub">Historia, presente y convicciones de organizaciones que abrazan.</p>
+    <figure class="hero-cinta">
+      <span class="cinta-lbl cinta-lbl--desde">1987 · 5 casas</span>
+      <img src="img/cinta-casas.png" width="1127" height="403" alt="Una cinta celeste que empieza con 5 casas dibujadas y se ensancha, llena de casas, hasta el logo de Organizaciones de lxs Chicxs del Pueblo.">
+      <span class="cinta-lbl cinta-lbl--hoy">2026 · más de 400 casas</span>
+    </figure>
   </section>
 
   <div class="manifiesto">
@@ -426,7 +443,7 @@
     <div class="hito">
       <div class="eyebrow">Parte 2 · desde 1987</div>
       <h2>La historia del Movimiento</h2>
-      <p>Acá empieza la historia de la organización: en 1987 nace el Movimiento Nacional de los Chicos del Pueblo, que hoy reúne a más de 400 organizaciones de todo el país.</p>
+      <p>Acá empieza la historia de la organización: en 1987 nace el Movimiento Nacional de los Chicos del Pueblo. Su herencia sigue hoy en las Organizaciones de lxs Chicxs del Pueblo, que reúnen a más de 400 casas de todo el país.</p>
     </div>
 
     <div class="timeline">
@@ -457,7 +474,7 @@
           <div class="era-top"><span class="era-date num">1990</span></div>
           <h3>La respuesta del barrio</h3>
           <p>Con el impacto de la hiperinflación y el modelo neoliberal en los años noventa, la realidad en los barrios populares se vuelve muy dura. Frente a la ausencia del Estado, es la propia comunidad la que se pone al hombro la respuesta. Las vecinas y los vecinos empiezan a juntarse para resolver lo cotidiano.</p>
-          <p>Nacen así ollas populares, jardines comunitarios, redes de apoyo escolar y radios del barrio creadas y sostenidas por la misma gente que hoy forma parte del Movimiento. Este cambio es clave: las familias pasan de ser asistidas a organizarse colectivamente para defender el pan, el cuidado y el futuro de sus pibes y pibas.</p>
+          <p>Nacen así ollas populares, jardines comunitarios, redes de apoyo escolar y radios del barrio creadas y sostenidas por la misma gente que hoy forma parte de las Organizaciones de lxs Chicxs del Pueblo. Este cambio es clave: las familias pasan de ser asistidas a organizarse colectivamente para defender el pan, el cuidado y el futuro de sus pibes y pibas.</p>
         </article>
 
         <article class="era" id="era-8">
@@ -518,17 +535,25 @@
       <h2>La historia en números</h2>
     </div>
 
-    <figure class="cinta">
-      <img src="img/cinta-casas.jpg" width="1200" height="578" alt="Una cinta celeste que empieza en 1987 con 5 casas dibujadas y se ensancha hasta 2026, llena de casas y con el logo de Organizaciones de lxs Chicxs del Pueblo: más de 400 casas.">
-      <figcaption>De 5 casas en 1987 a más de 400 en 2026: hoy la red reúne organizaciones de todo el país.<sup><a class="ref" href="#ref-1" aria-label="Fuente 1">[1]</a></sup><sup><a class="ref" href="#ref-14" aria-label="Fuente 14">[14]</a></sup></figcaption>
-    </figure>
+    <div class="growth">
+      <div class="growth-num from">
+        <div class="big num" data-count="5" data-duration="900">5</div>
+        <div class="cap">casas fundadoras · 1987</div>
+      </div>
+      <div class="growth-arrow" aria-hidden="true"></div>
+      <div class="growth-num to">
+        <div class="big"><span class="num" data-count="400" data-duration="1400">0</span><span aria-hidden="true">+</span></div>
+        <div class="cap">casas hoy, en todo el país</div>
+      </div>
+      <div class="growth-caption">De un acta firmada por un puñado de casas a una red nacional: hoy las Organizaciones de lxs Chicxs del Pueblo reúnen a más de 400 casas.<sup><a class="ref" href="#ref-1" aria-label="Fuente 1">[1]</a></sup><sup><a class="ref" href="#ref-14" aria-label="Fuente 14">[14]</a></sup></div>
+    </div>
 
     <div class="stats">
       <div class="stat"><div class="big num" data-count="18" data-duration="900">0</div><div class="cap">países en el Primer Encuentro Latinoamericano, 1990</div></div>
       <div class="stat"><div class="big num" data-count="400" data-duration="1100">0</div><div class="cap">chicos y chicas en la Tercera Marcha por la Vida, 2005</div></div>
       <div class="stat"><div class="big num" data-count="4500" data-duration="1400">0</div><div class="cap">km recorridos en esa Marcha, de Tucumán a Plaza de Mayo</div></div>
       <div class="stat"><div class="big num" data-count="86" data-duration="1000">0</div><div class="cap">años de patronato de menores, de la Ley Agote (1919) a la Ley 26.061 (2005)</div></div>
-      <div class="stat"><div class="big num" data-count="39" data-duration="900">0</div><div class="cap">años de trayectoria del Movimiento desde 1987</div></div>
+      <div class="stat"><div class="big num" data-count="39" data-duration="900">0</div><div class="cap">años de historia desde el acta fundacional de 1987</div></div>
       <div class="stat"><div class="big num" data-count="10" data-duration="800">0</div><div class="cap">provincias con organizaciones de la red hoy, de Chubut a Chaco</div></div>
     </div>
   </section>
@@ -546,7 +571,7 @@
           <div class="placard-face placard-front"><div class="lema">"El hambre es un crimen"</div></div>
           <div class="placard-face placard-back">
             <span class="when">Consigna de Alberto Morlachetti</span>
-            <p>Resume la denuncia central del Movimiento y se repite en cada Marcha Nacional, hasta hoy.</p>
+            <p>Resume la denuncia central del Movimiento, y las Organizaciones de lxs Chicxs del Pueblo la siguen levantando en cada marcha.</p>
             <span class="fuente">Fuente [15]</span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
@@ -681,7 +706,7 @@
   </section>
 
   <aside class="elaboracion">
-    <p>Este recorrido histórico fue elaborado a partir del libro <em>Con ternura venceremos</em><sup><a class="ref" href="#ref-20" aria-label="Fuente 20">[20]</a></sup> y de testimonios compartidos en charlas con referentes del Movimiento.</p>
+    <p>Este recorrido histórico fue elaborado a partir del libro <em>Con ternura venceremos</em><sup><a class="ref" href="#ref-20" aria-label="Fuente 20">[20]</a></sup> y de testimonios compartidos en charlas con referentes de las Organizaciones de lxs Chicxs del Pueblo.</p>
   </aside>
 
   <section class="fuentes" id="fuentes">
@@ -695,7 +720,7 @@
     </ol>
 
     <h3 class="fuentes-tit">Fuentes secundarias</h3>
-    <p class="fuentes-def">Documentos del Movimiento, normativa oficial, registros audiovisuales y notas periodísticas.</p>
+    <p class="fuentes-def">Documentos del Movimiento y de las Organizaciones de lxs Chicxs del Pueblo, normativa oficial, registros audiovisuales y notas periodísticas.</p>
     <ol class="sources" start="2">
       <li id="ref-2"><a href="https://servicios.infoleg.gob.ar/infolegInternet/verNorma.do?id=103606" target="_blank" rel="noopener">InfoLEG — Ley 10.903 de Patronato de Menores (Ley Agote), 1919</a></li>
       <li id="ref-3"><a href="https://www.saij.gob.ar/docs-f/ediciones/libros/CONST%20NACIONAL%201949%20digital.pdf" target="_blank" rel="noopener">SAIJ — Constitución de la Nación Argentina de 1949</a></li>
@@ -732,78 +757,11 @@
   </div>
 </footer>
 
-<script src="js/red-datos.js?v=18"></script>
-<script src="js/sesion.js?v=18"></script>
+<script src="js/red-datos.js?v=19"></script>
+<script src="js/sesion.js?v=19"></script>
 <script>
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---- hero SVG: sun + growing network of houses ---- */
-  var svg = document.getElementById('heroArt');
-  var ns = 'http://www.w3.org/2000/svg';
-  function el(name, attrs){
-    var e = document.createElementNS(ns, name);
-    for (var k in attrs) e.setAttribute(k, attrs[k]);
-    return e;
-  }
-  // sun (riso misregistration: brick echo behind marigold disc)
-  var sunX = 120, sunY = 78, sunR = 46;
-  var gSunBack = el('g', {transform:'translate(5,4)', opacity:'0.55'});
-  var gSunFront = el('g', {});
-  for (var i=0;i<16;i++){
-    var ang = (i/16) * Math.PI * 2;
-    var x1 = sunX + Math.cos(ang)*(sunR+6), y1 = sunY + Math.sin(ang)*(sunR+6);
-    var x2 = sunX + Math.cos(ang)*(sunR+26), y2 = sunY + Math.sin(ang)*(sunR+26);
-    gSunBack.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'var(--brick)','stroke-width':5,'stroke-linecap':'round'}));
-    gSunFront.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'var(--marigold)','stroke-width':5,'stroke-linecap':'round'}));
-  }
-  svg.appendChild(gSunBack);
-  svg.appendChild(gSunFront);
-  svg.appendChild(el('circle',{cx:sunX+5,cy:sunY+4,r:sunR,fill:'var(--brick)',opacity:'0.55'}));
-  svg.appendChild(el('circle',{cx:sunX,cy:sunY,r:sunR,fill:'var(--marigold)',stroke:'var(--ink)','stroke-width':3}));
-
-  // thread + 5 founding houses, then fading network of many small orgs
-  var baseY = 170;
-  var houseXs = [70,150,230,310,390];
-  var pathD = 'M ' + houseXs[0] + ' ' + baseY;
-  for (var h=1; h<houseXs.length; h++){ pathD += ' L ' + houseXs[h] + ' ' + baseY; }
-  pathD += ' L 780 ' + baseY;
-  svg.appendChild(el('path',{d:pathD, fill:'none', stroke:'var(--teal)', 'stroke-width':2.5, 'stroke-dasharray':'1 9', 'stroke-linecap':'round'}));
-
-  function house(x,y,scale){
-    var g = el('g',{transform:'translate('+x+','+y+') scale('+scale+')'});
-    g.appendChild(el('rect',{x:-13,y:-2,width:26,height:20,fill:'var(--card-bg)',stroke:'var(--ink)','stroke-width':2.5}));
-    g.appendChild(el('polygon',{points:'-16,-2 0,-18 16,-2', fill:'var(--brick)',stroke:'var(--ink)','stroke-width':2.5,'stroke-linejoin':'round'}));
-    return g;
-  }
-  houseXs.forEach(function(x){ svg.appendChild(house(x, baseY, 1)); });
-
-  // de 5 casas a más de 400: 395 puntos más, cada vez más densos y dispersos hacia la derecha
-  var seed = 1987;
-  function rnd(){ seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
-  var cluster = el('g', {'aria-hidden':'true'});
-  var n = 395, x0 = 418, x1 = 792;
-  var dots = [];
-  for (var j=0;j<n;j++){
-    var t = Math.pow(rnd(), 0.45);          // exponente < 1: se acumulan hacia la derecha
-    var cx = x0 + t*(x1 - x0);
-    var spread = 4 + t*t*56;                // la nube se abre a medida que crece la red
-    var cy = baseY + (rnd() + rnd() - 1) * spread;
-    cy = Math.min(Math.max(cy, 104), 214);
-    dots.push({x:cx, y:cy, t:t});
-  }
-  dots.sort(function(a,b){ return a.x - b.x; });
-  dots.forEach(function(d, k){
-    var c = el('circle',{cx:d.x.toFixed(1), cy:d.y.toFixed(1), r:(2.9 - d.t*1.1).toFixed(2),
-      fill: k % 9 === 0 ? 'var(--ink)' : (k % 3 === 0 ? 'var(--celeste)' : 'var(--celeste-700)')});
-    if (!reduced){ c.setAttribute('class','hdot'); c.style.animationDelay = (0.3 + d.t*1.8).toFixed(2) + 's'; }
-    cluster.appendChild(c);
-  });
-  svg.appendChild(cluster);
-  var lblStyle = {'font-family':'Archivo, sans-serif','font-weight':700,'font-size':12,'letter-spacing':'.06em',fill:'var(--ink-soft)'};
-  var lbl1 = el('text', Object.assign({x:230, y:212, 'text-anchor':'middle'}, lblStyle)); lbl1.textContent = '1987 · 5 CASAS';
-  var lbl2 = el('text', Object.assign({x:792, y:92, 'text-anchor':'end'}, lblStyle)); lbl2.textContent = 'HOY · MÁS DE 400 ORGANIZACIONES';
-  svg.appendChild(lbl1); svg.appendChild(lbl2);
 
   /* ---- scroll reveal for era cards ---- */
   var eras = document.querySelectorAll('.era');
@@ -928,6 +886,19 @@
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       btn.textContent = open ? 'Ocultar' : label;
     });
+  });
+
+  /* ---- fuentes: el número abre directo el documento o la página citada ----
+     (las que no tienen link, como la charla o el libro, siguen llevando a la lista del final) */
+  document.querySelectorAll('a.ref[href^="#ref-"]').forEach(function(ref){
+    var item = document.getElementById(ref.getAttribute('href').slice(1));
+    var link = item && item.querySelector('a[href]');
+    if (!link) return;
+    ref.href = link.href;
+    ref.target = '_blank';
+    ref.rel = 'noopener';
+    ref.title = link.textContent;
+    ref.setAttribute('aria-label', ref.getAttribute('aria-label') + ': ' + link.textContent + ' (se abre en otra pestaña)');
   });
 
   /* ---- placard flip ---- */
