@@ -78,6 +78,9 @@
   function marcaInventado(o, campo) {
     return (o.inventados || []).indexOf(campo) !== -1 ? ' <span class="inventado" title="Dato inventado: no estaba en la encuesta">inventado</span>' : "";
   }
+  function marcaFicticia(o) {
+    return o.ficticia ? ' <span class="inventado" title="Organización de ejemplo: no es real">ficticia</span>' : "";
+  }
   function fecha(iso) {
     var p = String(iso).split("-");
     return +p[2] + " " + MESES[+p[1] - 1];
@@ -320,7 +323,7 @@
       return '<li class="org-card' + (o.id === seleccionId ? " is-selected" : "") + '" data-id="' + o.id + '">' +
         '<div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
         '<h3><button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button></h3>" +
-        '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
+        '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaFicticia(o) + "</div>" +
         (o.descripcion ? '<p class="org-desc">' + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>" : "") +
         '<div class="org-actions">' +
         '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '" aria-label="Ver ficha de ' + esc(o.nombre) + '">Ver ficha</button>' +
@@ -357,7 +360,7 @@
 
   function popupHtml(o) {
     return '<p class="popup-title">' + esc(o.nombre) + "</p>" +
-      '<p class="popup-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + "</p>" +
+      '<p class="popup-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + marcaFicticia(o) + "</p>" +
       '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '">Ver ficha</button>';
   }
 
@@ -521,7 +524,7 @@
     if (opts.preview) html += '<span class="preview-flag">Vista previa · así se verá en el mapa</span>';
     html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
       '<div><h2 id="modalOrgTitulo">' + esc(o.nombre || "Sin nombre") + "</h2>" +
-      '<div class="org-meta">' + esc(tipoLabel(o)) + marcaInventado(o, "tipoOtro") + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div></div></div>";
+      '<div class="org-meta">' + esc(tipoLabel(o)) + marcaInventado(o, "tipoOtro") + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaFicticia(o) + "</div></div></div>";
     if (o.descripcion) html += "<p>" + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>";
     var p = o.participantes || {}, ed = o.educadorxs || {};
     var personas = totalPersonas(p)
@@ -1008,8 +1011,9 @@
     fichaPos = { lat: o.lat, lng: o.lng };
     fichaPinManual = true;
     var inventados = (o.inventados || []).map(function (k) { return CAMPOS_LABEL[k]; }).filter(Boolean);
-    $("fichaInventados").hidden = !inventados.length;
-    $("fichaInventados").textContent = "Estos datos son inventados porque no estaban en la encuesta: " + inventados.join(", ") + ". Al corregirlos dejan de estar marcados.";
+    $("fichaInventados").hidden = !inventados.length && !o.ficticia;
+    $("fichaInventados").textContent = o.ficticia ? "Esta es una organización ficticia, de ejemplo: todos sus datos son inventados."
+      : "Estos datos son inventados porque no estaban en la encuesta: " + inventados.join(", ") + ". Al corregirlos dejan de estar marcados.";
     var estado = $("fichaEstado");
     estado.hidden = false;
     estado.innerHTML = "✅ Tu ficha está <strong>publicada</strong> en el mapa. Última actualización: " + fecha(o.actualizada) +
@@ -1181,7 +1185,7 @@
       var d = s.datos;
       return '<li class="card solicitud">' +
         '<div class="org-tags" style="margin:0"><span class="tag tag--destacado">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
-        "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + "</h3>" +
+        "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + marcaFicticia(d) + "</h3>" +
         '<p class="org-meta">' + esc(tipoLabel(d)) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
         '<p class="pedido-mail">Cuenta a habilitar: <strong>' + esc(s.email) + "</strong></p>" +
         (s.mensaje ? "<blockquote>" + esc(s.mensaje) + "</blockquote>" : "") +
