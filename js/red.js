@@ -5,24 +5,11 @@
   "use strict";
 
   var TIPOS = window.RED_TIPOS;
-  var RECURSOS = window.RED_RECURSOS;
   var CONVOCATORIAS = window.RED_CONVOCATORIAS;
   // opciones del cuestionario de la red
   var PERSONERIAS = window.RED_PERSONERIAS, ACTIVIDADES = window.RED_ACTIVIDADES, ALCANCES = window.RED_ALCANCES;
   var REDES = window.RED_REDES, ESPACIOS = window.RED_ESPACIOS, SUELDOS = window.RED_SUELDOS;
   var FONDOS_PUBLICOS = window.RED_FONDOS_PUBLICOS, FONDOS_PRIVADOS = window.RED_FONDOS_PRIVADOS;
-  // el formulario del tablero cambia según el tipo de aviso
-  var TEXTOS_AVISO = {
-    necesita: { label: "¿Qué necesitan?", opciones: "recursos",
-      titulo: "Ej.: Necesitamos 2 ollas grandes para la olla popular",
-      detalle: "Cantidades, para cuándo lo necesitan, si pueden pasar a buscar…" },
-    ofrece: { label: "¿Qué ofrecen?", opciones: "recursos",
-      titulo: "Ej.: Tenemos ropa de invierno para chicos de 4 a 10 años",
-      detalle: "Qué tienen, cuánto, hasta cuándo y cómo se retira…" },
-    convoca: { label: "Tipo de convocatoria", opciones: "convocatorias",
-      titulo: "Ej.: Jornada de pintura en el centro comunitario",
-      detalle: "A quiénes invitan, qué hay que llevar, cómo anotarse…" },
-  };
   var LOCALIDADES = window.RED_LOCALIDADES;
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -35,7 +22,7 @@
     espacioInfo: "Espacio (detalle)", sueldos: "Sueldos", sueldosInfo: "Sueldos (detalle)", fondosPublicos: "Fondos públicos",
     fondosPublicosDetalle: "Fondos públicos (detalle)", fondosPrivados: "Fondos privados", fondosPrivadosDetalle: "Fondos privados (detalle)",
     direccion: "Dirección", ubicacionPublica: "Ubicación para visitantes", ubicacionRed: "Ubicación para la red", lat: "Ubicación en el mapa",
-    necesita: "Necesitan", ofrece: "Ofrecen", necesitaOtros: "Otras necesidades", ofreceOtros: "Otras ofertas", telefono: "Teléfono", correo: "Correo", redes: "Redes",
+    telefono: "Teléfono", correo: "Correo", redes: "Redes",
   };
 
   /* ---------------- estado ---------------- */
@@ -62,7 +49,7 @@
   var ultimoPedido = null;       // nombre de la organización del último pedido enviado
   var emailRechazado = "";       // cuenta no habilitada con la que se intentó ingresar
   var nOrg = 1000;
-  var filtro = { q: "", prov: "", recurso: "", tipos: {} };
+  var filtro = { q: "", prov: "", tipos: {} };
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function $(id) { return document.getElementById(id); }
@@ -77,17 +64,6 @@
   function fecha(iso) {
     var p = String(iso).split("-");
     return +p[2] + " " + MESES[+p[1] - 1];
-  }
-  // "pañales, garrafa de gas" -> ["Pañales", "Garrafa de gas"] (sin repetidos, máx. 6)
-  function separarOtros(texto) {
-    var vistos = {};
-    return String(texto || "").split(/[,;\n]/).map(function (t) { return t.trim().slice(0, 40); })
-      .filter(function (t) {
-        var k = norm(t);
-        if (!k || vistos[k]) return false;
-        vistos[k] = true;
-        return true;
-      }).slice(0, 6).map(function (t) { return t.charAt(0).toUpperCase() + t.slice(1); });
   }
   function tipoLabel(o) { return o.tipo === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[o.tipo] || TIPOS.otro).label; }
   function tipoIcono(o) { return (TIPOS[o.tipo] || TIPOS.otro).icono; }
@@ -119,7 +95,7 @@
 
   /* ---------------- vistas (botones de la barra celeste) ---------------- */
   var botonesVista = Array.prototype.slice.call(document.querySelectorAll(".nav-vista"));
-  var VISTAS = ["mapa", "tablero", "ficha", "acceso", "coord"];
+  var VISTAS = ["mapa", "agenda", "ficha", "acceso", "coord"];
   function mostrarVista(v, sinHash) {
     var boton = document.querySelector('.nav-vista[data-vista="' + v + '"]');
     if (!boton || boton.hidden) v = "mapa";
@@ -260,14 +236,6 @@
     window.RED_PROVINCIAS.forEach(function (p) {
       selProv.insertAdjacentHTML("beforeend", '<option value="' + esc(p) + '">' + esc(p) + "</option>");
     });
-    var selRec = $("fRecurso");
-    var grpN = '<optgroup label="Necesitan…">';
-    var grpO = '<optgroup label="Ofrecen…">';
-    Object.keys(RECURSOS).forEach(function (k) {
-      grpN += '<option value="necesita:' + k + '">Necesitan: ' + esc(RECURSOS[k]) + "</option>";
-      grpO += '<option value="ofrece:' + k + '">Ofrecen: ' + esc(RECURSOS[k]) + "</option>";
-    });
-    selRec.insertAdjacentHTML("beforeend", grpN + "</optgroup>" + grpO + "</optgroup>");
 
     var box = $("fTipos");
     Object.keys(TIPOS).forEach(function (k) {
@@ -285,10 +253,9 @@
     });
     $("fBuscar").addEventListener("input", function () { filtro.q = this.value; aplicarFiltros(); });
     selProv.addEventListener("change", function () { filtro.prov = this.value; aplicarFiltros(true); });
-    selRec.addEventListener("change", function () { filtro.recurso = this.value; aplicarFiltros(); });
     $("btnLimpiar").addEventListener("click", function () {
-      filtro = { q: "", prov: "", recurso: "", tipos: {} };
-      $("fBuscar").value = ""; selProv.value = ""; selRec.value = "";
+      filtro = { q: "", prov: "", tipos: {} };
+      $("fBuscar").value = ""; selProv.value = "";
       box.querySelectorAll("[data-tipo]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
       aplicarFiltros(true);
     });
@@ -298,16 +265,9 @@
     if (filtro.prov && o.provincia !== filtro.prov) return false;
     var tiposOn = Object.keys(filtro.tipos);
     if (tiposOn.length && !filtro.tipos[o.tipo]) return false;
-    if (filtro.recurso) {
-      var p = filtro.recurso.split(":");
-      if ((o[p[0]] || []).indexOf(p[1]) === -1) return false;
-    }
     if (filtro.q) {
       var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, rol !== "visitante" ? o.referente : "", tipoLabel(o),
-        (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).join(" "), o.actividadesOtras || "",
-        (o.necesita || []).map(function (k) { return RECURSOS[k]; }).join(" "),
-        (o.ofrece || []).map(function (k) { return RECURSOS[k]; }).join(" "),
-        (o.necesitaOtros || []).join(" "), (o.ofreceOtros || []).join(" ")].join(" "));
+        (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).join(" "), o.actividadesOtras || ""].join(" "));
       var palabras = norm(filtro.q).split(/\s+/).filter(Boolean);
       for (var i = 0; i < palabras.length; i++) if (blob.indexOf(palabras[i]) === -1) return false;
     }
@@ -315,7 +275,7 @@
   }
 
   function hayFiltros() {
-    return !!(filtro.q || filtro.prov || filtro.recurso || Object.keys(filtro.tipos).length);
+    return !!(filtro.q || filtro.prov || Object.keys(filtro.tipos).length);
   }
 
   function aplicarFiltros(reencuadrar) {
@@ -326,23 +286,6 @@
   }
 
   /* ---------------- listado ---------------- */
-  function tagsHtml(o, max) {
-    var html = "";
-    var n = 0;
-    function tag(txt, clase) {
-      if (max && n >= max) return;
-      html += '<span class="tag ' + clase + '">' + txt + "</span>"; n++;
-    }
-    // primero todo lo que necesitan, después todo lo que ofrecen (lo escrito a mano va con borde punteado)
-    (o.necesita || []).forEach(function (k) { tag("Necesita: " + esc(RECURSOS[k]), "tag--necesita"); });
-    (o.necesitaOtros || []).forEach(function (t) { tag("Necesita: " + esc(t), "tag--necesita tag--otro"); });
-    (o.ofrece || []).forEach(function (k) { tag("Ofrece: " + esc(RECURSOS[k]), "tag--ofrece"); });
-    (o.ofreceOtros || []).forEach(function (t) { tag("Ofrece: " + esc(t), "tag--ofrece tag--otro"); });
-    var total = (o.necesita || []).length + (o.ofrece || []).length + (o.necesitaOtros || []).length + (o.ofreceOtros || []).length;
-    if (max && total > max) html += '<span class="tag tag--neutral">+' + (total - max) + "</span>";
-    return html;
-  }
-
   function renderLista(lista) {
     $("listCount").textContent = plural(lista.length, "organización", "organizaciones");
     var ul = $("orgList");
@@ -356,7 +299,6 @@
         '<h3><button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button></h3>" +
         '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
         '<p class="org-desc">' + esc(o.descripcion) + "</p>" +
-        '<div class="org-tags">' + tagsHtml(o, 3) + "</div>" +
         '<div class="org-actions">' +
         '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '" aria-label="Ver ficha de ' + esc(o.nombre) + '">Ver ficha</button>' +
         '<button type="button" class="btn btn-sm" data-en-mapa-lista="' + o.id + '" aria-label="Ver ' + esc(o.nombre) + ' en el mapa">📍 En el mapa</button>' +
@@ -537,39 +479,6 @@
     intentarIngreso(f.elements.email.value);
   });
 
-  function coincidencias(o) {
-    var leSirven = [];
-    var lesSirve = [];
-    orgs.forEach(function (x) {
-      if (x.id === o.id) return;
-      var dan = (x.ofrece || []).filter(function (k) { return (o.necesita || []).indexOf(k) !== -1; })
-        .map(function (k) { return RECURSOS[k]; }).concat(cruceOtros(o.necesitaOtros, x.ofreceOtros));
-      var reciben = (x.necesita || []).filter(function (k) { return (o.ofrece || []).indexOf(k) !== -1; })
-        .map(function (k) { return RECURSOS[k]; }).concat(cruceOtros(o.ofreceOtros, x.necesitaOtros));
-      var cerca = x.provincia === o.provincia ? 0 : 1;
-      if (dan.length) leSirven.push({ org: x, recursos: dan, cerca: cerca });
-      if (reciben.length) lesSirve.push({ org: x, recursos: reciben, cerca: cerca });
-    });
-    function orden(a, b) { return a.cerca - b.cerca || b.recursos.length - a.recursos.length || a.org.nombre.localeCompare(b.org.nombre, "es"); }
-    return { leSirven: leSirven.sort(orden).slice(0, 4), lesSirve: lesSirve.sort(orden).slice(0, 4) };
-  }
-
-  // coincidencias entre textos libres: "pañales" cruza con "Pañales talle M"
-  function cruceOtros(a, b) {
-    return (a || []).filter(function (t) {
-      var nt = norm(t);
-      return (b || []).some(function (u) { var nu = norm(u); return nt.indexOf(nu) !== -1 || nu.indexOf(nt) !== -1; });
-    });
-  }
-
-  function listaMatches(items) {
-    return '<ul class="matches">' + items.map(function (m) {
-      return '<li><button type="button" data-ver="' + m.org.id + '">' + esc(m.org.nombre) + "</button> · " +
-        esc(m.org.localidad) + (m.cerca ? ", " + esc(m.org.provincia) : "") + " — " +
-        esc(m.recursos.join(", ")) + "</li>";
-    }).join("") + "</ul>";
-  }
-
   function detalleHtml(o, opts) {
     opts = opts || {};
     var ubic;
@@ -612,17 +521,11 @@
         return '<span class="tag tag--neutral">' + esc(t) + "</span>";
       }).join("") + "</div></div>";
     }
-    if ((o.necesita || []).length || (o.ofrece || []).length || (o.necesitaOtros || []).length || (o.ofreceOtros || []).length) {
-      html += '<div class="det-sec"><h3>Necesitan y ofrecen</h3><div class="org-tags" style="margin:0">' + tagsHtml(o) + "</div></div>";
-    }
     if (!opts.preview) {
-      var c = coincidencias(o);
-      if (c.leSirven.length) html += '<div class="det-sec"><h3>Quiénes pueden ayudarles</h3>' + listaMatches(c.leSirven) + "</div>";
-      if (c.lesSirve.length) html += '<div class="det-sec"><h3>A quiénes pueden ayudar</h3>' + listaMatches(c.lesSirve) + "</div>";
       var suyos = avisos.filter(function (a) { return a.orgId === o.id; });
       if (suyos.length) {
-        html += '<div class="det-sec"><h3>Sus avisos en el tablero</h3><ul class="matches">' + suyos.map(function (a) {
-          return "<li><strong>" + esc(etiquetaAviso(a.tipo)) + ":</strong> " + esc(a.titulo) + (a.cuando ? " (" + fecha(a.cuando) + ")" : "") + "</li>";
+        html += '<div class="det-sec"><h3>Sus convocatorias en la agenda</h3><ul class="matches">' + suyos.map(function (a) {
+          return "<li><strong>" + esc(etiquetaClase(a)) + ":</strong> " + esc(a.titulo) + (a.cuando ? " (" + fecha(a.cuando) + ")" : "") + "</li>";
         }).join("") + "</ul></div>";
       }
     }
@@ -691,24 +594,19 @@
     if (o) mostrarModal(detalleHtml(o));
   }
 
-  /* ---------------- tablero ---------------- */
-  function etiquetaAviso(t) { return { necesita: "Necesitan", ofrece: "Ofrecen", convoca: "Convocatoria" }[t]; }
-  function etiquetaRecurso(a) {
-    if (a.tipo === "convoca") return CONVOCATORIAS[a.recurso] || "Actividad";
-    return RECURSOS[a.recurso] || "Otra cosa";
-  }
+  /* ---------------- agenda ---------------- */
+  function etiquetaClase(a) { return CONVOCATORIAS[a.clase] || "Actividad"; }
 
   // quiénes respondieron: lo ve cualquiera, también quien entra como visitante
   function respuestasHtml(a) {
     var quienes = (a.respondieron || []).map(orgById).filter(Boolean);
-    var titulo = { necesita: "Quieren ayudar", ofrece: "Les interesa", convoca: "Se suman" }[a.tipo];
     if (!quienes.length) return '<p class="aviso-resp aviso-resp--vacio">Todavía ninguna organización respondió.</p>';
     var max = avisosAbiertos[a.id] ? quienes.length : 3;
     var html = quienes.slice(0, max).map(function (o) {
       return '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button>";
     }).join(", ");
     if (quienes.length > max) html += ' y <button type="button" class="aviso-mas" data-abrir-resp="' + a.id + '">' + plural(quienes.length - max, "más", "más") + "</button>";
-    return '<p class="aviso-resp"><strong>' + titulo + " (" + quienes.length + "):</strong> " + html + "</p>";
+    return '<p class="aviso-resp"><strong>Se suman (' + quienes.length + "):</strong> " + html + "</p>";
   }
 
   // distancia en km entre dos organizaciones (fórmula del haversine)
@@ -731,31 +629,15 @@
     });
   }
 
-  function opcionesAviso(tipo) {
-    var t = TEXTOS_AVISO[tipo];
-    var fuente = t.opciones === "convocatorias" ? CONVOCATORIAS : RECURSOS;
-    $("avRecursoLabel").textContent = t.label;
-    $("avRecurso").innerHTML = Object.keys(fuente).map(function (k) {
-      return '<option value="' + k + '">' + esc(fuente[k]) + "</option>";
-    }).join("") + (tipo === "convoca" ? "" : '<option value="otro">Otra cosa (la aclaran en el título)</option>');
-    $("avTitulo").placeholder = t.titulo;
-    $("avDetalle").placeholder = t.detalle;
-    $("avConvoca").hidden = tipo !== "convoca";
-    $("avCuando").required = tipo === "convoca";
-  }
-
   function renderAvisos() {
     var ul = $("avisosList");
     var esOrg = rol === "org";
-    $("filtroMias").hidden = !esOrg;
+    $("avisosFiltros").hidden = !esOrg;
     if (!esOrg && avisoFiltro === "mias") marcarFiltroAviso("");
     if (esOrg) $("cuentaMias").textContent = avisos.filter(function (a) { return a.orgId === sesion.orgId; }).length || "";
-    var lista = avisos.filter(function (a) {
-      if (avisoFiltro === "mias") return a.orgId === sesion.orgId;
-      return !avisoFiltro || a.tipo === avisoFiltro;
-    });
+    var lista = avisos.filter(function (a) { return avisoFiltro !== "mias" || a.orgId === sesion.orgId; });
     function porFecha(a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; }
-    // una organización ve primero los avisos de las casas más cercanas (los propios, al final)
+    // una organización ve primero las convocatorias de las casas más cercanas (los propios, al final)
     var yo = esOrg ? miOrg() : null;
     var porCercania = yo && avisoFiltro !== "mias" && ordenAvisos === "cerca";
     var dist = {};
@@ -768,13 +650,13 @@
     if (yo) {
       $("ordenAvisos").value = ordenAvisos;
       $("avisosOrdenTexto").innerHTML = porCercania
-        ? "Ordenados por cercanía a <strong>" + esc(yo.nombre) + "</strong> (" + esc(yo.localidad) + ")."
-        : "Ordenados por fecha de publicación.";
+        ? "Ordenadas por cercanía a <strong>" + esc(yo.nombre) + "</strong> (" + esc(yo.localidad) + ")."
+        : "Ordenadas por fecha de publicación.";
     }
     if (!lista.length) {
       ul.innerHTML = '<li class="vacio">' + (avisoFiltro === "mias"
-        ? "Todavía no publicaron avisos. Usá el formulario “Publicar un aviso”."
-        : "No hay avisos de este tipo por ahora.") + "</li>";
+        ? "Todavía no publicaron convocatorias. Usá el formulario “Publicar una convocatoria”."
+        : "No hay convocatorias por ahora.") + "</li>";
       renderStats();
       return;
     }
@@ -783,11 +665,11 @@
       var propio = rol === "org" && a.orgId === sesion.orgId;
       var accion;
       if (rol === "coord") {
-        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Quitar aviso</button>';
+        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Quitar convocatoria</button>';
       } else if (propio) {
-        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Cerrar aviso</button>';
+        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Cerrar convocatoria</button>';
       } else {
-        var txt = a.tipo === "necesita" ? "Podemos ayudar" : a.tipo === "ofrece" ? "Nos interesa" : "Nos sumamos";
+        var txt = "Nos sumamos";
         if (rol === "visitante") {
           // el visitante ve el botón, pero apagado y con la aclaración
           accion = '<span class="aviso-hint">Solo organizaciones de la red</span>' +
@@ -798,9 +680,9 @@
             (hecho ? "✓ Avisado" : txt) + "</button>";
         }
       }
-      return '<li class="aviso aviso--' + a.tipo + (a.nuevo ? " is-new" : "") + '">' +
-        '<div class="aviso-top"><span class="aviso-kind">' + etiquetaAviso(a.tipo) + '</span><span class="tag tag--neutral">' + esc(etiquetaRecurso(a)) + "</span>" +
-        (propio ? '<span class="tag tag--ofrece">Tu aviso</span>' : "") +
+      return '<li class="aviso aviso--convoca' + (a.nuevo ? " is-new" : "") + '">' +
+        '<div class="aviso-top"><span class="aviso-kind">Convocatoria</span><span class="tag tag--neutral">' + esc(etiquetaClase(a)) + "</span>" +
+        (propio ? '<span class="tag tag--destacado">Tu convocatoria</span>' : "") +
         (yo && a.orgId !== yo.id && dist[a.id] != null ? '<span class="aviso-dist">📍 ' + textoDistancia(dist[a.id]) + "</span>" : "") +
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
@@ -816,12 +698,11 @@
     renderStats();
   }
 
-  function initTablero() {
-    opcionesAviso("necesita");
+  function initAgenda() {
+    $("avClase").innerHTML = Object.keys(CONVOCATORIAS).map(function (k) {
+      return '<option value="' + k + '">' + esc(CONVOCATORIAS[k]) + "</option>";
+    }).join("");
     $("avCuando").min = HOY;
-    document.querySelectorAll('input[name="avTipo"]').forEach(function (r) {
-      r.addEventListener("change", function () { opcionesAviso(r.value); });
-    });
     $("ordenAvisos").addEventListener("change", function () { ordenAvisos = this.value; renderAvisos(); });
     document.querySelectorAll("[data-av-filtro]").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -839,44 +720,41 @@
         var idc = cerrar.getAttribute("data-cerrar-aviso");
         avisos = avisos.filter(function (a) { return a.id !== idc; });
         renderAvisos();
-        toast(rol === "coord" ? "La coordinación quitó el aviso del tablero." : "Cerraste el aviso. ¡Ojalá se haya resuelto!");
+        toast(rol === "coord" ? "La coordinación quitó la convocatoria de la agenda." : "Cerraste la convocatoria.");
         return;
       }
       var resp = e.target.closest("[data-responder]");
       if (!resp) return;
       if (rol === "visitante") { toast("Solo las organizaciones de la red pueden responder. Si sos parte de una, tocá “Ingresar”."); return; }
-      if (rol !== "org") { toast("La coordinación modera el tablero, pero no responde avisos."); return; }
+      if (rol !== "org") { toast("La coordinación modera la agenda, pero no se suma a las convocatorias."); return; }
       var id = resp.getAttribute("data-responder");
       var a = avisos.filter(function (x) { return x.id === id; })[0];
       var o = orgById(a.orgId);
       a.respondieron = (a.respondieron || []).concat(sesion.orgId);
       renderAvisos();
       var quien = miOrg().nombre;
-      toast("Le avisamos a " + (o ? o.nombre : "la organización") + " que " + quien + " quiere ponerse en contacto.");
+      toast("Le avisamos a " + (o ? o.nombre : "la organización") + " que " + quien + " se suma.");
     });
     $("formAviso").addEventListener("submit", function (e) {
       e.preventDefault();
       var titulo = $("avTitulo").value.trim();
-      var tipo = this.querySelector('input[name="avTipo"]:checked').value;
-      var cuando = tipo === "convoca" ? $("avCuando").value : "";
+      var cuando = $("avCuando").value;
       var faltan = [];
-      if (tipo === "convoca" && !cuando) faltan.push("avCuando");
+      if (!cuando) faltan.push("avCuando");
       if (!titulo) faltan.push("avTitulo");
       ["avCuando", "avTitulo"].forEach(function (id) {
         if (faltan.indexOf(id) !== -1) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid");
       });
       if (faltan.length) { $(faltan[0]).focus(); return; }
       var aviso = {
-        id: "av-" + Date.now(), orgId: sesion.orgId, tipo: tipo, recurso: $("avRecurso").value,
-        fecha: HOY, titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
+        id: "av-" + Date.now(), orgId: sesion.orgId, clase: $("avClase").value,
+        fecha: HOY, cuando: cuando, lugar: $("avLugar").value.trim(), titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
       };
-      if (tipo === "convoca") { aviso.cuando = cuando; aviso.lugar = $("avLugar").value.trim(); }
       avisos.push(aviso);
       this.reset();
-      opcionesAviso("necesita");
-      if (avisoFiltro !== "mias") marcarFiltroAviso("");   // en "Mis publicaciones" el aviso nuevo ya se ve
+      if (avisoFiltro !== "mias") marcarFiltroAviso("");   // en "Mis publicaciones" la convocatoria nueva ya se ve
       renderAvisos();
-      toast("¡Publicado! Las organizaciones de la red ya lo pueden ver.");
+      toast("¡Publicada! Las organizaciones de la red ya la pueden ver.");
     });
   }
 
@@ -923,12 +801,6 @@
     ["oNinxs", "oJovenes", "oAdultxs"].forEach(function (id) { $(id).addEventListener("input", actualizarTotal); });
     $("oTipo").addEventListener("change", mostrarOtros);
     $("oPersoneria").addEventListener("change", mostrarOtros);
-    ["oNecesita", "oOfrece"].forEach(function (id) {
-      var name = id === "oNecesita" ? "necesita" : "ofrece";
-      $(id).innerHTML = Object.keys(RECURSOS).map(function (k) {
-        return '<label><input type="checkbox" name="' + name + '" value="' + k + '"><span>' + esc(RECURSOS[k]) + "</span></label>";
-      }).join("");
-    });
     selLoc.addEventListener("change", function () {
       var l = LOCALIDADES[this.value];
       if (!l) return;
@@ -1031,10 +903,6 @@
     f.querySelector('input[name="oVisPublica"][value="' + (o.ubicacionPublica === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     f.querySelector('input[name="oVisRed"][value="' + (o.ubicacionRed === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     ajustarVisibilidad();
-    f.querySelectorAll('input[name="necesita"]').forEach(function (c) { c.checked = (o.necesita || []).indexOf(c.value) !== -1; });
-    f.querySelectorAll('input[name="ofrece"]').forEach(function (c) { c.checked = (o.ofrece || []).indexOf(c.value) !== -1; });
-    set("oNecesitaOtros", (o.necesitaOtros || []).join(", "));
-    set("oOfreceOtros", (o.ofreceOtros || []).join(", "));
     fichaPos = { lat: o.lat, lng: o.lng };
     var estado = $("fichaEstado");
     estado.hidden = false;
@@ -1071,10 +939,6 @@
       ubicacionPublica: f.querySelector('input[name="oVisPublica"]:checked').value,
       ubicacionRed: f.querySelector('input[name="oVisRed"]:checked').value,
       lat: pos.lat, lng: pos.lng,
-      necesita: Array.prototype.map.call(f.querySelectorAll('input[name="necesita"]:checked'), function (c) { return c.value; }),
-      ofrece: Array.prototype.map.call(f.querySelectorAll('input[name="ofrece"]:checked'), function (c) { return c.value; }),
-      necesitaOtros: separarOtros($("oNecesitaOtros").value),
-      ofreceOtros: separarOtros($("oOfreceOtros").value),
       telefono: $("oTelefono").value.trim(),
       correo: $("oCorreo").value.trim(),
       whatsappPublico: f.querySelector('input[name="oWaVis"]:checked').value === "publico",
@@ -1206,7 +1070,7 @@
     ul.innerHTML = solicitudes.map(function (s) {
       var d = s.datos;
       return '<li class="card solicitud">' +
-        '<div class="org-tags" style="margin:0"><span class="tag tag--ofrece">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
+        '<div class="org-tags" style="margin:0"><span class="tag tag--destacado">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
         "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + "</h3>" +
         '<p class="org-meta">' + esc(tipoLabel(d)) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
         '<p class="pedido-mail">Cuenta a habilitar: <strong>' + esc(s.email) + "</strong></p>" +
@@ -1252,7 +1116,7 @@
       var loc = LOCALIDADES[d.localidad];
       nOrg += 1;
       var nueva = Object.assign({
-        horarios: "", direccion: "", telefono: "", necesita: [], ofrece: [], necesitaOtros: [], ofreceOtros: [],
+        horarios: "", direccion: "", telefono: "",
         tipoOtro: "", personeria: "", personeriaDetalle: "", referenteRol: "", actividades: [], actividadesOtras: "",
         participantes: { ninxs: "", jovenes: "", adultxs: "" }, alcance: "", whatsappPublico: false,
         educadorxs: { total: "", mujeres: "", varones: "", otrxs: "" },
@@ -1286,7 +1150,7 @@
     var baja = e.target.closest("[data-baja]");
     if (baja) {
       var o = orgById(baja.getAttribute("data-baja"));
-      if (!o || !window.confirm("¿Quitar “" + o.nombre + "” del mapa? También se desactivan sus cuentas y sus avisos.")) return;
+      if (!o || !window.confirm("¿Quitar “" + o.nombre + "” del mapa? También se desactivan sus cuentas y sus convocatorias.")) return;
       orgs = orgs.filter(function (x) { return x !== o; });
       usuarios = usuarios.filter(function (u) { return u.orgId !== o.id; });
       avisos = avisos.filter(function (a) { return a.orgId !== o.id; });
@@ -1318,7 +1182,7 @@
 
   /* ---------------- arranque ---------------- */
   initFiltros();
-  initTablero();
+  initAgenda();
   initFormFicha();
   initAcceso();
   initMapa();

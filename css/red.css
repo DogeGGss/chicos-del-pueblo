@@ -25,7 +25,7 @@
 
 /* ---------- filtros ---------- */
 .filtros{
-  display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.2fr); gap:.6rem;
+  display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:.6rem;
   margin-bottom:1rem;
 }
 .chips-tipo{ grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:.4rem; }
@@ -78,9 +78,7 @@
   font-size:.72rem; font-weight:600; padding:.12rem .5rem; border-radius:999px;
   border:1.5px solid var(--ink); white-space:nowrap;
 }
-.tag--necesita{ background:var(--necesita-bg); border-color:var(--necesita-borde); color:var(--necesita-fg); }
-.tag--ofrece{ background:var(--celeste-100); border-color:var(--celeste); color:var(--ink); }
-.tag--otro{ border-style:dashed; }
+.tag--destacado{ background:var(--celeste-100); border-color:var(--celeste); color:var(--ink); }
 .otro-campo{ margin-top:.6rem; }
 .tag--neutral{ border-color:var(--line-strong); color:var(--ink-soft); }
 .tag--pendiente{ border-color:var(--warn); color:var(--warn); }
@@ -132,8 +130,8 @@
 }
 .card-text{ font-size:.9rem; color:var(--ink-soft); margin:0 0 .8rem; }
 
-/* ---------- tablero ---------- */
-.tablero{ display:grid; grid-template-columns:minmax(0, 4fr) minmax(0, 8fr); gap:1.4rem; align-items:start; }
+/* ---------- agenda ---------- */
+.agenda{ display:grid; grid-template-columns:minmax(0, 4fr) minmax(0, 8fr); gap:1.4rem; align-items:start; }
 .publicar{ position:sticky; top:4.6rem; box-shadow:5px 5px 0 var(--celeste); }
 .form-stack{ display:flex; flex-direction:column; gap:.8rem; }
 .seg{ display:flex; flex-wrap:wrap; gap:.35rem; }
@@ -160,7 +158,6 @@
   border:1.5px solid var(--line); border-left:6px solid var(--celeste);
   border-radius:var(--radius); padding:.9rem 1rem; background:var(--card-bg);
 }
-.aviso--necesita{ border-left-color:var(--necesita-borde); }
 .aviso--convoca{ border-left-color:var(--celeste-700); border-left-style:double; border-left-width:8px; }
 .aviso.is-new{ animation:flash 1.6s ease; }
 @keyframes flash{ from{ background:var(--celeste-100); } to{ background:var(--card-bg); } }
@@ -203,9 +200,6 @@
   display:inline-block; font-size:.8rem; font-weight:600; padding:.3rem .65rem; border-radius:999px;
   border:1.5px solid var(--line-strong); background:var(--paper);
 }
-.check-chips--necesita input:checked + span{ background:var(--necesita-bg); border-color:var(--necesita-borde); color:var(--necesita-fg); }
-:root[data-theme="dark"] .check-chips--necesita input:checked + span{ border-color:var(--ink); box-shadow:0 0 0 1px var(--ink); }
-.check-chips--ofrece input:checked + span{ background:var(--celeste); border-color:var(--solid); color:var(--on-celeste); }
 .check-chips input:focus-visible + span{ outline:3px solid var(--focus); outline-offset:2px; }
 .check-chips input:checked + span::before{ content:"✓ "; }
 .ficha-acciones{ display:flex; justify-content:flex-end; gap:.6rem; flex-wrap:wrap; align-items:center; }
@@ -313,7 +307,6 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
 .det-sec h3{ font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; margin:0 0 .4rem; color:var(--ink-soft); }
 .matches{ list-style:none; margin:.2rem 0 0; padding:0; display:flex; flex-direction:column; gap:.35rem; }
 .matches li{ font-size:.86rem; background:var(--celeste-50); border-radius:var(--radius); padding:.45rem .65rem; }
-.matches button{ font:inherit; font-weight:700; color:var(--celeste-700); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; text-align:left; }
 .det-actions{ display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1.1rem; }
 .preview-flag{
   display:inline-block; margin-bottom:.7rem; font-family:var(--f-head); font-weight:800; font-size:.68rem;
@@ -335,7 +328,7 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
   .split{ grid-template-columns:1fr; }
   .split-map{ position:static; order:-1; }
   .mapa{ height:46vh; min-height:280px; }
-  .tablero{ grid-template-columns:1fr; }
+  .agenda{ grid-template-columns:1fr; }
   .publicar{ position:static; }
   .stats{ grid-template-columns:repeat(4, minmax(0,1fr)); width:100%; }
 }
@@ -363,7 +356,7 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
 :root[data-theme="dark"] .modal::backdrop{ background:rgba(0,0,0,.6); }
 
 /* ---------- cuestionario de la red: qué se publica y qué ven solo las cuentas de la red ---------- */
-.check-chips:not(.check-chips--necesita):not(.check-chips--ofrece) input:checked + span{ background:var(--celeste-100); border-color:var(--solid); color:var(--ink); }
+.check-chips input:checked + span{ background:var(--celeste-100); border-color:var(--solid); color:var(--ink); }
 .grid-4{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:.6rem .8rem; }
 .total-campo{ justify-content:flex-end; }
 .total-num{ font-family:var(--f-head); font-weight:800; font-size:1.4rem; line-height:2.4rem; color:var(--ink); }

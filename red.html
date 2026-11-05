@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
-<meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con tablero para pedir y ofrecer recursos entre ellas.">
-<script src="js/tema.js?v=19"></script>
+<meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con una agenda de convocatorias entre ellas.">
+<script src="js/tema.js?v=20"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=19">
-<link rel="stylesheet" href="css/red.css?v=19">
+<link rel="stylesheet" href="css/marca.css?v=20">
+<link rel="stylesheet" href="css/red.css?v=20">
 </head>
 <body data-app>
 
@@ -41,7 +41,7 @@
       <div class="nav-links">
         <a href="index.html">Historia</a>
         <button type="button" class="nav-vista" data-vista="mapa" aria-controls="vista-mapa" aria-current="true">Mapa de la red</button>
-        <button type="button" class="nav-vista" data-vista="tablero" aria-controls="vista-tablero">Tablero <span class="tab-count num" id="cuentaAvisos"></span></button>
+        <button type="button" class="nav-vista" data-vista="agenda" aria-controls="vista-agenda">Agenda <span class="tab-count num" id="cuentaAvisos"></span></button>
         <button type="button" class="nav-vista" data-vista="ficha" aria-controls="vista-ficha" id="tab-ficha" hidden>Mi organización</button>
         <button type="button" class="nav-vista" data-vista="acceso" aria-controls="vista-acceso" id="tab-acceso">Solicitar acceso</button>
         <button type="button" class="nav-vista" data-vista="coord" aria-controls="vista-coord" id="tab-coord" hidden>Coordinación <span class="tab-count num" id="cuentaPendientes"></span></button>
@@ -52,7 +52,7 @@
 </div>
 
 <div class="demo-banner" role="note">
-  <strong>Prototipo:</strong> las organizaciones, contactos y avisos son <strong>ficticios</strong>, el ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
+  <strong>Prototipo:</strong> las organizaciones, contactos y convocatorias son <strong>ficticios</strong>, el ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
 </div>
 
 <main>
@@ -64,13 +64,13 @@
         <div>
           <div class="eyebrow">Somos una comunidad de comunidades</div>
           <h1 class="vista-title">Las organizaciones de la red, en el mapa</h1>
-          <p class="vista-lead">Buscá quién trabaja cerca, qué hace cada casa y qué necesita o puede ofrecer a las demás.</p>
+          <p class="vista-lead">Buscá quién trabaja cerca y qué hace cada casa.</p>
         </div>
         <dl class="stats" aria-label="La red en números">
           <div class="stat"><dt>Organizaciones</dt><dd class="num" id="statOrgs">0</dd></div>
           <div class="stat"><dt>Provincias</dt><dd class="num" id="statProv">0</dd></div>
           <div class="stat"><dt>Niñxs y jóvenes</dt><dd class="num" id="statChicos">0</dd></div>
-          <div class="stat"><dt>Avisos activos</dt><dd class="num" id="statAvisos">0</dd></div>
+          <div class="stat"><dt>Convocatorias</dt><dd class="num" id="statAvisos">0</dd></div>
         </dl>
       </div>
 
@@ -82,12 +82,6 @@
         <label class="field">
           <span class="sr-only">Provincia</span>
           <select id="fProvincia" class="field-control"><option value="">Todas las provincias</option></select>
-        </label>
-        <label class="field">
-          <span class="sr-only">Recurso</span>
-          <select id="fRecurso" class="field-control">
-            <option value="">Cualquier necesidad u oferta</option>
-          </select>
         </label>
         <div class="chips-tipo" id="fTipos" role="group" aria-label="Filtrar por tipo de organización"></div>
       </div>
@@ -108,35 +102,30 @@
     </div>
   </section>
 
-  <!-- ============ TABLERO ============ -->
-  <section class="vista" id="vista-tablero" hidden>
+  <!-- ============ AGENDA ============ -->
+  <section class="vista" id="vista-agenda" hidden>
     <div class="wrap">
       <div class="intro intro--simple">
-        <div class="eyebrow">Lo que sobra en una casa, falta en otra</div>
-        <h1 class="vista-title">Tablero de la red</h1>
-        <p class="vista-lead">Pedidos, ofrecimientos y convocatorias entre organizaciones. Si podés ayudar, avisá con un toque.</p>
+        <div class="eyebrow">Lo que se viene en la red</div>
+        <h1 class="vista-title">Agenda de la red</h1>
+        <p class="vista-lead">Encuentros, jornadas, talleres y marchas que convocan las organizaciones. Si querés sumarte, avisá con un toque.</p>
       </div>
 
-      <div class="tablero">
+      <div class="agenda">
         <aside class="publicar card" id="publicarCard">
-          <h2 class="card-title">Publicar un aviso</h2>
+          <h2 class="card-title">Publicar una convocatoria</h2>
           <div id="publicarBloqueado" class="card-text">
             Solo las organizaciones de la red pueden publicar. Si sos parte de una, tocá <strong>“Ingresar”</strong> arriba a la derecha con tu cuenta de Google habilitada.
           </div>
           <form id="formAviso" class="form-stack" novalidate hidden>
-            <div class="seg" role="radiogroup" aria-label="Tipo de aviso">
-              <label><input type="radio" name="avTipo" value="necesita" checked><span>Necesitamos</span></label>
-              <label><input type="radio" name="avTipo" value="ofrece"><span>Ofrecemos</span></label>
-              <label><input type="radio" name="avTipo" value="convoca"><span>Convocamos</span></label>
-            </div>
             <label class="field">
-              <span class="field-label" id="avRecursoLabel">¿Qué necesitan?</span>
-              <select id="avRecurso" class="field-control" required></select>
+              <span class="field-label">Tipo de convocatoria</span>
+              <select id="avClase" class="field-control" required></select>
             </label>
-            <div class="grid-2 av-convoca" id="avConvoca" hidden>
+            <div class="grid-2 av-convoca">
               <label class="field">
                 <span class="field-label">Fecha *</span>
-                <input id="avCuando" class="field-control" type="date">
+                <input id="avCuando" class="field-control" type="date" required>
               </label>
               <label class="field">
                 <span class="field-label">Lugar</span>
@@ -145,35 +134,32 @@
             </div>
             <label class="field">
               <span class="field-label">Título *</span>
-              <input id="avTitulo" class="field-control" maxlength="80" required>
+              <input id="avTitulo" class="field-control" maxlength="80" required placeholder="Ej.: Jornada de pintura en el centro comunitario">
             </label>
             <label class="field">
               <span class="field-label">Detalle</span>
-              <textarea id="avDetalle" class="field-control" rows="3" maxlength="400"></textarea>
+              <textarea id="avDetalle" class="field-control" rows="3" maxlength="400" placeholder="A quiénes invitan, qué hay que llevar, cómo anotarse…"></textarea>
             </label>
-            <button class="btn btn-primary" type="submit">Publicar en el tablero</button>
+            <button class="btn btn-primary" type="submit">Publicar en la agenda</button>
           </form>
         </aside>
 
         <div class="avisos-col">
-          <div class="avisos-filtros" role="group" aria-label="Filtrar avisos">
-            <button class="pill" type="button" data-av-filtro="" aria-pressed="true">Todos</button>
-            <button class="pill" type="button" data-av-filtro="necesita" aria-pressed="false">Necesitan</button>
-            <button class="pill" type="button" data-av-filtro="ofrece" aria-pressed="false">Ofrecen</button>
-            <button class="pill" type="button" data-av-filtro="convoca" aria-pressed="false">Convocatorias</button>
-            <button class="pill pill--mias" type="button" data-av-filtro="mias" aria-pressed="false" id="filtroMias" hidden>Mis publicaciones <span class="tab-count num" id="cuentaMias"></span></button>
+          <div class="avisos-filtros" id="avisosFiltros" role="group" aria-label="Filtrar convocatorias" hidden>
+            <button class="pill" type="button" data-av-filtro="" aria-pressed="true">Todas</button>
+            <button class="pill pill--mias" type="button" data-av-filtro="mias" aria-pressed="false">Mis publicaciones <span class="tab-count num" id="cuentaMias"></span></button>
           </div>
           <div class="avisos-orden" id="avisosOrden" hidden>
             <span id="avisosOrdenTexto"></span>
             <label class="orden-sel">
-              <span class="sr-only">Ordenar avisos</span>
+              <span class="sr-only">Ordenar convocatorias</span>
               <select id="ordenAvisos" class="field-control">
-                <option value="cerca">Más cercanos primero</option>
+                <option value="cerca">Más cercanas primero</option>
                 <option value="recientes">Más recientes primero</option>
               </select>
             </label>
           </div>
-          <ul class="avisos" id="avisosList" aria-label="Avisos de la red"></ul>
+          <ul class="avisos" id="avisosList" aria-label="Convocatorias de la red"></ul>
         </div>
       </div>
     </div>
@@ -185,7 +171,7 @@
       <div class="intro intro--simple">
         <div class="eyebrow">Tu ficha en la red</div>
         <h1 class="vista-title" id="fichaTitulo">Mi organización</h1>
-        <p class="vista-lead">Mantené tus datos al día: son las preguntas del cuestionario de la red, más qué necesitan y qué pueden ofrecer. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
+        <p class="vista-lead">Mantené tus datos al día: son las preguntas del cuestionario de la red. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
         <p class="estado-ficha" id="fichaEstado" hidden></p>
       </div>
 
@@ -313,30 +299,7 @@
         </fieldset>
 
         <fieldset class="card ficha-bloque">
-          <legend class="card-title">4 · Qué necesitan y qué pueden ofrecer</legend>
-          <p class="card-text">Esto es lo que cruza la red: cuando una casa necesita algo que otra ofrece, las dos lo ven en su ficha.</p>
-          <div class="grid-2">
-            <div class="field">
-              <span class="field-label">Necesitamos</span>
-              <div class="check-chips check-chips--necesita" id="oNecesita"></div>
-              <label class="field otro-campo">
-                <span class="field-hint">¿Algo más que no está en la lista? Escribilo, separado por comas.</span>
-                <input id="oNecesitaOtros" class="field-control" maxlength="160" placeholder="Ej.: pañales, garrafa de gas">
-              </label>
-            </div>
-            <div class="field">
-              <span class="field-label">Podemos ofrecer</span>
-              <div class="check-chips check-chips--ofrece" id="oOfrece"></div>
-              <label class="field otro-campo">
-                <span class="field-hint">¿Algo más que puedan ofrecer? Escribilo, separado por comas.</span>
-                <input id="oOfreceOtros" class="field-control" maxlength="160" placeholder="Ej.: equipo de sonido, clases de guitarra">
-              </label>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="card ficha-bloque">
-          <legend class="card-title">5 · Contacto y redes</legend>
+          <legend class="card-title">4 · Contacto y redes</legend>
           <div class="grid-2">
             <label class="field">
               <span class="field-label">Número de WhatsApp *</span>
@@ -362,7 +325,7 @@
         </fieldset>
 
         <fieldset class="card ficha-bloque ficha-bloque--coord">
-          <legend class="card-title">6 · Datos internos <span class="dato-badge dato-badge--coord">🔒 Solo la red</span></legend>
+          <legend class="card-title">5 · Datos internos <span class="dato-badge dato-badge--coord">🔒 Solo la red</span></legend>
           <p class="card-text">Estos datos ayudan a conocer cómo está cada casa. No se publican: los ven solo las organizaciones que ingresan con su cuenta.</p>
           <div class="grid-2">
             <label class="field">
@@ -434,8 +397,8 @@
               <table class="roles">
                 <thead><tr><th scope="col">Quién</th><th scope="col">Cómo entra</th><th scope="col">Qué puede hacer</th></tr></thead>
                 <tbody>
-                  <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, las fichas y qué necesita u ofrece cada organización, y sus redes. No ve mails, ni el WhatsApp salvo que la casa elija mostrarlo.</td></tr>
-                  <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar avisos, responder los de otras y ver los contactos y los datos internos de las casas de la red (espacio, sueldos, financiamiento).</td></tr>
+                  <tr><th scope="row">Visitante</th><td>Sin iniciar sesión</td><td>Ver el mapa, la agenda, las fichas y las redes de cada organización. No ve mails, ni el WhatsApp salvo que la casa elija mostrarlo.</td></tr>
+                  <tr><th scope="row">Organización</th><td>“Ingresar con Google”, con un mail habilitado</td><td>Editar la ficha de <em>su</em> organización, publicar convocatorias, sumarse a las de otras y ver los contactos y los datos internos de las casas de la red (espacio, sueldos, financiamiento).</td></tr>
                   <tr><th scope="row">Coordinación</th><td>“Ingresar con Google”, con un mail de coordinación</td><td>Dar de alta organizaciones, decidir qué mails pertenecen a cada una y moderar.</td></tr>
                 </tbody>
               </table>
@@ -549,8 +512,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=19"></script>
-<script src="js/red-datos.js?v=19"></script>
-<script src="js/red.js?v=19"></script>
+<script src="js/sesion.js?v=20"></script>
+<script src="js/red-datos.js?v=20"></script>
+<script src="js/red.js?v=20"></script>
 </body>
 </html>

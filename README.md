@@ -3,7 +3,7 @@
 Micrositio con dos páginas:
 
 - **Historia** (`index.html`): recorre, en once tramos, la historia del **Movimiento Nacional de los Chicos del Pueblo** en Argentina, desde la Ley Agote de 1919 hasta la red de más de 400 organizaciones que existe hoy.
-- **Mapa de la red** (`red.html`): prototipo de herramienta para que las organizaciones de la red se ubiquen en un mapa, cuenten qué hacen y se comuniquen entre sí (qué necesitan, qué pueden ofrecer).
+- **Mapa de la red** (`red.html`): prototipo de herramienta para que las organizaciones de la red se ubiquen en un mapa, cuenten qué hacen y se comuniquen entre sí.
 
 Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes sociales y condiciones de vida — las organizaciones sociales en acción** (Universidad Nacional de General Sarmiento).
 
@@ -21,13 +21,13 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 
 ### Mapa de la red (prototipo)
 
-- **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia, qué necesitan u ofrecen) sincronizado con un mapa Leaflet. Cada organización elige por separado si los visitantes y las otras organizaciones ven su dirección exacta o solo una zona aproximada.
-- **Ficha de cada organización**: qué hacen, edades, horarios y el cruce automático con otras casas que pueden ayudarles o a las que pueden ayudar.
-- **Tablero de la red**: avisos de "necesitamos", "ofrecemos" y convocatorias entre organizaciones.
+- **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia) sincronizado con un mapa Leaflet. Cada organización elige por separado si los visitantes y las otras organizaciones ven su dirección exacta o solo una zona aproximada.
+- **Ficha de cada organización**: qué hacen, edades, horarios y sus convocatorias en la agenda.
+- **Agenda de la red**: convocatorias de las organizaciones (encuentros, jornadas, talleres, marchas) con fecha y lugar; otras organizaciones pueden sumarse.
 - **Acceso solo para la red**: mirar es público; publicar es solo para organizaciones con una cuenta de Google habilitada por la coordinación. El ingreso con Google está **simulado** con cuentas de ejemplo (una de ellas no habilitada, para mostrar el rechazo).
 - **Mi organización** (rol organización): edición de la ficha propia con vista previa y punto en el mapa; los cambios se publican al instante.
 - **Solicitar acceso** (visitantes): pedido para que la coordinación habilite una cuenta, junto con la explicación de quién puede hacer qué.
-- **Coordinación**: aprobación de pedidos de acceso, gestión de qué mails pertenecen a cada organización, baja de organizaciones y moderación del tablero.
+- **Coordinación**: aprobación de pedidos de acceso, gestión de qué mails pertenecen a cada organización, baja de organizaciones y moderación de la agenda.
 
 > Todos los datos del prototipo son **ficticios** (`js/red-datos.js`) y los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
 

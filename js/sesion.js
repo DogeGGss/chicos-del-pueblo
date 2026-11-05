@@ -21,7 +21,7 @@
       else window.sessionStorage.removeItem(CLAVE);
     } catch (e) { /* sin almacenamiento: la sesión dura hasta recargar */ }
   }
-  // cantidad de avisos del tablero, para mostrarla también en Historia
+  // cantidad de convocatorias de la agenda, para mostrarla también en Historia
   function guardarCuentaAvisos(n) {
     try { window.sessionStorage.setItem(CLAVE_AVISOS, String(n)); } catch (e) { /* sin almacenamiento */ }
   }
