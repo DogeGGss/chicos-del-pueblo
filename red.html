@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
 <meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con una agenda de convocatorias entre ellas.">
-<script src="js/tema.js?v=22"></script>
+<script src="js/tema.js?v=24"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=22">
-<link rel="stylesheet" href="css/red.css?v=22">
+<link rel="stylesheet" href="css/marca.css?v=24">
+<link rel="stylesheet" href="css/red.css?v=24">
 </head>
 <body data-app>
 
@@ -52,7 +52,7 @@
 </div>
 
 <div class="demo-banner" role="note">
-  <strong>Prototipo:</strong> las organizaciones, contactos y convocatorias son <strong>ficticios</strong>, el ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
+  <strong>Prototipo:</strong> las organizaciones salen de la encuesta a organizaciones sociales. Lo que faltaba se completó a mano y aparece marcado como <span class="inventado">inventado</span>. El ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
 </div>
 
 <main>
@@ -172,6 +172,7 @@
         <h1 class="vista-title" id="fichaTitulo">Mi organización</h1>
         <p class="vista-lead">Mantené tus datos al día: son las preguntas del cuestionario de la red. Los cambios se publican al instante; la coordinación puede corregirlos si hace falta.</p>
         <p class="estado-ficha" id="fichaEstado" hidden></p>
+        <p class="estado-ficha" id="fichaInventados" hidden></p>
       </div>
 
       <form id="formFicha" class="ficha" novalidate>
@@ -201,8 +202,8 @@
               <input id="oPersoneriaDetalle" class="field-control" maxlength="80">
             </label>
             <label class="field col-2">
-              <span class="field-label">¿Qué hacen? *</span>
-              <textarea id="oDescripcion" class="field-control" rows="3" required maxlength="400" placeholder="Actividades, proyectos, cómo trabajan con lxs chicxs…"></textarea>
+              <span class="field-label">¿Qué hacen?</span>
+              <textarea id="oDescripcion" class="field-control" rows="3" maxlength="400" placeholder="Actividades, proyectos, cómo trabajan con lxs chicxs…"></textarea>
             </label>
             <label class="field col-2">
               <span class="field-label">Días y horarios</span>
@@ -226,10 +227,16 @@
           <legend class="card-title">2 · Dónde están</legend>
           <div class="grid-2">
             <label class="field">
-              <span class="field-label">Localidad *</span>
-              <select id="oLocalidad" class="field-control" required></select>
+              <span class="field-label">Provincia *</span>
+              <select id="oProvincia" class="field-control" required></select>
             </label>
             <label class="field">
+              <span class="field-label">Localidad *</span>
+              <input id="oLocalidad" class="field-control" list="listaLocalidades" maxlength="60" autocomplete="off" required placeholder="Escribí y elegí de la lista">
+              <datalist id="listaLocalidades"></datalist>
+              <span class="field-hint">¿No aparece? Escribila igual y marcá el punto en el mapa.</span>
+            </label>
+            <label class="field col-2">
               <span class="field-label">Dirección</span>
               <input id="oDireccion" class="field-control" maxlength="80" placeholder="Calle y número (obligatoria si se muestra exacta)">
             </label>
@@ -288,10 +295,10 @@
             <div class="field col-2">
               <span class="field-label">¿Cuántxs educadorxs trabajan? <small>(todas las personas del equipo de trabajo)</small></span>
               <div class="grid-4">
-                <label class="field"><span class="field-hint">Total</span><input id="oEducTotal" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
                 <label class="field"><span class="field-hint">Mujeres</span><input id="oEducMujeres" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
                 <label class="field"><span class="field-hint">Varones</span><input id="oEducVarones" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
                 <label class="field"><span class="field-hint">Otrxs</span><input id="oEducOtrxs" class="field-control" type="number" min="0" max="999" inputmode="numeric"></label>
+                <div class="field total-campo"><span class="field-hint">Total</span><output id="oEducTotal" class="total-num">0</output></div>
               </div>
             </div>
           </div>
@@ -435,8 +442,14 @@
               <div class="check-chips" id="aTipos" tabindex="-1"></div>
             </div>
             <label class="field">
+              <span class="field-label">Provincia *</span>
+              <select id="aProvincia" class="field-control" required></select>
+            </label>
+            <label class="field">
               <span class="field-label">Localidad *</span>
-              <select id="aLocalidad" class="field-control" required></select>
+              <input id="aLocalidad" class="field-control" list="listaLocalidadesAcceso" maxlength="60" autocomplete="off" required placeholder="Escribí y elegí de la lista">
+              <datalist id="listaLocalidadesAcceso"></datalist>
+              <span class="field-hint">¿No aparece? Escribila igual.</span>
             </label>
             <label class="field">
               <span class="field-label">Referente *</span>
@@ -511,8 +524,9 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=22"></script>
-<script src="js/red-datos.js?v=22"></script>
-<script src="js/red.js?v=22"></script>
+<script src="js/sesion.js?v=24"></script>
+<script src="js/red-localidades.js?v=24"></script>
+<script src="js/red-datos.js?v=24"></script>
+<script src="js/red.js?v=24"></script>
 </body>
 </html>

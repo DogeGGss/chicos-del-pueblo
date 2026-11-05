@@ -29,7 +29,7 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 - **Solicitar acceso** (visitantes): pedido para que la coordinación habilite una cuenta, junto con la explicación de quién puede hacer qué.
 - **Coordinación**: aprobación de pedidos de acceso, gestión de qué mails pertenecen a cada organización, baja de organizaciones y moderación de la agenda.
 
-> Todos los datos del prototipo son **ficticios** (`js/red-datos.js`) y los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
+> Las organizaciones de `js/red-datos.js` salen de la encuesta a organizaciones sociales. Lo que la encuesta no traía se completó a mano y el sitio lo marca como **inventado**. Los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
 
 La interfaz del mapa se basa en el prototipo "Portal de Talleres" de Ingeniería de Software (UNGS), adaptado a organizaciones sociales.
 
@@ -40,6 +40,7 @@ HTML, CSS y JavaScript vanilla, sin frameworks ni dependencias de build.
 - `js/tema.js`: interruptor de **modo claro / oscuro** (el mismo del prototipo de Ingeniería de Software), recordado entre visitas. El modo oscuro usa azul noche con el mismo celeste de la marca.
 - `css/marca.css`: identidad compartida (celeste `#63C2EB`, blanco y negro, logo de Organizaciones de lxs Chicxs del Pueblo), tomada de [chicxsdelpueblo.com.ar](https://chicxsdelpueblo.com.ar/).
 - `red.html`, `css/red.css`, `js/red.js`, `js/red-datos.js`: mapa de la red.
+- `js/red-localidades.js`: localidades oficiales de Argentina por provincia, tomadas de la API [Georef](https://datosgobar.github.io/georef-ar-api/) (datos.gob.ar). Si una localidad no está, se puede escribir a mano y marcar el punto en el mapa.
 - `vendor/`: [Leaflet](https://leafletjs.com/) 1.9.4 y Leaflet.markercluster 1.5.3, incluidos en el repo. Mapa base: [Argenmap](https://www.ign.gob.ar/) del Instituto Geográfico Nacional (sin API key, con la toponimia oficial argentina: "Islas Malvinas"), sobre datos de © OpenStreetMap.
 
 ## Ver el sitio

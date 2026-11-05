@@ -10,11 +10,12 @@
   var PERSONERIAS = window.RED_PERSONERIAS, ACTIVIDADES = window.RED_ACTIVIDADES, ALCANCES = window.RED_ALCANCES;
   var REDES = window.RED_REDES, ESPACIOS = window.RED_ESPACIOS, SUELDOS = window.RED_SUELDOS;
   var FONDOS_PUBLICOS = window.RED_FONDOS_PUBLICOS, FONDOS_PRIVADOS = window.RED_FONDOS_PRIVADOS;
-  var LOCALIDADES = window.RED_LOCALIDADES;
+  var LOC_AR = window.RED_LOC_AR;   // localidades oficiales por provincia (js/red-localidades.js)
+  var INDICE_LOC = {};              // "provincia|nombre sin tildes" -> [nombre, lat, lng]
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   var CAMPOS_LABEL = {
-    nombre: "Nombre", tipos: "Tipos", tipoOtro: "Tipo (otro)", personeria: "Personería", personeriaDetalle: "Personería (detalle)",
+    nombre: "Nombre", provincia: "Provincia", tipos: "Tipos", tipoOtro: "Tipo (otro)", personeria: "Personería", personeriaDetalle: "Personería (detalle)",
     referente: "Referente", referenteRol: "Rol del referente", descripcion: "Descripción", horarios: "Horarios",
     actividades: "Actividades", actividadesOtras: "Otras actividades", participantes: "Personas que participan",
     alcance: "Alcance", educadorxs: "Educadorxs", whatsappPublico: "Quién ve el WhatsApp", localidad: "Localidad",
@@ -60,6 +61,22 @@
   }
   function norm(s) {
     return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+  Object.keys(LOC_AR).forEach(function (p) {
+    LOC_AR[p].l.forEach(function (l) { INDICE_LOC[p + "|" + norm(l[0])] = l; });
+  });
+  function localidadOficial(prov, nombre) { return INDICE_LOC[prov + "|" + norm(String(nombre || "").trim())] || null; }
+  // centro de una localidad; null si es una que escribieron a mano y no está en la lista
+  function centroLocalidad(prov, nombre) {
+    var l = localidadOficial(prov, nombre);
+    return l ? { lat: l[1], lng: l[2] } : null;
+  }
+  function llenarLocalidades(idLista, prov) {
+    $(idLista).innerHTML = (LOC_AR[prov] ? LOC_AR[prov].l : []).map(function (l) { return '<option value="' + esc(l[0]) + '"></option>'; }).join("");
+  }
+  // lo que no estaba en la encuesta y se completó a mano figura en o.inventados
+  function marcaInventado(o, campo) {
+    return (o.inventados || []).indexOf(campo) !== -1 ? ' <span class="inventado" title="Dato inventado: no estaba en la encuesta">inventado</span>' : "";
   }
   function fecha(iso) {
     var p = String(iso).split("-");
@@ -304,7 +321,7 @@
         '<div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
         '<h3><button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button></h3>" +
         '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div>" +
-        '<p class="org-desc">' + esc(o.descripcion) + "</p>" +
+        (o.descripcion ? '<p class="org-desc">' + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>" : "") +
         '<div class="org-actions">' +
         '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '" aria-label="Ver ficha de ' + esc(o.nombre) + '">Ver ficha</button>' +
         '<button type="button" class="btn btn-sm" data-en-mapa-lista="' + o.id + '" aria-label="Ver ' + esc(o.nombre) + ' en el mapa">📍 En el mapa</button>' +
@@ -398,7 +415,8 @@
   // si no puede verla, el punto se corre al centro de su localidad (con un pequeño desplazamiento propio)
   function posVisible(o) {
     if (veExacta(o)) return { lat: o.lat, lng: o.lng };
-    var loc = LOCALIDADES[o.localidad] || o;
+    // si la localidad no está en la lista, se redondea el punto para no revelar dónde está la casa
+    var loc = centroLocalidad(o.provincia, o.localidad) || { lat: Math.round(o.lat * 50) / 50, lng: Math.round(o.lng * 50) / 50 };
     var h = 0;
     String(o.id).split("").forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 997; });
     return { lat: +(loc.lat + Math.sin(h) * 0.012).toFixed(5), lng: +(loc.lng + Math.cos(h) * 0.015).toFixed(5) };
@@ -466,7 +484,7 @@
       return;
     }
     var contacto = e.target.closest("[data-contacto]");
-    if (contacto) { toast("En el prototipo los contactos son ficticios: acá se abriría " + contacto.getAttribute("data-contacto") + "."); return; }
+    if (contacto) { toast("En el prototipo no se abre nada: acá se abriría " + contacto.getAttribute("data-contacto") + "."); return; }
     var enviar = e.target.closest("[data-enviar-ficha]");
     if (enviar) { modal.close(); enviarFicha(); return; }
     var login = e.target.closest("[data-login]");
@@ -503,8 +521,8 @@
     if (opts.preview) html += '<span class="preview-flag">Vista previa · así se verá en el mapa</span>';
     html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
       '<div><h2 id="modalOrgTitulo">' + esc(o.nombre || "Sin nombre") + "</h2>" +
-      '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div></div></div>";
-    html += "<p>" + esc(o.descripcion) + "</p>";
+      '<div class="org-meta">' + esc(tipoLabel(o)) + marcaInventado(o, "tipoOtro") + " · " + esc(o.localidad) + ", " + esc(o.provincia) + "</div></div></div>";
+    if (o.descripcion) html += "<p>" + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>";
     var p = o.participantes || {}, ed = o.educadorxs || {};
     var personas = totalPersonas(p)
       ? "≈ " + totalPersonas(p) + '<br><small>' + plural(+p.ninxs || 0, "niñx", "niñxs") + " · " + plural(+p.jovenes || 0, "joven", "jóvenes") + " · " + plural(+p.adultxs || 0, "adultx", "adultxs") + "</small>"
@@ -512,12 +530,12 @@
     var educ = +ed.total ? ed.total + '<br><small>' + plural(+ed.mujeres || 0, "mujer", "mujeres") + " · " + plural(+ed.varones || 0, "varón", "varones") + (+ed.otrxs ? " · " + plural(+ed.otrxs, "otrx", "otrxs") : "") + "</small>" : "—";
     var pers = PERSONERIAS[o.personeria] ? esc(PERSONERIAS[o.personeria]) + (o.personeriaDetalle ? " (" + esc(o.personeriaDetalle) + ")" : "") : "—";
     html += '<dl class="det-grid">' +
-      "<div><dt>Ubicación</dt><dd>" + ubic + "</dd></div>" +
-      "<div><dt>Días y horarios</dt><dd>" + esc(o.horarios || "—") + "</dd></div>" +
-      "<div><dt>Personas que participan</dt><dd>" + personas + "</dd></div>" +
-      "<div><dt>Educadorxs</dt><dd>" + educ + "</dd></div>" +
+      "<div><dt>Ubicación</dt><dd>" + ubic + (marcaInventado(o, "lat") ? "<br><small>Punto del mapa" + marcaInventado(o, "lat") + "</small>" : "") + "</dd></div>" +
+      "<div><dt>Días y horarios</dt><dd>" + esc(o.horarios || "—") + marcaInventado(o, "horarios") + "</dd></div>" +
+      "<div><dt>Personas que participan</dt><dd>" + personas + marcaInventado(o, "participantes") + "</dd></div>" +
+      "<div><dt>Educadorxs</dt><dd>" + educ + marcaInventado(o, "educadorxs") + "</dd></div>" +
       "<div><dt>Alcance</dt><dd>" + esc(ALCANCES[o.alcance] || "—") + "</dd></div>" +
-      "<div><dt>Personería jurídica</dt><dd>" + pers + "</dd></div>" +
+      "<div><dt>Personería jurídica</dt><dd>" + pers + marcaInventado(o, "personeria") + "</dd></div>" +
       "<div><dt>Ficha actualizada</dt><dd>" + fecha(o.actualizada || HOY) + "</dd></div>" +
       "</dl>";
     var acts = (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).filter(Boolean);
@@ -541,10 +559,10 @@
     var veTodo = rol !== "visitante" || opts.preview;
     html += '<div class="det-sec"><h3>Contacto y redes</h3>';
     if (veTodo) {
-      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + (o.correo ? " · ✉️ " + esc(o.correo) : "") + "</p>";
+      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + marcaInventado(o, "telefono") + (o.correo ? " · ✉️ " + esc(o.correo) + marcaInventado(o, "correo") : "") + "</p>";
       if (opts.preview) html += '<p class="card-text" style="margin:.3rem 0 0"><small>El WhatsApp lo ve ' + (o.whatsappPublico ? "cualquier persona" : "solo la red") + "; el correo, solo la red.</small></p>";
     } else if (o.whatsappPublico) {
-      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + '</p><p class="card-text" style="margin:.3rem 0 0"><small>El correo lo ven solo las organizaciones de la red.</small></p>';
+      html += '<p style="margin:0;font-size:.9rem">💬 ' + esc(o.telefono || "—") + marcaInventado(o, "telefono") + '</p><p class="card-text" style="margin:.3rem 0 0"><small>El correo lo ven solo las organizaciones de la red.</small></p>';
     } else {
       html += '<p class="card-text" style="margin:0">El WhatsApp y el correo los ven solo las organizaciones de la red. Si sos parte de una, tocá <strong>“Ingresar”</strong> con tu cuenta habilitada.</p>';
     }
@@ -577,13 +595,13 @@
     return '<div class="det-sec det-coord"><h3>🔒 Solo para la red</h3>' +
       '<p class="card-text"><small>Lo ven solo las organizaciones que ingresan con su cuenta. Los visitantes no.</small></p>' +
       '<dl class="det-grid">' +
-      "<div><dt>Quien responde</dt><dd>" + esc(o.referente || "—") + (o.referenteRol ? "<br><small>" + esc(o.referenteRol) + "</small>" : "") + "</dd></div>" +
-      "<div><dt>Actividades nuevas</dt><dd>" + esc(o.actividadesNuevas || "No") + "</dd></div>" +
-      "<div><dt>Actividades dadas de baja</dt><dd>" + esc(o.actividadesBaja || "No") + "</dd></div>" +
+      "<div><dt>Quien responde</dt><dd>" + esc(o.referente || "—") + (o.referenteRol ? "<br><small>" + esc(o.referenteRol) + marcaInventado(o, "referenteRol") + "</small>" : "") + "</dd></div>" +
+      "<div><dt>Actividades nuevas</dt><dd>" + esc(o.actividadesNuevas || "No") + marcaInventado(o, "actividadesNuevas") + "</dd></div>" +
+      "<div><dt>Actividades dadas de baja</dt><dd>" + esc(o.actividadesBaja || "No") + marcaInventado(o, "actividadesBaja") + "</dd></div>" +
       "<div><dt>Espacio físico</dt><dd>" + conInfo(ESPACIOS[o.espacio], o.espacioInfo) + "</dd></div>" +
       "<div><dt>Educadorxs con sueldo</dt><dd>" + conInfo(SUELDOS[o.sueldos], o.sueldosInfo) + "</dd></div>" +
-      "<div><dt>Fondos públicos</dt><dd>" + lista(o.fondosPublicos, FONDOS_PUBLICOS, o.fondosPublicosDetalle) + "</dd></div>" +
-      "<div><dt>Financiamiento privado</dt><dd>" + lista(o.fondosPrivados, FONDOS_PRIVADOS, o.fondosPrivadosDetalle) + "</dd></div>" +
+      "<div><dt>Fondos públicos</dt><dd>" + lista(o.fondosPublicos, FONDOS_PUBLICOS, o.fondosPublicosDetalle) + marcaInventado(o, "fondosPublicos") + "</dd></div>" +
+      "<div><dt>Financiamiento privado</dt><dd>" + lista(o.fondosPrivados, FONDOS_PRIVADOS, o.fondosPrivadosDetalle) + marcaInventado(o, "fondosPrivados") + "</dd></div>" +
       "</dl></div>";
   }
 
@@ -725,6 +743,7 @@
       return '<li class="aviso aviso--convoca' + (a.nuevo ? " is-new" : "") + '">' +
         '<div class="aviso-top"><span class="aviso-kind">Convocatoria</span><span class="tag tag--neutral">' + esc(etiquetaClase(a)) + "</span>" +
         (propio ? '<span class="tag tag--destacado">Tu convocatoria</span>' : "") +
+        (a.inventada ? '<span class="inventado" title="Convocatoria inventada para mostrar la agenda">inventada</span>' : "") +
         (yo && a.orgId !== yo.id && dist[a.id] != null ? '<span class="aviso-dist">📍 ' + textoDistancia(dist[a.id]) + "</span>" : "") +
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
@@ -810,15 +829,13 @@
   var mapaFicha = null;
   var pinFicha = null;
   var fichaPos = null;
+  var fichaPinManual = false;   // tocaron el mapa: elegir otra localidad ya no mueve el punto
 
   function initFormFicha() {
-    var selLoc = $("oLocalidad");
-    selLoc.innerHTML = '<option value="">Elegí…</option>';
-    window.RED_PROVINCIAS.forEach(function (p) {
-      var opts = Object.keys(LOCALIDADES).filter(function (l) { return LOCALIDADES[l].prov === p; }).sort();
-      selLoc.insertAdjacentHTML("beforeend", '<optgroup label="' + esc(p) + '">' + opts.map(function (l) {
-        return '<option value="' + esc(l) + '">' + esc(l) + "</option>";
-      }).join("") + "</optgroup>");
+    ["oProvincia", "aProvincia"].forEach(function (id) {
+      $(id).innerHTML = '<option value="">Elegí…</option>' + window.RED_PROVINCIAS.map(function (p) {
+        return '<option value="' + esc(p) + '">' + esc(p) + "</option>";
+      }).join("");
     });
     function opciones(id, dic, vacio) {
       $(id).innerHTML = (vacio ? '<option value="">' + vacio + "</option>" : "") + Object.keys(dic).map(function (k) {
@@ -845,17 +862,35 @@
       return '<label class="field"><span class="field-hint">' + esc(REDES[k]) + '</span><input class="field-control" data-red="' + k + '" maxlength="80" placeholder="' +
         (k === "web" ? "www…" : k === "facebook" ? "Nombre de la página" : "@usuario o link") + '"></label>';
     }).join("");
-    ["oNinxs", "oJovenes", "oAdultxs"].forEach(function (id) { $(id).addEventListener("input", actualizarTotal); });
+    ["oNinxs", "oJovenes", "oAdultxs", "oEducMujeres", "oEducVarones", "oEducOtrxs"].forEach(function (id) { $(id).addEventListener("input", actualizarTotal); });
     $("oTipos").addEventListener("change", mostrarOtros);
     ["oFondosPublicos", "oFondosPrivados"].forEach(function (id) {
       $(id).addEventListener("change", function () { sincronizarNegativa(this); });
     });
     $("oPersoneria").addEventListener("change", mostrarOtros);
-    selLoc.addEventListener("change", function () {
-      var l = LOCALIDADES[this.value];
-      if (!l) return;
-      fichaPos = { lat: l.lat, lng: l.lng };
-      if (mapaFicha) { mapaFicha.setView([l.lat, l.lng], 13); moverPinFicha(); }
+    $("oProvincia").addEventListener("change", function () {
+      llenarLocalidades("listaLocalidades", this.value);
+      set("oLocalidad", "");
+      fichaPos = null;
+      fichaPinManual = false;
+      moverPinFicha();
+      var p = LOC_AR[this.value];
+      if (p && mapaFicha) mapaFicha.setView(p.c, 7);
+      $("mapaFichaHint").textContent = "Elegí la localidad y después tocá el mapa para ajustar el punto.";
+    });
+    $("oLocalidad").addEventListener("change", function () {
+      var prov = $("oProvincia").value;
+      var oficial = localidadOficial(prov, this.value);
+      if (oficial) this.value = oficial[0];
+      var centro = centroLocalidad(prov, this.value);
+      if (centro) $("mapaFicha").removeAttribute("aria-invalid");
+      if (fichaPinManual) return;
+      fichaPos = centro;
+      moverPinFicha();
+      if (centro && mapaFicha) mapaFicha.setView([centro.lat, centro.lng], 13);
+      $("mapaFichaHint").textContent = centro || !this.value.trim()
+        ? "Elegí la localidad y después tocá el mapa para ajustar el punto."
+        : "Esa localidad no está en la lista: tocá el mapa para marcar dónde están.";
     });
     $("formFicha").addEventListener("submit", function (e) { e.preventDefault(); enviarFicha(); });
     $("btnVistaPrevia").addEventListener("click", function () {
@@ -876,6 +911,8 @@
       L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapaFicha);
       mapaFicha.on("click", function (e) {
         fichaPos = { lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) };
+        fichaPinManual = true;
+        $("mapaFicha").removeAttribute("aria-invalid");
         moverPinFicha();
         $("mapaFichaHint").textContent = "Punto marcado. Podés tocar de nuevo para corregirlo.";
       });
@@ -910,8 +947,12 @@
   });
 
   function set(id, v) { $(id).value = v == null ? "" : v; }
+  function totalEducadorxs() {
+    return (+$("oEducMujeres").value || 0) + (+$("oEducVarones").value || 0) + (+$("oEducOtrxs").value || 0);
+  }
   function actualizarTotal() {
     $("oTotalPersonas").textContent = totalPersonas({ ninxs: $("oNinxs").value, jovenes: $("oJovenes").value, adultxs: $("oAdultxs").value });
+    $("oEducTotal").textContent = totalEducadorxs();
   }
   function mostrarOtros() {
     $("oTipoOtroCampo").hidden = marcados($("formFicha"), "tipos").indexOf("otro") === -1;
@@ -945,11 +986,11 @@
     $("fichaTitulo").textContent = o.nombre;
     set("oNombre", o.nombre); marcar(f, "tipos", o.tipos); set("oTipoOtro", o.tipoOtro); set("oReferente", o.referente);
     set("oReferenteRol", o.referenteRol); set("oPersoneria", o.personeria); set("oPersoneriaDetalle", o.personeriaDetalle);
-    set("oDescripcion", o.descripcion); set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
+    set("oDescripcion", o.descripcion); set("oHorarios", o.horarios); set("oProvincia", o.provincia); llenarLocalidades("listaLocalidades", o.provincia); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
     set("oTelefono", o.telefono); set("oCorreo", o.correo);
     var p = o.participantes || {}, ed = o.educadorxs || {};
-    set("oNinxs", p.ninxs); set("oJovenes", p.jovenes); set("oAdultxs", p.adultxs); actualizarTotal();
-    set("oEducTotal", ed.total); set("oEducMujeres", ed.mujeres); set("oEducVarones", ed.varones); set("oEducOtrxs", ed.otrxs);
+    set("oNinxs", p.ninxs); set("oJovenes", p.jovenes); set("oAdultxs", p.adultxs);
+    set("oEducMujeres", ed.mujeres); set("oEducVarones", ed.varones); set("oEducOtrxs", ed.otrxs); actualizarTotal();
     set("oAlcance", o.alcance); set("oActividadesOtras", o.actividadesOtras);
     marcar(f, "actividades", o.actividades);
     f.querySelectorAll("[data-red]").forEach(function (inp) { inp.value = (o.redes || {})[inp.getAttribute("data-red")] || ""; });
@@ -965,6 +1006,10 @@
     f.querySelector('input[name="oVisRed"][value="' + (o.ubicacionRed === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     ajustarVisibilidad();
     fichaPos = { lat: o.lat, lng: o.lng };
+    fichaPinManual = true;
+    var inventados = (o.inventados || []).map(function (k) { return CAMPOS_LABEL[k]; }).filter(Boolean);
+    $("fichaInventados").hidden = !inventados.length;
+    $("fichaInventados").textContent = "Estos datos son inventados porque no estaban en la encuesta: " + inventados.join(", ") + ". Al corregirlos dejan de estar marcados.";
     var estado = $("fichaEstado");
     estado.hidden = false;
     estado.innerHTML = "✅ Tu ficha está <strong>publicada</strong> en el mapa. Última actualización: " + fecha(o.actualizada) +
@@ -975,9 +1020,9 @@
 
   function leerFicha() {
     var f = $("formFicha");
-    var loc = $("oLocalidad").value;
+    var loc = $("oLocalidad").value.trim();
     var base = miOrg() || {};
-    var pos = fichaPos || (LOCALIDADES[loc] ? { lat: LOCALIDADES[loc].lat, lng: LOCALIDADES[loc].lng } : { lat: null, lng: null });
+    var pos = fichaPos || { lat: null, lng: null };
     return {
       id: base.id || null,
       nombre: $("oNombre").value.trim(),
@@ -993,9 +1038,9 @@
       actividadesOtras: $("oActividadesOtras").value.trim(),
       participantes: { ninxs: num("oNinxs"), jovenes: num("oJovenes"), adultxs: num("oAdultxs") },
       alcance: $("oAlcance").value,
-      educadorxs: { total: num("oEducTotal"), mujeres: num("oEducMujeres"), varones: num("oEducVarones"), otrxs: num("oEducOtrxs") },
+      educadorxs: { total: totalEducadorxs() || "", mujeres: num("oEducMujeres"), varones: num("oEducVarones"), otrxs: num("oEducOtrxs") },
       localidad: loc,
-      provincia: LOCALIDADES[loc] ? LOCALIDADES[loc].prov : "",
+      provincia: $("oProvincia").value,
       direccion: $("oDireccion").value.trim(),
       ubicacionPublica: f.querySelector('input[name="oVisPublica"]:checked').value,
       ubicacionRed: f.querySelector('input[name="oVisRed"]:checked').value,
@@ -1018,8 +1063,8 @@
 
   function validarFicha(d) {
     var faltan = [];
-    [["oNombre", d.nombre], ["oTipos", d.tipos.length], ["oReferente", d.referente], ["oDescripcion", d.descripcion],
-      ["oLocalidad", d.localidad], ["oTelefono", d.telefono]].concat(d.tipos.indexOf("otro") !== -1 ? [["oTipoOtro", d.tipoOtro]] : []).forEach(function (p) {
+    [["oNombre", d.nombre], ["oTipos", d.tipos.length], ["oReferente", d.referente],
+      ["oProvincia", d.provincia], ["oLocalidad", d.localidad], ["mapaFicha", d.lat != null], ["oTelefono", d.telefono]].concat(d.tipos.indexOf("otro") !== -1 ? [["oTipoOtro", d.tipoOtro]] : []).forEach(function (p) {
       if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
       else $(p[0]).removeAttribute("aria-invalid");
     });
@@ -1044,7 +1089,9 @@
     if (rol !== "org" || !o) return;
     var d = leerFicha();
     if (!validarFicha(d)) return;
-    if (!diferencias(o, d).length) { toast("No hay cambios para guardar."); return; }
+    var cambios = diferencias(o, d);
+    if (!cambios.length) { toast("No hay cambios para guardar."); return; }
+    o.inventados = (o.inventados || []).filter(function (k) { return cambios.indexOf(k) === -1; });
     Object.keys(d).forEach(function (k) { if (k !== "id") o[k] = d[k]; });
     o.actualizada = HOY;
     construirMarcadores();
@@ -1072,7 +1119,7 @@
 
   /* ---------------- solicitar acceso (visitantes) ---------------- */
   function initAcceso() {
-    $("aLocalidad").innerHTML = $("oLocalidad").innerHTML;
+    $("aProvincia").addEventListener("change", function () { llenarLocalidades("listaLocalidadesAcceso", this.value); set("aLocalidad", ""); });
     $("formAcceso").addEventListener("input", function (e) {
       var marcado = e.target.closest("[aria-invalid]");   // en los grupos de chips la marca está en el contenedor
       if (marcado) marcado.removeAttribute("aria-invalid");
@@ -1080,12 +1127,14 @@
     $("formAcceso").addEventListener("submit", function (e) {
       e.preventDefault();
       var d = {
-        nombre: $("aNombre").value.trim(), tipos: marcados(this, "aTipos"), localidad: $("aLocalidad").value,
+        nombre: $("aNombre").value.trim(), tipos: marcados(this, "aTipos"), provincia: $("aProvincia").value, localidad: $("aLocalidad").value.trim(),
         referente: $("aReferente").value.trim(), email: $("aEmail").value.trim().toLowerCase(),
         mensaje: $("aMensaje").value.trim(),
       };
+      var oficial = localidadOficial(d.provincia, d.localidad);
+      if (oficial) d.localidad = oficial[0];
       var faltan = [];
-      [["aNombre", d.nombre], ["aTipos", d.tipos.length], ["aLocalidad", d.localidad], ["aReferente", d.referente],
+      [["aNombre", d.nombre], ["aTipos", d.tipos.length], ["aProvincia", d.provincia], ["aLocalidad", d.localidad], ["aReferente", d.referente],
         ["aEmail", emailValido(d.email)]].forEach(function (p) {
         if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
         else $(p[0]).removeAttribute("aria-invalid");
@@ -1105,7 +1154,7 @@
       }
       solicitudes.push({
         id: "sol-" + Date.now(), email: d.email, mensaje: d.mensaje, fecha: HOY,
-        datos: { nombre: d.nombre, tipos: d.tipos, localidad: d.localidad, provincia: LOCALIDADES[d.localidad].prov,
+        datos: { nombre: d.nombre, tipos: d.tipos, localidad: d.localidad, provincia: d.provincia,
           referente: d.referente, descripcion: "" },
       });
       ultimoPedido = d.nombre;
@@ -1174,7 +1223,8 @@
     solicitudes = solicitudes.filter(function (x) { return x !== s; });
     if (b.hasAttribute("data-aprobar")) {
       var d = s.datos;
-      var loc = LOCALIDADES[d.localidad];
+      var c = LOC_AR[d.provincia] ? LOC_AR[d.provincia].c : [-35.5, -63.5];
+      var loc = centroLocalidad(d.provincia, d.localidad) || { lat: c[0], lng: c[1] };
       nOrg += 1;
       var nueva = Object.assign({
         horarios: "", direccion: "", telefono: "",

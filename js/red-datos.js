@@ -1,7 +1,7 @@
 /**
- * Datos de ejemplo del prototipo "Mapa de la red".
- * TODAS las organizaciones, personas, teléfonos y convocatorias son FICTICIOS:
- * sirven solo para mostrar cómo funcionaría la herramienta.
+ * Datos del prototipo "Mapa de la red": las organizaciones salen de la encuesta a organizaciones sociales.
+ * Lo que la encuesta no traía se completó a mano para mostrar la herramienta:
+ * esos campos están listados en "inventados" y el sitio los marca como inventados.
  */
 (function () {
   /* Tipos de organización: los mismos del cuestionario de la red. */
@@ -75,297 +75,1162 @@
   };
 
   window.RED_PROVINCIAS = [
-    "Buenos Aires", "Chaco", "Chubut", "Córdoba", "La Pampa",
-    "Mendoza", "Río Negro", "San Juan", "San Luis", "Santa Fe",
+    "Buenos Aires", "Catamarca", "Chaco", "Chubut", "Ciudad Autónoma de Buenos Aires", "Córdoba", "Corrientes",
+    "Entre Ríos", "Formosa", "Jujuy", "La Pampa", "La Rioja", "Mendoza", "Misiones", "Neuquén", "Río Negro",
+    "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe", "Santiago del Estero", "Tierra del Fuego", "Tucumán",
   ];
-
-  /* Centro aproximado de cada localidad (para ubicar la zona). */
-  window.RED_LOCALIDADES = {
-    "Avellaneda":        { prov: "Buenos Aires", lat: -34.6625, lng: -58.3650 },
-    "Florencio Varela":  { prov: "Buenos Aires", lat: -34.8068, lng: -58.2757 },
-    "Quilmes":           { prov: "Buenos Aires", lat: -34.7206, lng: -58.2546 },
-    "La Plata":          { prov: "Buenos Aires", lat: -34.9214, lng: -57.9545 },
-    "Berazategui":       { prov: "Buenos Aires", lat: -34.7631, lng: -58.2112 },
-    "Moreno":            { prov: "Buenos Aires", lat: -34.6509, lng: -58.7896 },
-    "Paso del Rey":      { prov: "Buenos Aires", lat: -34.6450, lng: -58.7580 },
-    "José C. Paz":       { prov: "Buenos Aires", lat: -34.5160, lng: -58.7680 },
-    "Los Polvorines":    { prov: "Buenos Aires", lat: -34.5280, lng: -58.7040 },
-    "San Miguel":        { prov: "Buenos Aires", lat: -34.5430, lng: -58.7120 },
-    "González Catán":    { prov: "Buenos Aires", lat: -34.7700, lng: -58.6470 },
-    "Lomas de Zamora":   { prov: "Buenos Aires", lat: -34.7600, lng: -58.4000 },
-    "Mar del Plata":     { prov: "Buenos Aires", lat: -38.0055, lng: -57.5426 },
-    "Bahía Blanca":      { prov: "Buenos Aires", lat: -38.7196, lng: -62.2724 },
-    "Rosario":           { prov: "Santa Fe",     lat: -32.9442, lng: -60.6505 },
-    "Santa Fe":          { prov: "Santa Fe",     lat: -31.6333, lng: -60.7000 },
-    "Córdoba":           { prov: "Córdoba",      lat: -31.4201, lng: -64.1888 },
-    "Villa María":       { prov: "Córdoba",      lat: -32.4075, lng: -63.2402 },
-    "Mendoza":           { prov: "Mendoza",      lat: -32.8895, lng: -68.8458 },
-    "Las Heras":         { prov: "Mendoza",      lat: -32.8500, lng: -68.8200 },
-    "San Juan":          { prov: "San Juan",     lat: -31.5375, lng: -68.5364 },
-    "San Luis":          { prov: "San Luis",     lat: -33.3017, lng: -66.3378 },
-    "Resistencia":       { prov: "Chaco",        lat: -27.4606, lng: -58.9839 },
-    "Santa Rosa":        { prov: "La Pampa",     lat: -36.6167, lng: -64.2833 },
-    "Bariloche":         { prov: "Río Negro",    lat: -41.1335, lng: -71.3103 },
-    "General Roca":      { prov: "Río Negro",    lat: -39.0333, lng: -67.5833 },
-    "Trelew":            { prov: "Chubut",       lat: -43.2489, lng: -65.3051 },
-    "Comodoro Rivadavia":{ prov: "Chubut",       lat: -45.8641, lng: -67.4966 },
-  };
-
-  var n = 0;
-  /* Datos de ejemplo del cuestionario: se completan solos y siempre igual
-     (a partir del número de cada organización), salvo que la ficha los traiga. */
-  var ACT_POR_TIPO = {
-    jardin: ["artisticas", "apoyo"], club: ["deportivas"], casaninx: ["apoyo", "artisticas", "deportivas"],
-    centrodia: ["apoyo", "oficios", "terapeutico"], hogar: ["apoyo", "terapeutico", "oficios"],
-    biblioteca: ["biblioteca", "apoyo"], cultural: ["artisticas", "comunicacion"], murga: ["artisticas"],
-    comedor: ["apoyo"], radio: ["comunicacion", "artisticas"], educativo: ["apoyo", "fines"], otro: [],
-  };
-  var ROLES = ["Coordinación general", "Fundadorx", "Educadorx a cargo", "Presidencia de la asociación civil", "Equipo de conducción"];
-  function elegir(lista, n, k) { return lista[(n * 7 + k * 13) % lista.length]; }
-  function participantes(o, n) {
-    var total = +o.chicos || 40;
-    var m = String(o.edades || "").match(/(\d+)\D+(\d+)/);
-    var min = m ? +m[1] : 0, max = m ? +m[2] : 30;
-    var hastaDoce = Math.max(0, Math.min(max, 12) - min + 1), trece = Math.max(0, Math.min(max, 18) - Math.max(min, 13) + 1);
-    var parteN = hastaDoce + trece ? hastaDoce / (hastaDoce + trece) : 0.5;
-    var adultxs = m ? Math.round(total * (0.08 + (n % 4) * 0.03)) : Math.round(total * 0.3);
-    var ninxs = Math.round(total * parteN);
-    return { ninxs: ninxs, jovenes: total - ninxs, adultxs: adultxs };
-  }
-  function cuestionario(o, n) {
-    var tipo = o.tipo || o.tipos[0];
-    var acts = (ACT_POR_TIPO[tipo] || []).slice();
-    var extra = ["generos", "consumo", "comunicacion", "habitat", "medica", "deportivas"][n % 6];
-    if (n % 3 === 0 && acts.indexOf(extra) === -1) acts.push(extra);
-    var educ = 3 + (n * 5) % 14, mujeres = Math.round(educ * 0.65), otrxs = n % 5 === 0 ? 1 : 0;
-    var redes = { facebook: "", instagram: "", waCanal: "", youtube: "", web: "", otra: "" };
-    if (o.redes) redes.instagram = o.redes;
-    if (n % 4 === 1) redes.facebook = o.nombre;
-    if (tipo === "radio") redes.youtube = "@" + o.nombre.toLowerCase().replace(/[^a-z]+/g, "");
-    var publicos = ["udi", "opnya", "envion", "alimprov", "alimmuni", "sedronar", "universidades"];
-    var fp = n % 6 === 0 ? ["ninguno"] : [elegir(publicos, n, 1), elegir(publicos, n, 4)].filter(function (v, i, a) { return a.indexOf(v) === i; });
-    return {
-      personeria: elegir(["asociacion", "asociacion", "fundacion", "tramite", "ninguna", "cooperativa"], n, 2),
-      personeriaDetalle: "",
-      actividades: acts,
-      actividadesOtras: "",
-      participantes: participantes(o, n),
-      alcance: elegir(["barrial", "barrial", "local", "municipal", "intermunicipal"], n, 3),
-      redes: redes,
-      whatsappPublico: n % 3 === 1,
-      educadorxs: { total: educ, mujeres: mujeres, varones: educ - mujeres - otrxs, otrxs: otrxs },
-      // solo para la red: no lo ven los visitantes
-      referenteRol: elegir(ROLES, n, 5),
-      actividadesNuevas: n % 4 === 2 ? "Taller de huerta" : "",
-      actividadesBaja: n % 7 === 3 ? "Torneo de fútbol de los sábados: no hay quien lo coordine" : "",
-      espacio: elegir(["propio", "prestado", "cedido", "alquilado", "compartido", "propio"], n, 6),
-      espacioInfo: "",
-      sueldos: elegir(["ningunx", "algunxs", "algunxs", "ningunx", "mitad"], n, 7),
-      sueldosInfo: "",
-      fondosPublicos: fp,
-      fondosPublicosDetalle: "",
-      fondosPrivados: n % 5 === 2 ? ["ninguno"] : [elegir(["individuos", "fundaciones", "religiosas", "empresas"], n, 8)],
-      fondosPrivadosDetalle: "",
-    };
-  }
-
-  function org(o) {
-    n += 1;
-    var loc = window.RED_LOCALIDADES[o.localidad];
-    // desplazamiento chico y determinístico para que las casas de una misma localidad no se pisen
-    var dLat = (Math.sin(n * 12.9898) * 0.018);
-    var dLng = (Math.cos(n * 78.233) * 0.022);
-    var base = Object.assign({
-      id: "org-" + n,
-      provincia: loc.prov,
-      lat: +(loc.lat + dLat).toFixed(5),
-      lng: +(loc.lng + dLng).toFixed(5),
-      // qué ubicación se muestra: "zona" (aproximada) o "exacta", por separado para
-      // visitantes (público) y para las otras organizaciones de la red
-      ubicacionPublica: "zona",
-      ubicacionRed: "zona",
-      direccion: "",
-      tipoOtro: "",
-      telefono: "(0" + (10 + (n % 80)) + ") 15-0000-" + String(1000 + n).slice(-4),
-      correo: "contacto@ejemplo-" + n + ".org.ar",
-      estado: "aprobada",
-      actualizada: "2026-09-" + String(1 + (n * 7) % 24).padStart(2, "0"),
-    }, cuestionario(o, n), o);
-    if (typeof o.redes === "string") base.redes = cuestionario(o, n).redes;
-    delete base.chicos; delete base.edades;
-    base.tipos = o.tipos || [o.tipo];   // una organización puede ser de varios tipos
-    delete base.tipo;
-    return base;
-  }
-
 
   window.RED_ORGS = [
-    org({ nombre: "Casa del Niño Semillitas", tipo: "casaninx", localidad: "Avellaneda",
-      referente: "Marta Giménez", edades: "4 a 14 años", chicos: 85,
-      horarios: "Lunes a viernes de 8 a 18", redes: "@casasemillitas",
-      descripcion: "Casa del niño con desayuno, almuerzo y merienda. Apoyo escolar a la tarde y taller de huerta los sábados.",
-      direccion: "Pasaje Los Aromos 245", ubicacionRed: "exacta" }),
-    org({ nombre: "Merendero Los Gurises", tipos: ["comedor", "centrodia"], localidad: "José C. Paz",
-      referente: "Graciela Ortiz", edades: "2 a 12 años", chicos: 60,
-      horarios: "Lunes, miércoles y viernes de 16 a 19", redes: "@merendero.losgurises",
-      descripcion: "Merendero barrial que funciona en la casa de una vecina. Leche, pan casero y juegos después de la escuela."}),
-    org({ nombre: "Comedor Juanito Laguna", tipo: "comedor", localidad: "Florencio Varela",
-      referente: "Héctor Ramírez", edades: "Todas las edades", chicos: 140,
-      horarios: "Lunes a sábado, almuerzo de 12 a 14",
-      descripcion: "Comedor comunitario que da almuerzo a familias del barrio. Olla popular los sábados." }),
-    org({ nombre: "Centro Cultural La Ronda", tipo: "cultural", localidad: "Quilmes",
-      referente: "Lucía Paredes", edades: "8 a 18 años", chicos: 70,
-      horarios: "Martes a sábado de 15 a 20", redes: "@laronda.cultural",
-      descripcion: "Murga, teatro, radio y serigrafía. Los chicos arman su propio programa de radio cada viernes.",
-      direccion: "Calle 844 N.º 1520", ubicacionPublica: "exacta", ubicacionRed: "exacta" }),
-    org({ nombre: "Hogar Tres Veces Casa", tipo: "hogar", localidad: "La Plata",
-      referente: "Padre Julián Moyano", edades: "6 a 17 años", chicos: 24,
-      horarios: "Convivencial, 24 horas",
-      descripcion: "Casa convivencial para chicos y chicas. Panadería y huerta como proyectos productivos." }),
-    org({ nombre: "Apoyo Escolar Pizarrón Abierto", tipo: "educativo", localidad: "Berazategui",
-      referente: "Noelia Sosa", edades: "6 a 15 años", chicos: 45,
-      horarios: "Lunes a jueves de 14 a 17",
-      descripcion: "Apoyo escolar primaria y secundaria. Biblioteca popular abierta al barrio." }),
-    org({ nombre: "Club Social El Potrero", tipo: "club", localidad: "Moreno",
-      referente: "Walter Benítez", edades: "5 a 17 años", chicos: 120,
-      horarios: "Martes, jueves y sábados de 17 a 20",
-      descripcion: "Fútbol mixto, hockey y merienda después del entrenamiento. Torneos con otros clubes de barrio.",
-      direccion: "Av. del Potrero 3300", ubicacionRed: "exacta" }),
-    org({ nombre: "Casa Abierta Paso del Rey", tipo: "hogar", localidad: "Paso del Rey",
-      referente: "Silvia Acosta", edades: "0 a 12 años", chicos: 50,
-      horarios: "Lunes a viernes de 7 a 17",
-      descripcion: "Jardín comunitario y casa del niño. Acompañamiento a las familias en trámites." }),
-    org({ nombre: "Merendero Pancitas Felices", tipo: "comedor", localidad: "Los Polvorines",
-      referente: "Rosa Villalba", edades: "3 a 12 años", chicos: 55,
-      horarios: "Martes y jueves de 16 a 18:30",
-      descripcion: "Merienda y taller de lectura. Funciona en el salón de la parroquia del barrio." }),
-    org({ nombre: "Taller de Oficios Manos del Barrio", tipo: "centrodia", localidad: "San Miguel",
-      referente: "Jorge Almada", edades: "14 a 21 años", chicos: 35,
-      horarios: "Lunes a viernes de 9 a 13",
-      descripcion: "Carpintería, electricidad y herrería para adolescentes. Emprendimiento de muebles a pedido." }),
-    org({ nombre: "Comedor Nuestra Señora del Barrio", tipo: "comedor", localidad: "González Catán",
-      referente: "Carmen Duarte", edades: "Todas las edades", chicos: 200,
-      horarios: "Lunes a viernes, almuerzo y cena",
-      descripcion: "Comedor con más de 200 raciones diarias. Ropero comunitario los miércoles."}),
-    org({ nombre: "Salita Comunitaria Ternura", tipo: "centrodia", localidad: "Lomas de Zamora",
-      referente: "Dra. Paula Ferreyra", edades: "0 a 18 años", chicos: 300,
-      horarios: "Lunes a viernes de 9 a 15",
-      descripcion: "Controles de niño sano, vacunación y talleres de salud sexual integral junto a promotoras del barrio." }),
-    org({ nombre: "Casa de Jóvenes Mar y Arena", tipo: "centrodia", localidad: "Mar del Plata",
-      referente: "Federico Lagos", edades: "12 a 20 años", chicos: 40,
-      horarios: "Lunes a viernes de 14 a 20",
-      descripcion: "Espacio de encuentro para adolescentes: música, surf social y terminalidad educativa." }),
-    org({ nombre: "Merendero Vientos del Sur", tipo: "comedor", localidad: "Bahía Blanca",
-      referente: "Andrea Molina", edades: "3 a 14 años", chicos: 48,
-      horarios: "Lunes a viernes de 16 a 18",
-      descripcion: "Merienda, apoyo escolar y juegos. Hacemos colecta de abrigo todos los inviernos." }),
-    org({ nombre: "Centro Comunitario Los Pibes del Sur", tipo: "centrodia", localidad: "Rosario",
-      referente: "Matías Correa", edades: "6 a 17 años", chicos: 90,
-      horarios: "Lunes a viernes de 14 a 19",
-      descripcion: "Apoyo escolar, biblioteca y taller de rap. Articulamos con la escuela del barrio." }),
-    org({ nombre: "Hogar Costa Litoral", tipo: "hogar", localidad: "Santa Fe",
-      referente: "Hna. Beatriz Luján", edades: "4 a 16 años", chicos: 18,
-      horarios: "Convivencial, 24 horas",
-      descripcion: "Casa convivencial a orillas del Salado. Huerta y taller de cerámica." }),
-    org({ nombre: "Comedor La Esperanza", tipo: "comedor", localidad: "Córdoba",
-      referente: "Ramona Quiroga", edades: "Todas las edades", chicos: 160,
-      horarios: "Lunes a sábado de 11:30 a 14",
-      descripcion: "Comedor y copa de leche. Taller de costura para las mamás del barrio." }),
-    org({ nombre: "Club de Barrio Los Algarrobos", tipo: "club", localidad: "Villa María",
-      referente: "Diego Luna", edades: "6 a 16 años", chicos: 75,
-      horarios: "Lunes a viernes de 17 a 20",
-      descripcion: "Básquet, fútbol y vóley. Merienda después de cada entrenamiento." }),
-    org({ nombre: "Casa de la Niñez Cerro Arco", tipo: "casaninx", localidad: "Las Heras",
-      referente: "Estela Pérez", edades: "3 a 12 años", chicos: 65,
-      horarios: "Lunes a viernes de 8 a 16",
-      descripcion: "Casa de día con desayuno, almuerzo y talleres de arte." }),
-    org({ nombre: "Centro Cultural Acequia", tipos: ["radio", "cultural"], localidad: "Mendoza",
-      referente: "Tomás Videla", edades: "10 a 18 años", chicos: 55,
-      horarios: "Martes a viernes de 16 a 20",
-      descripcion: "Folclore, audiovisual y radio comunitaria." }),
-    org({ nombre: "Merendero Sol de Zonda", tipo: "comedor", localidad: "San Juan",
-      referente: "Liliana Castro", edades: "2 a 12 años", chicos: 42,
-      horarios: "Lunes a viernes de 17 a 19",
-      descripcion: "Merienda y ludoteca. Festejamos juntos los cumpleaños del mes." }),
-    org({ nombre: "Apoyo Escolar Las Chacras", tipo: "educativo", localidad: "San Luis",
-      referente: "Mauricio Funes", edades: "6 a 14 años", chicos: 38,
-      horarios: "Lunes a jueves de 14:30 a 17:30",
-      descripcion: "Apoyo escolar y alfabetización digital con computadoras donadas." }),
-    org({ nombre: "Comedor Comunitario Barrio Toba", tipo: "comedor", localidad: "Resistencia",
-      referente: "Celestino Gómez", edades: "Todas las edades", chicos: 180,
-      horarios: "Lunes a viernes, almuerzo",
-      descripcion: "Comedor comunitario en barrio toba. Taller de lengua qom y artesanía." }),
-    org({ nombre: "Casa del Niño Caldenes", tipo: "casaninx", localidad: "Santa Rosa",
-      referente: "Ana Berardi", edades: "4 a 13 años", chicos: 52,
-      horarios: "Lunes a viernes de 8 a 17",
-      descripcion: "Casa de día, huerta agroecológica y cría de gallinas." }),
-    org({ nombre: "Centro Juvenil Cordillera", tipo: "cultural", localidad: "Bariloche",
-      referente: "Nahuel Epulef", edades: "12 a 20 años", chicos: 45,
-      horarios: "Lunes a sábado de 15 a 21",
-      descripcion: "Espacio joven en el Alto: música, murales y preparación para el primer empleo." }),
-    org({ nombre: "Merendero Chacra y Manzana", tipo: "comedor", localidad: "General Roca",
-      referente: "Soledad Pino", edades: "2 a 12 años", chicos: 50,
-      horarios: "Lunes a viernes de 16:30 a 18:30",
-      descripcion: "Merienda con fruta del Alto Valle y taller de cocina con las familias." }),
-    org({ nombre: "Casa de Chicxs Valle Inferior", tipo: "casaninx", localidad: "Trelew",
-      referente: "Gwen Roberts", edades: "6 a 16 años", chicos: 36,
-      horarios: "Lunes a viernes de 14 a 18",
-      descripcion: "Apoyo escolar, merienda y taller de ajedrez." }),
-    org({ nombre: "Comedor Vientos del Golfo", tipo: "comedor", localidad: "Comodoro Rivadavia",
-      referente: "Miguel Ángel Rojas", edades: "Todas las edades", chicos: 130,
-      horarios: "Lunes a sábado, almuerzo y merienda",
-      descripcion: "Comedor en barrio de la zona norte. Ropero y peluquería social una vez por mes." }),
-
-    /* pedidos de acceso pendientes (aparecen en el panel de Coordinación) */
-    org({ nombre: "Biblioteca Popular Letras al Viento", tipo: "biblioteca", localidad: "Avellaneda",
-      referente: "Hernán Lucero", edades: "5 a 15 años", chicos: 30,
-      horarios: "Sábados de 10 a 13",
-      descripcion: "Biblioteca popular con cuentacuentos y apoyo escolar los sábados.", estado: "pendiente",
-      emailSolicitud: "hernan.lucero@example.com",
-      mensaje: "Participamos de los encuentros de zona sur desde 2024. Nos conoce Casa del Niño Semillitas." }),
-    org({ nombre: "Olla Popular Barrio Obrero", tipo: "comedor", localidad: "Rosario",
-      referente: "Carla Benítez", edades: "Todas las edades", chicos: 90,
-      horarios: "Martes y viernes, cena",
-      descripcion: "Olla popular que arrancó en 2024. Queremos sumarnos a la red.", estado: "pendiente",
-      emailSolicitud: "olla.barrioobrero@example.com",
-      mensaje: "Fuimos a la marcha de noviembre con el Centro Comunitario Los Pibes del Sur y queremos sumarnos a la red." }),
-    org({ nombre: "Escuelita de Fútbol Los Cóndores", tipo: "club", localidad: "Mendoza",
-      referente: "Raúl Aguirre", edades: "6 a 14 años", chicos: 60,
-      horarios: "Lunes, miércoles y viernes de 18 a 20",
-      descripcion: "Escuela de fútbol infantil gratuita con merienda.", estado: "pendiente",
-      emailSolicitud: "raul.aguirre@example.com",
-      mensaje: "Somos una escuelita de fútbol gratuita. Todavía no participamos de ningún encuentro de la red." }),
+    {
+      "id": "org-1",
+      "nombre": "Escuela Popular de Música",
+      "tipos": [
+        "otro"
+      ],
+      "tipoOtro": "Escuela de música",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Gerónimo Ilardi",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 1,
+        "jovenes": 45,
+        "adultxs": 24
+      },
+      "alcance": "provincial",
+      "educadorxs": {
+        "total": 24,
+        "mujeres": 13,
+        "varones": 11,
+        "otrxs": ""
+      },
+      "localidad": "Villa Ballester",
+      "provincia": "Buenos Aires",
+      "direccion": "Alberdi 4449",
+      "lat": -34.54563,
+      "lng": -58.56282,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 5846-4011",
+      "correo": "contacto@organizacion-1.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "Escuela.popular.musica",
+        "waCanal": "",
+        "youtube": "Escuela popular de musica",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "No",
+      "actividadesBaja": "No",
+      "espacio": "prestado",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "ninguno"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat",
+        "tipoOtro"
+      ]
+    },
+    {
+      "id": "org-2",
+      "nombre": "Mesa Reconquista",
+      "tipos": [
+        "otro"
+      ],
+      "tipoOtro": "Mesa de organizaciones",
+      "personeria": "ninguna",
+      "personeriaDetalle": "",
+      "referente": "Facundo Moyano",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades deportivas, apoyo escolar y atención médica.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "deportivas",
+        "apoyo",
+        "medica",
+        "terapeutico",
+        "consumo",
+        "fines",
+        "generos",
+        "comunicacion"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 20,
+        "jovenes": 20,
+        "adultxs": 15
+      },
+      "alcance": "municipal",
+      "educadorxs": {
+        "total": 10,
+        "mujeres": 4,
+        "varones": 6,
+        "otrxs": ""
+      },
+      "localidad": "Villa José León Suárez",
+      "provincia": "Buenos Aires",
+      "direccion": "",
+      "lat": -34.5265,
+      "lng": -58.57139,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 3643-6792",
+      "correo": "contacto@organizacion-2.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "Taller de Barberia- Manicuria",
+      "actividadesBaja": "No",
+      "espacio": "prestado",
+      "espacioInfo": "",
+      "sueldos": "todxs",
+      "sueldosInfo": "",
+      "fondosPublicos": [],
+      "fondosPublicosDetalle": "Otras",
+      "fondosPrivados": [
+        "otros"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat",
+        "tipoOtro"
+      ]
+    },
+    {
+      "id": "org-3",
+      "nombre": "Biblioteca popular la Carcova",
+      "tipos": [
+        "biblioteca"
+      ],
+      "tipoOtro": "",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Yair Rubio",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, apoyo escolar y terminalidad educativa.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo",
+        "fines"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 60,
+        "jovenes": 20,
+        "adultxs": 60
+      },
+      "alcance": "local",
+      "educadorxs": {
+        "total": 20,
+        "mujeres": 15,
+        "varones": 5,
+        "otrxs": ""
+      },
+      "localidad": "Villa Cárcova",
+      "provincia": "Buenos Aires",
+      "direccion": "Beltrán 92",
+      "lat": -34.52527,
+      "lng": -58.57993,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0003",
+      "correo": "contacto@organizacion-3.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "Biblioteca popular la Carcova",
+        "waCanal": "Biblioteca popular la Carcova",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "No",
+      "actividadesBaja": "Ensamble musical para jovenes",
+      "espacio": "propio",
+      "espacioInfo": "",
+      "sueldos": "mitad",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "ninguno"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "fundaciones"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "telefono",
+        "fondosPublicos",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-4",
+      "nombre": "Los pingüinos Hakuna Matata",
+      "tipos": [
+        "jardin"
+      ],
+      "tipoOtro": "",
+      "personeria": "otra",
+      "personeriaDetalle": "",
+      "referente": "Valdéz Patricia",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, apoyo escolar y espacio terapéutico.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo",
+        "terapeutico",
+        "consumo",
+        "generos",
+        "comunicacion"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 47,
+        "jovenes": 20,
+        "adultxs": 70
+      },
+      "alcance": "barrial",
+      "educadorxs": {
+        "total": 15,
+        "mujeres": 5,
+        "varones": 10,
+        "otrxs": ""
+      },
+      "localidad": "Loma Hermosa",
+      "provincia": "Buenos Aires",
+      "direccion": "Paraná 6430",
+      "lat": -34.56275,
+      "lng": -58.60008,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0004",
+      "correo": "contacto@organizacion-4.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "Tienen, falta el dato",
+        "instagram": "Tienen, falta el dato",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "",
+      "actividadesBaja": "",
+      "espacio": "prestado",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "ninguno"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "actividadesNuevas",
+        "actividadesBaja",
+        "telefono",
+        "fondosPublicos",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-5",
+      "nombre": "Asoc. Mujeres la Colmena",
+      "tipos": [
+        "jardin"
+      ],
+      "tipoOtro": "",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Nancy Bonchet",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, apoyo escolar y terminalidad educativa.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo",
+        "fines",
+        "generos"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 400,
+        "jovenes": 150,
+        "adultxs": 20
+      },
+      "alcance": "barrial",
+      "educadorxs": {
+        "total": 30,
+        "mujeres": 29,
+        "varones": 1,
+        "otrxs": ""
+      },
+      "localidad": "Villa Hidalgo",
+      "provincia": "Buenos Aires",
+      "direccion": "Mitre 284",
+      "lat": -34.52587,
+      "lng": -58.57652,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0005",
+      "correo": "contacto@organizacion-5.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "Tienen, falta el dato",
+        "instagram": "Tienen, falta el dato",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": "Tienen, falta el dato"
+      },
+      "actividadesNuevas": "UNSAM",
+      "actividadesBaja": "",
+      "espacio": "cedido",
+      "espacioInfo": "",
+      "sueldos": "algunxs",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "udi",
+        "opnya",
+        "envion",
+        "alimprov",
+        "alimmuni"
+      ],
+      "fondosPublicosDetalle": "Pnud",
+      "fondosPrivados": [
+        "individuos"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "actividadesBaja",
+        "telefono",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-6",
+      "nombre": "8 de Mayo",
+      "tipos": [
+        "biblioteca"
+      ],
+      "tipoOtro": "",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Andrea Biscione",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con apoyo escolar, espacio terapéutico y acompañamiento en consumo problemático.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "apoyo",
+        "terapeutico",
+        "consumo",
+        "generos",
+        "habitat"
+      ],
+      "actividadesOtras": "Alimentación, educaión y tercera edad",
+      "participantes": {
+        "ninxs": 80,
+        "jovenes": 10,
+        "adultxs": 100
+      },
+      "alcance": "barrial",
+      "educadorxs": {
+        "total": 8,
+        "mujeres": 7,
+        "varones": 1,
+        "otrxs": ""
+      },
+      "localidad": "El Libertador",
+      "provincia": "Buenos Aires",
+      "direccion": "Av Libertador 7914",
+      "lat": -34.55201,
+      "lng": -58.6144,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0006",
+      "correo": "contacto@organizacion-6.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "Centro comunitario 8 de mayo",
+        "instagram": "8 de mayo",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "No",
+      "actividadesBaja": "Campamentos",
+      "espacio": "ocupado",
+      "espacioInfo": "",
+      "sueldos": "todxs",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "udi",
+        "alimmuni"
+      ],
+      "fondosPublicosDetalle": "Otras",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "telefono",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-7",
+      "nombre": "Defensoria de Laburantes",
+      "tipos": [
+        "centrodia"
+      ],
+      "tipoOtro": "",
+      "personeria": "tramite",
+      "personeriaDetalle": "",
+      "referente": "Lucia Daniela Fernandez",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, apoyo escolar y comunicación.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo",
+        "comunicacion",
+        "habitat"
+      ],
+      "actividadesOtras": "Asesoramiento legal",
+      "participantes": {
+        "ninxs": 20,
+        "jovenes": 0,
+        "adultxs": 20
+      },
+      "alcance": "barrial",
+      "educadorxs": {
+        "total": 8,
+        "mujeres": 6,
+        "varones": 2,
+        "otrxs": ""
+      },
+      "localidad": "Balvanera",
+      "provincia": "Ciudad Autónoma de Buenos Aires",
+      "direccion": "Av. Corrientes 2925",
+      "lat": -34.60774,
+      "lng": -58.39853,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 6724-4350",
+      "correo": "contacto@organizacion-7.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "Defendoria de laburantes/ Sembrando patria CC",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "Olla popular",
+      "actividadesBaja": "",
+      "espacio": "alquilado",
+      "espacioInfo": "",
+      "sueldos": "masmitad",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "ninguno"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "individuos"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "actividadesBaja",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-8",
+      "nombre": "Centro Cultural America Mestiza",
+      "tipos": [
+        "cultural"
+      ],
+      "tipoOtro": "",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Natalia Quiñones",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con apoyo escolar y terminalidad educativa.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "apoyo",
+        "fines"
+      ],
+      "actividadesOtras": "Olla popular y biblioteca",
+      "participantes": {
+        "ninxs": 10,
+        "jovenes": 5,
+        "adultxs": 30
+      },
+      "alcance": "local",
+      "educadorxs": {
+        "total": 10,
+        "mujeres": 7,
+        "varones": 3,
+        "otrxs": ""
+      },
+      "localidad": "Barrio 9 de Julio",
+      "provincia": "Buenos Aires",
+      "direccion": "1 de agosto 7902",
+      "lat": -34.53246,
+      "lng": -58.58094,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 2576-9461",
+      "correo": "contacto@organizacion-8.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "América Mestiza",
+        "instagram": "Americamestiza",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "Olla Popular",
+      "actividadesBaja": "Talleres de teatro y oficios",
+      "espacio": "ocupado",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "alimprov",
+        "alimmuni"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "individuos"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-9",
+      "nombre": "Radio Reconquista",
+      "tipos": [
+        "otro"
+      ],
+      "tipoOtro": "Radio comunitaria",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Rafa",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, actividades deportivas y apoyo escolar.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "deportivas",
+        "apoyo",
+        "medica",
+        "terapeutico",
+        "consumo",
+        "fines",
+        "generos",
+        "comunicacion",
+        "habitat"
+      ],
+      "actividadesOtras": "Otras actividades",
+      "participantes": {
+        "ninxs": 20,
+        "jovenes": 30,
+        "adultxs": 30
+      },
+      "alcance": "provincial",
+      "educadorxs": {
+        "total": 5,
+        "mujeres": 3,
+        "varones": 2,
+        "otrxs": ""
+      },
+      "localidad": "Villa Hidalgo",
+      "provincia": "Buenos Aires",
+      "direccion": "Villalba 1366",
+      "lat": -34.53472,
+      "lng": -58.57073,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0009",
+      "correo": "contacto@organizacion-9.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "Tienen, falta el dato",
+        "instagram": "Tienen, falta el dato",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": "Tienen, falta el dato"
+      },
+      "actividadesNuevas": "No",
+      "actividadesBaja": "",
+      "espacio": "cedido",
+      "espacioInfo": "",
+      "sueldos": "mitad",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "alimmuni",
+        "udi"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "otros"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "actividadesBaja",
+        "participantes",
+        "educadorxs",
+        "telefono",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat",
+        "tipoOtro"
+      ]
+    },
+    {
+      "id": "org-10",
+      "nombre": "Mesa reconquista/ UNSAM",
+      "tipos": [
+        "otro"
+      ],
+      "tipoOtro": "Mesa de organizaciones",
+      "personeria": "ninguna",
+      "personeriaDetalle": "",
+      "referente": "Ernesto Paret",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, actividades deportivas y apoyo escolar.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "deportivas",
+        "apoyo",
+        "terapeutico",
+        "consumo",
+        "fines",
+        "generos",
+        "comunicacion",
+        "habitat"
+      ],
+      "actividadesOtras": "Otras actividades",
+      "participantes": {
+        "ninxs": 20,
+        "jovenes": 300,
+        "adultxs": 400
+      },
+      "alcance": "local",
+      "educadorxs": {
+        "total": 50,
+        "mujeres": 30,
+        "varones": 20,
+        "otrxs": ""
+      },
+      "localidad": "General San Martín",
+      "provincia": "Buenos Aires",
+      "direccion": "",
+      "lat": -34.58323,
+      "lng": -58.54468,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0010",
+      "correo": "contacto@organizacion-10.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "No",
+      "actividadesBaja": "No",
+      "espacio": "propio",
+      "espacioInfo": "",
+      "sueldos": "masmitad",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "opnya",
+        "envion",
+        "universidades",
+        "alimprov"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "telefono",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat",
+        "tipoOtro"
+      ]
+    },
+    {
+      "id": "org-11",
+      "nombre": "Biblioteca popular de curita",
+      "tipos": [
+        "biblioteca"
+      ],
+      "tipoOtro": "",
+      "personeria": "ninguna",
+      "personeriaDetalle": "",
+      "referente": "Nair Rodriguez-Micaela Dasilva",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas y apoyo escolar.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo"
+      ],
+      "actividadesOtras": "Otras actividades",
+      "participantes": {
+        "ninxs": 12,
+        "jovenes": 2,
+        "adultxs": 10
+      },
+      "alcance": "local",
+      "educadorxs": {
+        "total": 6,
+        "mujeres": 4,
+        "varones": 2,
+        "otrxs": ""
+      },
+      "localidad": "Barrio Lanzone",
+      "provincia": "Buenos Aires",
+      "direccion": "Gabriela Mistral 8056",
+      "lat": -34.53699,
+      "lng": -58.57046,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 7004-5664",
+      "correo": "contacto@organizacion-11.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "Biblio.curita",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "Taller de fanzine - presentación de libros",
+      "actividadesBaja": "taller de artes plasticas",
+      "espacio": "cedido",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "opnya"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-12",
+      "nombre": "Escucha Activa Mujeres y Disidencias",
+      "tipos": [
+        "centrodia"
+      ],
+      "tipoOtro": "",
+      "personeria": "otra",
+      "personeriaDetalle": "",
+      "referente": "Nair Rodriguez-Micaela Dasilva",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas, apoyo escolar y acompañamiento en consumo problemático.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "apoyo",
+        "consumo",
+        "generos"
+      ],
+      "actividadesOtras": "",
+      "participantes": {
+        "ninxs": 0,
+        "jovenes": 0,
+        "adultxs": 30
+      },
+      "alcance": "local",
+      "educadorxs": {
+        "total": 10,
+        "mujeres": 7,
+        "varones": 3,
+        "otrxs": ""
+      },
+      "localidad": "Barrio Lanzone",
+      "provincia": "Buenos Aires",
+      "direccion": "Gabriela Mistral 8056",
+      "lat": -34.5366,
+      "lng": -58.58145,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "11 5972-8826",
+      "correo": "contacto@organizacion-12.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "",
+        "instagram": "puntosdeencuentro_ok",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "Cine debate",
+      "actividadesBaja": "No",
+      "espacio": "cedido",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "universidades",
+        "alimprov"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "ninguno"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "personeria",
+        "participantes",
+        "fondosPrivados",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    },
+    {
+      "id": "org-13",
+      "nombre": "Orquesta estable Radio Reconquista",
+      "tipos": [
+        "centrodia"
+      ],
+      "tipoOtro": "",
+      "personeria": "asociacion",
+      "personeriaDetalle": "",
+      "referente": "Daniela Saez Felué",
+      "referenteRol": "Referente de la organización",
+      "descripcion": "Organización que trabaja con actividades artísticas y géneros y diversidades.",
+      "horarios": "Lunes a viernes de 9 a 17",
+      "actividades": [
+        "artisticas",
+        "generos"
+      ],
+      "actividadesOtras": "Otras actividades",
+      "participantes": {
+        "ninxs": 6,
+        "jovenes": 40,
+        "adultxs": 15
+      },
+      "alcance": "municipal",
+      "educadorxs": {
+        "total": 11,
+        "mujeres": 4,
+        "varones": 7,
+        "otrxs": ""
+      },
+      "localidad": "Villa José León Suárez",
+      "provincia": "Buenos Aires",
+      "direccion": "Villalba 1366",
+      "lat": -34.53521,
+      "lng": -58.57233,
+      "ubicacionPublica": "zona",
+      "ubicacionRed": "zona",
+      "telefono": "(011) 0000-0013",
+      "correo": "contacto@organizacion-13.example",
+      "whatsappPublico": false,
+      "redes": {
+        "facebook": "Orquesta estable de radio Reconquista",
+        "instagram": "La estable",
+        "waCanal": "",
+        "youtube": "",
+        "web": "",
+        "otra": ""
+      },
+      "actividadesNuevas": "",
+      "actividadesBaja": "",
+      "espacio": "propio",
+      "espacioInfo": "",
+      "sueldos": "ningunx",
+      "sueldosInfo": "",
+      "fondosPublicos": [
+        "opnya",
+        "envion"
+      ],
+      "fondosPublicosDetalle": "",
+      "fondosPrivados": [
+        "otros"
+      ],
+      "fondosPrivadosDetalle": "",
+      "estado": "aprobada",
+      "actualizada": "2026-09-25",
+      "inventados": [
+        "actividadesNuevas",
+        "actividadesBaja",
+        "telefono",
+        "descripcion",
+        "horarios",
+        "referenteRol",
+        "correo",
+        "lat"
+      ]
+    }
   ];
 
-  /* Cuentas de Google habilitadas: qué mail pertenece a qué organización (o a la coordinación).
-     En la versión real esta lista vive en el servidor y es el servidor el que la controla. */
+  /* Cuentas habilitadas (simuladas): una por organización, más la coordinación. */
   window.RED_USUARIOS = [
-    { email: "graciela.ortiz@example.com", nombre: "Graciela Ortiz", rol: "org", orgId: "org-2" },
-    { email: "merendero.losgurises@example.com", nombre: "Merendero Los Gurises", rol: "org", orgId: "org-2" },
-    { email: "marta.gimenez@example.com", nombre: "Marta Giménez", rol: "org", orgId: "org-1" },
-    { email: "lucia.paredes@example.com", nombre: "Lucía Paredes", rol: "org", orgId: "org-4" },
-    { email: "coordinacion.red@example.com", nombre: "Coordinación de la red", rol: "coord" },
+    {
+      "email": "org-1@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-1"
+    },
+    {
+      "email": "org-2@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-2"
+    },
+    {
+      "email": "org-3@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-3"
+    },
+    {
+      "email": "org-4@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-4"
+    },
+    {
+      "email": "org-5@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-5"
+    },
+    {
+      "email": "org-6@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-6"
+    },
+    {
+      "email": "org-7@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-7"
+    },
+    {
+      "email": "org-8@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-8"
+    },
+    {
+      "email": "org-9@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-9"
+    },
+    {
+      "email": "org-10@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-10"
+    },
+    {
+      "email": "org-11@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-11"
+    },
+    {
+      "email": "org-12@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-12"
+    },
+    {
+      "email": "org-13@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "rol": "org",
+      "orgId": "org-13"
+    },
+    {
+      "email": "coordinacion.red@example.com",
+      "nombre": "Coordinación de la red",
+      "rol": "coord"
+    }
   ];
 
   /* Cuentas que aparecen en el selector simulado de "Ingresar con Google". */
   window.RED_CUENTAS_DEMO = [
-    { email: "graciela.ortiz@example.com", nombre: "Graciela Ortiz", nota: "Merendero Los Gurises" },
-    { email: "marta.gimenez@example.com", nombre: "Marta Giménez", nota: "Casa del Niño Semillitas" },
-    { email: "coordinacion.red@example.com", nombre: "Coordinación de la red", nota: "Coordinación" },
-    { email: "juan.perez@example.com", nombre: "Juan Pérez", nota: "Cuenta no habilitada" },
+    {
+      "email": "org-1@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "nota": "Escuela Popular de Música"
+    },
+    {
+      "email": "org-3@example.com",
+      "nombre": "Cuenta de ejemplo",
+      "nota": "Biblioteca popular la Carcova"
+    },
+    {
+      "email": "coordinacion.red@example.com",
+      "nombre": "Coordinación de la red",
+      "nota": "Coordinación"
+    },
+    {
+      "email": "no.habilitada@example.com",
+      "nombre": "Cuenta no habilitada",
+      "nota": "Cuenta no habilitada"
+    }
   ];
 
-  /* respondieron: organizaciones que tocaron "Nos sumamos" */
+  /* Convocatorias inventadas, para mostrar la agenda. respondieron: organizaciones que tocaron "Nos sumamos" */
   window.RED_AVISOS = [
-    { id: "av-5", orgId: "org-1", clase: "encuentro", fecha: "2026-09-18",
-      cuando: "2026-10-04", lat: -34.6551, lng: -58.38597,
-      titulo: "Encuentro de educadorxs de zona sur — sábado 4/10",
-      detalle: "Nos juntamos a compartir experiencias de apoyo escolar. Traer algo para compartir. Hay espacio para 40 personas.",
-      respondieron: ["org-6", "org-4", "org-3", "org-12", "org-8", "org-11", "org-9", "org-2", "org-7"] },
-    { id: "av-9", orgId: "org-15", clase: "jornada", fecha: "2026-09-10",
-      cuando: "2026-09-27", lat: -32.94297, lng: -60.64808,
-      titulo: "Jornada de pintura del centro comunitario",
-      detalle: "Sábado 27/9 pintamos el salón. Invitamos a otras organizaciones de Rosario a sumarse con los chicos.",
-      respondieron: ["org-16", "org-22", "org-17", "org-18", "org-20", "org-21"] },
+    {
+      "id": "av-1",
+      "orgId": "org-3",
+      "clase": "encuentro",
+      "fecha": "2026-09-18",
+      "cuando": "2026-10-04",
+      "lat": -34.52527,
+      "lng": -58.57993,
+      "inventada": true,
+      "titulo": "Encuentro de educadorxs de la zona",
+      "detalle": "Convocatoria inventada para mostrar cómo funciona la agenda.",
+      "respondieron": [
+        "org-5",
+        "org-8"
+      ]
+    },
+    {
+      "id": "av-2",
+      "orgId": "org-5",
+      "clase": "jornada",
+      "fecha": "2026-09-10",
+      "cuando": "2026-10-11",
+      "lat": -34.52587,
+      "lng": -58.57652,
+      "inventada": true,
+      "titulo": "Jornada de trabajo comunitario",
+      "detalle": "Convocatoria inventada para mostrar cómo funciona la agenda.",
+      "respondieron": [
+        "org-11"
+      ]
+    }
   ];
 })();
