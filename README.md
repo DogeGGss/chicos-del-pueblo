@@ -23,7 +23,7 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 
 - **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia) sincronizado con un mapa Leaflet. Cada organización elige por separado si los visitantes y las otras organizaciones ven su dirección exacta o solo una zona aproximada.
 - **Ficha de cada organización**: qué hacen, edades, horarios y sus convocatorias en la agenda.
-- **Agenda de la red**: convocatorias de las organizaciones (encuentros, jornadas, talleres, marchas) con fecha y lugar; otras organizaciones pueden sumarse.
+- **Agenda de la red**: convocatorias de las organizaciones (encuentros, jornadas, talleres, marchas) con fecha y ubicación marcada en un minimapa; cada una tiene un botón para abrirla en Google Maps y otras organizaciones pueden sumarse.
 - **Acceso solo para la red**: mirar es público; publicar es solo para organizaciones con una cuenta de Google habilitada por la coordinación. El ingreso con Google está **simulado** con cuentas de ejemplo (una de ellas no habilitada, para mostrar el rechazo).
 - **Mi organización** (rol organización): edición de la ficha propia con vista previa y punto en el mapa; los cambios se publican al instante.
 - **Solicitar acceso** (visitantes): pedido para que la coordinación habilite una cuenta, junto con la explicación de quién puede hacer qué.

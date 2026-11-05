@@ -356,12 +356,12 @@
   /* respondieron: organizaciones que tocaron "Nos sumamos" */
   window.RED_AVISOS = [
     { id: "av-5", orgId: "org-1", clase: "encuentro", fecha: "2026-09-18",
-      cuando: "2026-10-04", lugar: "Casa del Niño Semillitas, Avellaneda",
+      cuando: "2026-10-04", lat: -34.6551, lng: -58.38597,
       titulo: "Encuentro de educadorxs de zona sur — sábado 4/10",
       detalle: "Nos juntamos a compartir experiencias de apoyo escolar. Traer algo para compartir. Hay espacio para 40 personas.",
       respondieron: ["org-6", "org-4", "org-3", "org-12", "org-8", "org-11", "org-9", "org-2", "org-7"] },
     { id: "av-9", orgId: "org-15", clase: "jornada", fecha: "2026-09-10",
-      cuando: "2026-09-27", lugar: "Centro Comunitario Los Pibes del Sur, Rosario",
+      cuando: "2026-09-27", lat: -32.94297, lng: -60.64808,
       titulo: "Jornada de pintura del centro comunitario",
       detalle: "Sábado 27/9 pintamos el salón. Invitamos a otras organizaciones de Rosario a sumarse con los chicos.",
       respondieron: ["org-16", "org-22", "org-17", "org-18", "org-20", "org-21"] },

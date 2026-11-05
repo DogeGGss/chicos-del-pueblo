@@ -111,6 +111,7 @@
     if (!sinHash) history.replaceState(null, "", v === "mapa" ? location.pathname : "#" + v);
     if (v === "mapa" && mapa) setTimeout(function () { mapa.invalidateSize(); }, 0);
     if (v === "ficha") initMapaFicha();
+    if (v === "agenda") initMapaAviso();
     window.scrollTo(0, 0);
   }
   botonesVista.forEach(function (b) {
@@ -206,6 +207,7 @@
     $("formAviso").hidden = rol !== "org";
     renderSesion();
     if (rol === "org") cargarFicha();
+    else limpiarPinAviso();
     construirMarcadores();
     aplicarFiltros();
     renderAvisos();
@@ -213,6 +215,7 @@
     var boton = document.querySelector('.nav-vista[data-vista="' + vista + '"]');
     if (!boton || boton.hidden) mostrarVista("mapa");
     else if (vista === "ficha") initMapaFicha();
+    else if (vista === "agenda") initMapaAviso();
   }
 
   /* ---------------- estadísticas ---------------- */
@@ -595,7 +598,43 @@
   }
 
   /* ---------------- agenda ---------------- */
+  var HINT_AVISO = "Tocá el mapa para marcar dónde es.";
+  var mapaAviso = null;
+  var pinAviso = null;
+  var avisoPos = null;
+
   function etiquetaClase(a) { return CONVOCATORIAS[a.clase] || "Actividad"; }
+  function linkGoogleMaps(a) { return "https://www.google.com/maps/search/?api=1&query=" + a.lat + "," + a.lng; }
+
+  function initMapaAviso() {
+    if (typeof L === "undefined" || rol !== "org") return;
+    if (!mapaAviso) {
+      mapaAviso = L.map("mapaAviso", { scrollWheelZoom: false });
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapaAviso);
+      mapaAviso.on("click", function (e) {
+        avisoPos = { lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) };
+        var icon = iconoPin(miOrg(), true);
+        if (!pinAviso) pinAviso = L.marker([avisoPos.lat, avisoPos.lng], { icon: icon, keyboard: false }).addTo(mapaAviso);
+        else pinAviso.setLatLng([avisoPos.lat, avisoPos.lng]);
+        $("mapaAviso").removeAttribute("aria-invalid");
+        $("mapaAvisoHint").textContent = "Punto marcado. Podés tocar de nuevo para corregirlo.";
+      });
+    }
+    setTimeout(function () {
+      mapaAviso.invalidateSize();
+      // arranca en la zona de la organización que publica
+      var yo = miOrg();
+      if (avisoPos) mapaAviso.setView([avisoPos.lat, avisoPos.lng], 13);
+      else if (yo) mapaAviso.setView([yo.lat, yo.lng], 12);
+    }, 0);
+  }
+
+  function limpiarPinAviso() {
+    avisoPos = null;
+    if (pinAviso) { mapaAviso.removeLayer(pinAviso); pinAviso = null; }
+    $("mapaAviso").removeAttribute("aria-invalid");
+    $("mapaAvisoHint").textContent = HINT_AVISO;
+  }
 
   // quiénes respondieron: lo ve cualquiera, también quien entra como visitante
   function respuestasHtml(a) {
@@ -686,7 +725,9 @@
         (yo && a.orgId !== yo.id && dist[a.id] != null ? '<span class="aviso-dist">📍 ' + textoDistancia(dist[a.id]) + "</span>" : "") +
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
-        (a.cuando ? '<p class="aviso-evento">📅 ' + fecha(a.cuando) + (a.lugar ? " · 📍 " + esc(a.lugar) : "") + "</p>" : "") +
+        '<div class="aviso-evento"><span>📅 ' + fecha(a.cuando) + "</span>" +
+        (a.lat != null ? '<a class="btn btn-sm" href="' + linkGoogleMaps(a) + '" target="_blank" rel="noopener" aria-label="Ver en Google Maps: ' + esc(a.titulo) + ' (se abre en otra pestaña)">📍 Ver en Google Maps</a>' : "") +
+        "</div>" +
         (a.detalle ? "<p>" + esc(a.detalle) + "</p>" : "") +
         respuestasHtml(a) +
         '<div class="aviso-foot"><span class="aviso-org">' +
@@ -741,17 +782,21 @@
       var cuando = $("avCuando").value;
       var faltan = [];
       if (!cuando) faltan.push("avCuando");
+      if (!avisoPos) faltan.push("mapaAviso");
       if (!titulo) faltan.push("avTitulo");
-      ["avCuando", "avTitulo"].forEach(function (id) {
+      if (!avisoPos) $("mapaAvisoHint").textContent = "Falta marcar la ubicación: tocá el mapa.";
+      ["avCuando", "mapaAviso", "avTitulo"].forEach(function (id) {
         if (faltan.indexOf(id) !== -1) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid");
       });
       if (faltan.length) { $(faltan[0]).focus(); return; }
       var aviso = {
         id: "av-" + Date.now(), orgId: sesion.orgId, clase: $("avClase").value,
-        fecha: HOY, cuando: cuando, lugar: $("avLugar").value.trim(), titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
+        fecha: HOY, cuando: cuando, lat: avisoPos.lat, lng: avisoPos.lng, titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
       };
       avisos.push(aviso);
       this.reset();
+      limpiarPinAviso();
+      initMapaAviso();
       if (avisoFiltro !== "mias") marcarFiltroAviso("");   // en "Mis publicaciones" la convocatoria nueva ya se ve
       renderAvisos();
       toast("¡Publicada! Las organizaciones de la red ya la pueden ver.");

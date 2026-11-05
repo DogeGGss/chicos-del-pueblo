@@ -132,7 +132,7 @@
 
 /* ---------- agenda ---------- */
 .agenda{ display:grid; grid-template-columns:minmax(0, 4fr) minmax(0, 8fr); gap:1.4rem; align-items:start; }
-.publicar{ position:sticky; top:4.6rem; box-shadow:5px 5px 0 var(--celeste); }
+.publicar{ position:sticky; top:4.6rem; max-height:calc(100vh - 5.4rem); overflow-y:auto; box-shadow:5px 5px 0 var(--celeste); }
 .form-stack{ display:flex; flex-direction:column; gap:.8rem; }
 .seg{ display:flex; flex-wrap:wrap; gap:.35rem; }
 .seg label{ cursor:pointer; }
@@ -144,8 +144,7 @@
 .seg input:checked + span{ background:var(--solid); border-color:var(--solid); color:var(--on-solid); }
 .seg input:focus-visible + span{ outline:3px solid var(--focus); outline-offset:2px; }
 
-.av-convoca{ gap:.6rem; }
-.aviso-evento{ font-size:.85rem; font-weight:600; color:var(--celeste-900); margin:0 0 .45rem !important; }
+.aviso-evento{ display:flex; flex-wrap:wrap; align-items:center; gap:.4rem .8rem; font-size:.85rem; font-weight:600; color:var(--celeste-900); margin:0 0 .55rem; }
 .avisos-orden{
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.4rem .8rem;
   font-size:.84rem; color:var(--ink-soft); margin:-.2rem 0 .8rem;
@@ -188,6 +187,8 @@
 .grid-3{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.9rem 1rem; }
 .col-2{ grid-column:1 / -1; }
 .mapa--ficha{ height:300px; }
+.mapa--aviso{ height:200px; cursor:crosshair; }
+.mapa--aviso[aria-invalid="true"]{ outline:2px solid var(--danger); outline-offset:1px; }
 .visibilidad{ display:flex; flex-direction:column; gap:.55rem; }
 .vis-fila{ display:flex; flex-wrap:wrap; align-items:center; gap:.4rem .8rem; }
 .vis-quien{ font-weight:700; font-size:.88rem; min-width:14rem; }
@@ -329,7 +330,7 @@ table.roles, table.cuentas{ width:100%; border-collapse:collapse; font-size:.88r
   .split-map{ position:static; order:-1; }
   .mapa{ height:46vh; min-height:280px; }
   .agenda{ grid-template-columns:1fr; }
-  .publicar{ position:static; }
+  .publicar{ position:static; max-height:none; overflow:visible; }
   .stats{ grid-template-columns:repeat(4, minmax(0,1fr)); width:100%; }
 }
 @media (max-width:640px){
