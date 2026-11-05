@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
 <meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con una agenda de convocatorias entre ellas.">
-<script src="js/tema.js?v=25"></script>
+<script src="js/tema.js?v=27"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=25">
-<link rel="stylesheet" href="css/red.css?v=25">
+<link rel="stylesheet" href="css/marca.css?v=27">
+<link rel="stylesheet" href="css/red.css?v=27">
 </head>
 <body data-app>
 
@@ -52,7 +52,7 @@
 </div>
 
 <div class="demo-banner" role="note">
-  <strong>Prototipo:</strong> las organizaciones salen de la encuesta a organizaciones sociales. Lo que faltaba se completó a mano y aparece marcado como <span class="inventado">inventado</span>, y las organizaciones de ejemplo como <span class="inventado">ficticia</span>. El ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
+  <strong>Prototipo:</strong> las organizaciones de la encuesta están marcadas como <span class="real">real</span> y las de ejemplo como <span class="inventado">ficticia</span>. En las reales, lo que faltaba se completó a mano y aparece como <span class="inventado">inventado</span>. El ingreso con Google está <strong>simulado</strong> y los cambios no se guardan al recargar. Probá “Ingresar” con las cuentas de ejemplo.
 </div>
 
 <main>
@@ -131,6 +131,11 @@
               <div id="mapaAviso" class="mapa mapa--aviso" role="region" aria-label="Mapa para marcar la ubicación de la convocatoria"></div>
               <span class="field-hint" id="mapaAvisoHint">Tocá el mapa para marcar dónde es.</span>
             </div>
+            <label class="field">
+              <span class="field-label">Dirección marcada</span>
+              <input id="avDireccion" class="field-control" maxlength="120" autocomplete="off" placeholder="Se completa al marcar el mapa">
+              <span class="field-hint">Sale del punto del mapa. Si no es exacta, podés corregirla.</span>
+            </label>
             <label class="field">
               <span class="field-label">Título *</span>
               <input id="avTitulo" class="field-control" maxlength="80" required placeholder="Ej.: Jornada de pintura en el centro comunitario">
@@ -524,9 +529,9 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=25"></script>
-<script src="js/red-localidades.js?v=25"></script>
-<script src="js/red-datos.js?v=25"></script>
-<script src="js/red.js?v=25"></script>
+<script src="js/sesion.js?v=27"></script>
+<script src="js/red-localidades.js?v=27"></script>
+<script src="js/red-datos.js?v=27"></script>
+<script src="js/red.js?v=27"></script>
 </body>
 </html>

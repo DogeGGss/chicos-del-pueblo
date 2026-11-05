@@ -23,13 +23,13 @@ Trabajo elaborado para la materia **Laboratorio Interdisciplinario: Redes social
 
 - **Mapa y directorio**: listado con buscador y filtros (tipo de organización, provincia) sincronizado con un mapa Leaflet. Cada organización elige por separado si los visitantes y las otras organizaciones ven su dirección exacta o solo una zona aproximada.
 - **Ficha de cada organización**: qué hacen, edades, horarios y sus convocatorias en la agenda.
-- **Agenda de la red**: convocatorias de las organizaciones (encuentros, jornadas, talleres, marchas) con fecha y ubicación marcada en un minimapa; cada una tiene un botón para abrirla en Google Maps y otras organizaciones pueden sumarse.
+- **Agenda de la red**: convocatorias de las organizaciones (encuentros, jornadas, talleres, marchas) con fecha y ubicación marcada en un minimapa, que completa sola la dirección con el servicio [Nominatim](https://nominatim.org/) de OpenStreetMap; cada una tiene un botón para abrirla en Google Maps y otras organizaciones pueden sumarse.
 - **Acceso solo para la red**: mirar es público; publicar es solo para organizaciones con una cuenta de Google habilitada por la coordinación. El ingreso con Google está **simulado** con cuentas de ejemplo (una de ellas no habilitada, para mostrar el rechazo).
 - **Mi organización** (rol organización): edición de la ficha propia con vista previa y punto en el mapa; los cambios se publican al instante.
 - **Solicitar acceso** (visitantes): pedido para que la coordinación habilite una cuenta, junto con la explicación de quién puede hacer qué.
 - **Coordinación**: aprobación de pedidos de acceso, gestión de qué mails pertenecen a cada organización, baja de organizaciones y moderación de la agenda.
 
-> Las organizaciones de `js/red-datos.js` salen de la encuesta a organizaciones sociales. Lo que la encuesta no traía se completó a mano y el sitio lo marca como **inventado**. Además hay organizaciones de ejemplo, todas ficticias, marcadas como **ficticia**. Los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
+> Las organizaciones de `js/red-datos.js` salen de la encuesta a organizaciones sociales. Lo que la encuesta no traía se completó a mano y el sitio lo marca como **inventado**. Esas organizaciones llevan la marca **real**; además hay organizaciones de ejemplo, todas ficticias, marcadas como **ficticia**. Los cambios viven en memoria: se pierden al recargar. En la versión real, Google confirma la identidad y **el servidor** (no la página) decide qué puede hacer cada cuenta.
 
 La interfaz del mapa se basa en el prototipo "Portal de Talleres" de Ingeniería de Software (UNGS), adaptado a organizaciones sociales.
 

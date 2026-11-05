@@ -82,6 +82,7 @@
 .otro-campo{ margin-top:.6rem; }
 .tag--neutral{ border-color:var(--line-strong); color:var(--ink-soft); }
 .inventado{ display:inline-block; font-size:.68rem; font-weight:700; font-style:normal; line-height:1.3; padding:0 .4rem; border-radius:999px; border:1.5px dashed var(--warn); color:var(--warn); white-space:nowrap; }
+.real{ display:inline-block; font-size:.68rem; font-weight:700; font-style:normal; line-height:1.3; padding:0 .4rem; border-radius:999px; border:1.5px solid var(--ok); color:var(--ok); white-space:nowrap; }
 .tag--pendiente{ border-color:var(--warn); color:var(--warn); }
 
 .vacio{ text-align:center; color:var(--ink-mute); padding:2rem 1rem; border:1.5px dashed var(--line-strong); border-radius:var(--radius); }

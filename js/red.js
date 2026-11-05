@@ -78,8 +78,10 @@
   function marcaInventado(o, campo) {
     return (o.inventados || []).indexOf(campo) !== -1 ? ' <span class="inventado" title="Dato inventado: no estaba en la encuesta">inventado</span>' : "";
   }
-  function marcaFicticia(o) {
-    return o.ficticia ? ' <span class="inventado" title="Organización de ejemplo: no es real">ficticia</span>' : "";
+  // de dónde sale la organización: la encuesta (real) o los datos de ejemplo (ficticia)
+  function marcaOrigen(o) {
+    if (o.ficticia) return ' <span class="inventado" title="Organización de ejemplo: no es real">ficticia</span>';
+    return o.inventados ? ' <span class="real" title="Organización real: sus datos salen de la encuesta">real</span>' : "";
   }
   function fecha(iso) {
     var p = String(iso).split("-");
@@ -323,7 +325,7 @@
       return '<li class="org-card' + (o.id === seleccionId ? " is-selected" : "") + '" data-id="' + o.id + '">' +
         '<div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
         '<h3><button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button></h3>" +
-        '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaFicticia(o) + "</div>" +
+        '<div class="org-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaOrigen(o) + "</div>" +
         (o.descripcion ? '<p class="org-desc">' + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>" : "") +
         '<div class="org-actions">' +
         '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '" aria-label="Ver ficha de ' + esc(o.nombre) + '">Ver ficha</button>' +
@@ -360,7 +362,7 @@
 
   function popupHtml(o) {
     return '<p class="popup-title">' + esc(o.nombre) + "</p>" +
-      '<p class="popup-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + marcaFicticia(o) + "</p>" +
+      '<p class="popup-meta">' + esc(tipoLabel(o)) + " · " + esc(o.localidad) + marcaOrigen(o) + "</p>" +
       '<button type="button" class="btn btn-sm btn-primary" data-ver="' + o.id + '">Ver ficha</button>';
   }
 
@@ -524,7 +526,7 @@
     if (opts.preview) html += '<span class="preview-flag">Vista previa · así se verá en el mapa</span>';
     html += '<div class="det-head"><div class="org-icon" aria-hidden="true">' + tipoIcono(o) + "</div>" +
       '<div><h2 id="modalOrgTitulo">' + esc(o.nombre || "Sin nombre") + "</h2>" +
-      '<div class="org-meta">' + esc(tipoLabel(o)) + marcaInventado(o, "tipoOtro") + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaFicticia(o) + "</div></div></div>";
+      '<div class="org-meta">' + esc(tipoLabel(o)) + marcaInventado(o, "tipoOtro") + " · " + esc(o.localidad) + ", " + esc(o.provincia) + marcaOrigen(o) + "</div></div></div>";
     if (o.descripcion) html += "<p>" + esc(o.descripcion) + marcaInventado(o, "descripcion") + "</p>";
     var p = o.participantes || {}, ed = o.educadorxs || {};
     var personas = totalPersonas(p)
@@ -626,6 +628,7 @@
   var mapaAviso = null;
   var pinAviso = null;
   var avisoPos = null;
+  var busquedaDireccion = 0;   // para descartar respuestas de un punto anterior
 
   function etiquetaClase(a) { return CONVOCATORIAS[a.clase] || "Actividad"; }
   function linkGoogleMaps(a) { return "https://www.google.com/maps/search/?api=1&query=" + a.lat + "," + a.lng; }
@@ -642,6 +645,7 @@
         else pinAviso.setLatLng([avisoPos.lat, avisoPos.lng]);
         $("mapaAviso").removeAttribute("aria-invalid");
         $("mapaAvisoHint").textContent = "Punto marcado. Podés tocar de nuevo para corregirlo.";
+        buscarDireccion(avisoPos);
       });
     }
     setTimeout(function () {
@@ -653,7 +657,39 @@
     }, 0);
   }
 
+  // "2774, 122 - General José María Paz" + localidad, a partir de la respuesta de OpenStreetMap
+  function textoDireccion(d) {
+    var a = d.address || {};
+    var calle = [a.road, a.house_number].filter(Boolean).join(" ");
+    var zona = a.suburb || a.neighbourhood || a.city || a.town || a.village || a.municipality;
+    return [calle, zona].filter(Boolean).join(", ") || d.display_name || "";
+  }
+
+  // el mapa da las coordenadas; la dirección la busca Nominatim, el servicio público de OpenStreetMap.
+  // Se espera un momento para no consultarlo en cada toque seguido.
+  function buscarDireccion(pos) {
+    var campo = $("avDireccion");
+    var turno = ++busquedaDireccion;
+    campo.value = "";
+    campo.placeholder = "Buscando la dirección…";
+    setTimeout(function () {
+      if (turno !== busquedaDireccion) return;
+      fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&accept-language=es&lat=" + pos.lat + "&lon=" + pos.lng)
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function (d) {
+          if (turno !== busquedaDireccion) return;
+          campo.value = textoDireccion(d);
+          campo.placeholder = campo.value ? "" : "No encontramos la dirección: podés escribirla";
+        })
+        .catch(function () {
+          if (turno === busquedaDireccion) campo.placeholder = "No encontramos la dirección: podés escribirla";
+        });
+    }, 500);
+  }
+
   function limpiarPinAviso() {
+    busquedaDireccion++;
+    $("avDireccion").placeholder = "Se completa al marcar el mapa";
     avisoPos = null;
     if (pinAviso) { mapaAviso.removeLayer(pinAviso); pinAviso = null; }
     $("mapaAviso").removeAttribute("aria-invalid");
@@ -751,7 +787,8 @@
         '<span class="aviso-fecha">' + fecha(a.fecha) + "</span></div>" +
         "<h3>" + esc(a.titulo) + "</h3>" +
         '<div class="aviso-evento"><span>📅 ' + fecha(a.cuando) + "</span>" +
-        (a.lat != null ? '<a class="btn btn-sm" href="' + linkGoogleMaps(a) + '" target="_blank" rel="noopener" aria-label="Ver en Google Maps: ' + esc(a.titulo) + ' (se abre en otra pestaña)">📍 Ver en Google Maps</a>' : "") +
+        (a.direccion ? "<span>📍 " + esc(a.direccion) + "</span>" : "") +
+        (a.lat != null ? '<a class="btn btn-sm" href="' + linkGoogleMaps(a) + '" target="_blank" rel="noopener" aria-label="Ver en Google Maps: ' + esc(a.titulo) + ' (se abre en otra pestaña)">🗺️ Ver en Google Maps</a>' : "") +
         "</div>" +
         (a.detalle ? "<p>" + esc(a.detalle) + "</p>" : "") +
         respuestasHtml(a) +
@@ -816,7 +853,7 @@
       if (faltan.length) { $(faltan[0]).focus(); return; }
       var aviso = {
         id: "av-" + Date.now(), orgId: sesion.orgId, clase: $("avClase").value,
-        fecha: HOY, cuando: cuando, lat: avisoPos.lat, lng: avisoPos.lng, titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
+        fecha: HOY, cuando: cuando, lat: avisoPos.lat, lng: avisoPos.lng, direccion: $("avDireccion").value.trim(), titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
       };
       avisos.push(aviso);
       this.reset();
@@ -1185,7 +1222,7 @@
       var d = s.datos;
       return '<li class="card solicitud">' +
         '<div class="org-tags" style="margin:0"><span class="tag tag--destacado">Pedido de acceso</span><span class="tag tag--neutral">' + fecha(s.fecha) + "</span></div>" +
-        "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + marcaFicticia(d) + "</h3>" +
+        "<h3>" + tipoIcono(d) + " " + esc(d.nombre) + marcaOrigen(d) + "</h3>" +
         '<p class="org-meta">' + esc(tipoLabel(d)) + " · " + esc(d.localidad) + ", " + esc(d.provincia) + " · Referente: " + esc(d.referente) + "</p>" +
         '<p class="pedido-mail">Cuenta a habilitar: <strong>' + esc(s.email) + "</strong></p>" +
         (s.mensaje ? "<blockquote>" + esc(s.mensaje) + "</blockquote>" : "") +
