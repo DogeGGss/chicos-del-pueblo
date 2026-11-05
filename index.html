@@ -226,6 +226,8 @@
     transform-style:preserve-3d;
   }
   .placard.flipped .placard-inner{ transform:rotateY(180deg); }
+  .placard:focus-visible{ outline:3px solid var(--celeste-700); outline-offset:4px; border-radius:.4rem; }
+  .placard:not(.flipped) .placard-back a{ pointer-events:none; visibility:hidden; }
   .placard-face{
     position:absolute; inset:0; backface-visibility:hidden;
     border-radius:.4rem; border:2px solid var(--ink);
@@ -375,7 +377,7 @@
   <section class="hero" id="hero">
     <div class="hero-badge"><span class="dot"></span> Movimiento Nacional · fundado el 30 de septiembre de 1987</div>
     <h1 class="masthead"><span class="l1">CHICXS</span><span class="l2">DEL PUEBLO</span></h1>
-    <p class="hero-sub">Historia, presente y convicciones de organizaciones que abrazan.</p>
+    <p class="hero-sub"><em>“Con ternura venceremos”</em>: historia, presente y convicciones de organizaciones que abrazan.</p>
     <figure class="hero-cinta">
       <span class="cinta-lbl cinta-lbl--desde">1987 · 5 casas</span>
       <img src="img/cinta-casas.png" width="1127" height="403" alt="Una cinta celeste que empieza con 5 casas dibujadas y se ensancha, llena de casas, hasta el logo de Organizaciones de lxs Chicxs del Pueblo.">
@@ -566,31 +568,31 @@
     <p class="titulos-nota">Tocá cada pancarta para ver quién acuñó la consigna y de dónde sale.</p>
     <div class="lemas">
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"El hambre es un crimen"</div></div>
           <div class="placard-face placard-back">
             <span class="when">Consigna de Alberto Morlachetti</span>
             <p>Resume la denuncia central del Movimiento, y las Organizaciones de lxs Chicxs del Pueblo la siguen levantando en cada marcha.</p>
-            <span class="fuente">Fuente [15]</span>
+            <span class="fuente">Fuente <a class="ref" href="#ref-15" aria-label="Fuente 15">[15]</a></span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Con ternura venceremos"</div></div>
           <div class="placard-face placard-back">
             <span class="when">Lema del padre Carlos Cajade</span>
             <p>Su respuesta a la institucionalización: reconstruir vínculos de cuidado en lugar de encerrar a la infancia pobre.</p>
-            <span class="fuente">Fuente [16]</span>
+            <span class="fuente">Fuente <a class="ref" href="#ref-16" aria-label="Fuente 16">[16]</a></span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Ni un pibe menos por las drogas"</div></div>
           <div class="placard-face placard-back">
@@ -599,21 +601,21 @@
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"La patria son lxs pibxs"</div></div>
           <div class="placard-face placard-back">
             <span class="when">Declaración de las organizaciones, 2019</span>
             <p>Lxs chicxs como parte central del pueblo y como sujetos políticos, no como un problema a corregir.</p>
-            <span class="fuente">Fuente [17]</span>
+            <span class="fuente">Fuente <a class="ref" href="#ref-17" aria-label="Fuente 17">[17]</a></span>
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Ellos son nuestros hijos"</div></div>
           <div class="placard-face placard-back">
@@ -622,9 +624,9 @@
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
-      <button class="placard" data-placard aria-expanded="false">
+      <div class="placard" data-placard role="button" tabindex="0" aria-expanded="false">
         <div class="placard-inner">
           <div class="placard-face placard-front"><div class="lema">"Un abrazo a la medida"</div></div>
           <div class="placard-face placard-back">
@@ -633,7 +635,7 @@
             <span class="placard-hint">Tocar para volver</span>
           </div>
         </div>
-      </button>
+      </div>
 
     </div>
   </section>
@@ -644,7 +646,7 @@
     </div>
     <div class="founders">
       <div class="founder">
-        <div class="avatar"><svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--celeste)"/><path d="M8 60 C8 42 18 34 30 34 C42 34 52 42 52 60 Z" fill="#1E201F"/><circle cx="30" cy="24" r="11" fill="#1E201F"/></svg></div>
+        <div class="avatar avatar--foto"><img src="img/alberto-morlachetti.jpg" width="240" height="240" alt="Retrato de Alberto Morlachetti"></div>
         <h4>Alberto Morlachetti</h4>
         <div class="role">Sociólogo y dirigente, fundador de Pelota de Trapo, La Casa de los Niños y la Escuela Talleres Gráficos. Luego de su partida, el Honorable Senado de la Nación rindió homenaje a su trayectoria.<sup><a class="ref" href="#ref-18" aria-label="Fuente 18">[18]</a></sup></div>
       </div>
@@ -902,9 +904,17 @@
 
   /* ---- placard flip ---- */
   document.querySelectorAll('[data-placard]').forEach(function(p){
-    p.addEventListener('click', function(){
+    function girar(){
       var flipped = p.classList.toggle('flipped');
       p.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+    }
+    p.addEventListener('click', function(e){
+      if (e.target.closest('a')) return;   // el número de la fuente abre el link, no gira la pancarta
+      girar();
+    });
+    p.addEventListener('keydown', function(e){
+      if (e.target !== p) return;
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); girar(); }
     });
   });
 })();
