@@ -629,6 +629,8 @@
   var pinAviso = null;
   var avisoPos = null;
   var busquedaDireccion = 0;   // para descartar respuestas de un punto anterior
+  var estadoDireccion = "";    // "" | "buscando" | "invalida": lo que se escribió en Dirección marcada
+  var HINT_DIRECCION = "Sale del punto del mapa. Si la cambiás, movemos el punto.";
 
   function etiquetaClase(a) { return CONVOCATORIAS[a.clase] || "Actividad"; }
   function linkGoogleMaps(a) { return "https://www.google.com/maps/search/?api=1&query=" + a.lat + "," + a.lng; }
@@ -639,12 +641,7 @@
       mapaAviso = L.map("mapaAviso", { scrollWheelZoom: false });
       L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapaAviso);
       mapaAviso.on("click", function (e) {
-        avisoPos = { lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) };
-        var icon = iconoPin(miOrg(), true);
-        if (!pinAviso) pinAviso = L.marker([avisoPos.lat, avisoPos.lng], { icon: icon, keyboard: false }).addTo(mapaAviso);
-        else pinAviso.setLatLng([avisoPos.lat, avisoPos.lng]);
-        $("mapaAviso").removeAttribute("aria-invalid");
-        $("mapaAvisoHint").textContent = "Punto marcado. Podés tocar de nuevo para corregirlo.";
+        ponerPinAviso(e.latlng.lat, e.latlng.lng);
         buscarDireccion(avisoPos);
       });
     }
@@ -655,6 +652,22 @@
       if (avisoPos) mapaAviso.setView([avisoPos.lat, avisoPos.lng], 13);
       else if (yo) mapaAviso.setView([yo.lat, yo.lng], 12);
     }, 0);
+  }
+
+  function ponerPinAviso(lat, lng) {
+    avisoPos = { lat: +(+lat).toFixed(5), lng: +(+lng).toFixed(5) };
+    var icon = iconoPin(miOrg(), true);
+    if (!pinAviso) pinAviso = L.marker([avisoPos.lat, avisoPos.lng], { icon: icon, keyboard: false }).addTo(mapaAviso);
+    else pinAviso.setLatLng([avisoPos.lat, avisoPos.lng]);
+    $("mapaAviso").removeAttribute("aria-invalid");
+    $("mapaAvisoHint").textContent = "Punto marcado. Podés tocar de nuevo para corregirlo.";
+  }
+
+  function marcarDireccion(estado, hint) {
+    estadoDireccion = estado;
+    if (estado === "invalida") $("avDireccion").setAttribute("aria-invalid", "true");
+    else $("avDireccion").removeAttribute("aria-invalid");
+    $("avDireccionHint").textContent = hint || HINT_DIRECCION;
   }
 
   // "2774, 122 - General José María Paz" + localidad, a partir de la respuesta de OpenStreetMap
@@ -670,6 +683,7 @@
   function buscarDireccion(pos) {
     var campo = $("avDireccion");
     var turno = ++busquedaDireccion;
+    marcarDireccion("");
     campo.value = "";
     campo.placeholder = "Buscando la dirección…";
     setTimeout(function () {
@@ -687,8 +701,35 @@
     }, 500);
   }
 
+  // al revés: lo que escribieron mueve el punto; si no se encuentra, la dirección es inválida.
+  // La búsqueda prefiere la zona del punto actual (o de la organización que publica).
+  function validarDireccion() {
+    var texto = $("avDireccion").value.trim();
+    var turno = ++busquedaDireccion;
+    if (!texto) { marcarDireccion(""); return; }
+    marcarDireccion("buscando", "Buscando esa dirección…");
+    var c = avisoPos || miOrg();
+    fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ar&accept-language=es&viewbox=" +
+      [c.lng - 1, c.lat + 1, c.lng + 1, c.lat - 1].join(",") + "&q=" + encodeURIComponent(texto))
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (lista) {
+        if (turno !== busquedaDireccion) return;
+        if (!lista.length) {
+          marcarDireccion("invalida", "No encontramos esa dirección: revisala o tocá el mapa para marcar el lugar.");
+          return;
+        }
+        ponerPinAviso(lista[0].lat, lista[0].lon);
+        mapaAviso.setView([avisoPos.lat, avisoPos.lng], 16);
+        marcarDireccion("", "Movimos el punto del mapa a esta dirección.");
+      })
+      .catch(function () {
+        if (turno === busquedaDireccion) marcarDireccion("", "No pudimos comprobar la dirección: fijate que el punto del mapa sea el correcto.");
+      });
+  }
+
   function limpiarPinAviso() {
     busquedaDireccion++;
+    marcarDireccion("");
     $("avDireccion").placeholder = "Se completa al marcar el mapa";
     avisoPos = null;
     if (pinAviso) { mapaAviso.removeLayer(pinAviso); pinAviso = null; }
@@ -806,6 +847,7 @@
       return '<option value="' + k + '">' + esc(CONVOCATORIAS[k]) + "</option>";
     }).join("");
     $("avCuando").min = HOY;
+    $("avDireccion").addEventListener("change", validarDireccion);
     $("ordenAvisos").addEventListener("change", function () { ordenAvisos = this.value; renderAvisos(); });
     document.querySelectorAll("[data-av-filtro]").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -851,6 +893,8 @@
         if (faltan.indexOf(id) !== -1) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid");
       });
       if (faltan.length) { $(faltan[0]).focus(); return; }
+      if (estadoDireccion === "buscando") { toast("Esperá un momento: estamos comprobando la dirección."); return; }
+      if (estadoDireccion === "invalida") { $("avDireccion").focus(); return; }
       var aviso = {
         id: "av-" + Date.now(), orgId: sesion.orgId, clase: $("avClase").value,
         fecha: HOY, cuando: cuando, lat: avisoPos.lat, lng: avisoPos.lng, direccion: $("avDireccion").value.trim(), titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
