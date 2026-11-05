@@ -14,7 +14,7 @@
   var HOY = "2026-09-25";
   var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   var CAMPOS_LABEL = {
-    nombre: "Nombre", tipo: "Tipo", tipoOtro: "Tipo (otro)", personeria: "Personería", personeriaDetalle: "Personería (detalle)",
+    nombre: "Nombre", tipos: "Tipos", tipoOtro: "Tipo (otro)", personeria: "Personería", personeriaDetalle: "Personería (detalle)",
     referente: "Referente", referenteRol: "Rol del referente", descripcion: "Descripción", horarios: "Horarios",
     actividades: "Actividades", actividadesOtras: "Otras actividades", participantes: "Personas que participan",
     alcance: "Alcance", educadorxs: "Educadorxs", whatsappPublico: "Quién ve el WhatsApp", localidad: "Localidad",
@@ -65,8 +65,11 @@
     var p = String(iso).split("-");
     return +p[2] + " " + MESES[+p[1] - 1];
   }
-  function tipoLabel(o) { return o.tipo === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[o.tipo] || TIPOS.otro).label; }
-  function tipoIcono(o) { return (TIPOS[o.tipo] || TIPOS.otro).icono; }
+  // una organización puede ser de varios tipos; el ícono del mapa es el del primero
+  function tipoLabel(o) {
+    return (o.tipos || []).map(function (k) { return k === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[k] || TIPOS.otro).label; }).join(", ");
+  }
+  function tipoIcono(o) { return (TIPOS[(o.tipos || [])[0]] || TIPOS.otro).icono; }
   function totalPersonas(p) { p = p || {}; return (+p.ninxs || 0) + (+p.jovenes || 0) + (+p.adultxs || 0); }
   // los datos internos del cuestionario los ve toda cuenta de la red que ingresó (organizaciones y coordinación), nunca los visitantes
   function veDatosRed() { return rol !== "visitante"; }
@@ -267,7 +270,7 @@
   function coincide(o) {
     if (filtro.prov && o.provincia !== filtro.prov) return false;
     var tiposOn = Object.keys(filtro.tipos);
-    if (tiposOn.length && !filtro.tipos[o.tipo]) return false;
+    if (tiposOn.length && !(o.tipos || []).some(function (k) { return filtro.tipos[k]; })) return false;
     if (filtro.q) {
       var blob = norm([o.nombre, o.localidad, o.provincia, o.descripcion, rol !== "visitante" ? o.referente : "", tipoLabel(o),
         (o.actividades || []).map(function (k) { return ACTIVIDADES[k]; }).join(" "), o.actividadesOtras || ""].join(" "));
@@ -809,11 +812,6 @@
   var fichaPos = null;
 
   function initFormFicha() {
-    var selTipo = $("oTipo");
-    selTipo.innerHTML = '<option value="">Elegí…</option>';
-    Object.keys(TIPOS).forEach(function (k) {
-      selTipo.insertAdjacentHTML("beforeend", '<option value="' + k + '">' + TIPOS[k].icono + " " + esc(TIPOS[k].label) + "</option>");
-    });
     var selLoc = $("oLocalidad");
     selLoc.innerHTML = '<option value="">Elegí…</option>';
     window.RED_PROVINCIAS.forEach(function (p) {
@@ -836,6 +834,10 @@
     opciones("oAlcance", ALCANCES, "Elegí…");
     opciones("oEspacio", ESPACIOS, "Elegí…");
     opciones("oSueldos", SUELDOS, "Elegí…");
+    var etiquetasTipo = {};
+    Object.keys(TIPOS).forEach(function (k) { etiquetasTipo[k] = TIPOS[k].icono + " " + TIPOS[k].label; });
+    chips("oTipos", "tipos", etiquetasTipo);
+    chips("aTipos", "aTipos", etiquetasTipo);
     chips("oActividades", "actividades", ACTIVIDADES);
     chips("oFondosPublicos", "fondosPublicos", FONDOS_PUBLICOS);
     chips("oFondosPrivados", "fondosPrivados", FONDOS_PRIVADOS);
@@ -844,7 +846,10 @@
         (k === "web" ? "www…" : k === "facebook" ? "Nombre de la página" : "@usuario o link") + '"></label>';
     }).join("");
     ["oNinxs", "oJovenes", "oAdultxs"].forEach(function (id) { $(id).addEventListener("input", actualizarTotal); });
-    $("oTipo").addEventListener("change", mostrarOtros);
+    $("oTipos").addEventListener("change", mostrarOtros);
+    ["oFondosPublicos", "oFondosPrivados"].forEach(function (id) {
+      $(id).addEventListener("change", function () { sincronizarNegativa(this); });
+    });
     $("oPersoneria").addEventListener("change", mostrarOtros);
     selLoc.addEventListener("change", function () {
       var l = LOCALIDADES[this.value];
@@ -859,7 +864,8 @@
       mostrarModal(detalleHtml(d, { preview: true }));
     });
     $("formFicha").addEventListener("input", function (e) {
-      if (e.target.getAttribute("aria-invalid")) e.target.removeAttribute("aria-invalid");
+      var marcado = e.target.closest("[aria-invalid]");   // en los grupos de chips la marca está en el contenedor
+      if (marcado) marcado.removeAttribute("aria-invalid");
     });
   }
 
@@ -885,12 +891,11 @@
   function moverPinFicha() {
     if (!mapaFicha) return;
     if (!fichaPos) { if (pinFicha) { mapaFicha.removeLayer(pinFicha); pinFicha = null; } return; }
-    var tipo = $("oTipo").value || "hogar";
-    var icon = iconoPin({ tipo: tipo }, true);
+    var icon = iconoPin({ tipos: marcados($("formFicha"), "tipos") }, true);
     if (!pinFicha) pinFicha = L.marker([fichaPos.lat, fichaPos.lng], { icon: icon, keyboard: false }).addTo(mapaFicha);
     else pinFicha.setLatLng([fichaPos.lat, fichaPos.lng]).setIcon(icon);
   }
-  $("oTipo") && $("oTipo").addEventListener("change", moverPinFicha);
+  $("oTipos").addEventListener("change", moverPinFicha);
 
   // si los visitantes ven la dirección exacta, las organizaciones de la red también
   function ajustarVisibilidad() {
@@ -909,7 +914,7 @@
     $("oTotalPersonas").textContent = totalPersonas({ ninxs: $("oNinxs").value, jovenes: $("oJovenes").value, adultxs: $("oAdultxs").value });
   }
   function mostrarOtros() {
-    $("oTipoOtroCampo").hidden = $("oTipo").value !== "otro";
+    $("oTipoOtroCampo").hidden = marcados($("formFicha"), "tipos").indexOf("otro") === -1;
     var pers = $("oPersoneria").value;
     $("oPersoneriaDetalleCampo").hidden = pers !== "otra" && pers !== "otrasit";
   }
@@ -918,6 +923,15 @@
   }
   function marcados(f, name) {
     return Array.prototype.map.call(f.querySelectorAll('input[name="' + name + '"]:checked'), function (c) { return c.value; });
+  }
+  // opción negativa ("No recibimos…"): mientras esté marcada, las demás quedan desmarcadas y apagadas
+  function sincronizarNegativa(box) {
+    var negativa = box.querySelector('input[value="ninguno"]');
+    box.querySelectorAll("input").forEach(function (c) {
+      if (c === negativa) return;
+      if (negativa.checked) c.checked = false;
+      c.disabled = negativa.checked;
+    });
   }
   function num(id) { return $(id).value === "" ? "" : Math.max(0, Math.round(+$(id).value)); }
 
@@ -929,7 +943,7 @@
     f.querySelectorAll("[aria-invalid]").forEach(function (x) { x.removeAttribute("aria-invalid"); });
     $("fichaError").hidden = true;
     $("fichaTitulo").textContent = o.nombre;
-    set("oNombre", o.nombre); set("oTipo", o.tipo); set("oTipoOtro", o.tipoOtro); set("oReferente", o.referente);
+    set("oNombre", o.nombre); marcar(f, "tipos", o.tipos); set("oTipoOtro", o.tipoOtro); set("oReferente", o.referente);
     set("oReferenteRol", o.referenteRol); set("oPersoneria", o.personeria); set("oPersoneriaDetalle", o.personeriaDetalle);
     set("oDescripcion", o.descripcion); set("oHorarios", o.horarios); set("oLocalidad", o.localidad); set("oDireccion", o.direccion);
     set("oTelefono", o.telefono); set("oCorreo", o.correo);
@@ -944,6 +958,8 @@
     set("oEspacio", o.espacio); set("oEspacioInfo", o.espacioInfo); set("oSueldos", o.sueldos); set("oSueldosInfo", o.sueldosInfo);
     marcar(f, "fondosPublicos", o.fondosPublicos); set("oFondosPublicosDetalle", o.fondosPublicosDetalle);
     marcar(f, "fondosPrivados", o.fondosPrivados); set("oFondosPrivadosDetalle", o.fondosPrivadosDetalle);
+    sincronizarNegativa($("oFondosPublicos"));
+    sincronizarNegativa($("oFondosPrivados"));
     mostrarOtros();
     f.querySelector('input[name="oVisPublica"][value="' + (o.ubicacionPublica === "exacta" ? "exacta" : "zona") + '"]').checked = true;
     f.querySelector('input[name="oVisRed"][value="' + (o.ubicacionRed === "exacta" ? "exacta" : "zona") + '"]').checked = true;
@@ -965,8 +981,8 @@
     return {
       id: base.id || null,
       nombre: $("oNombre").value.trim(),
-      tipo: $("oTipo").value,
-      tipoOtro: $("oTipo").value === "otro" ? $("oTipoOtro").value.trim() : "",
+      tipos: marcados(f, "tipos"),
+      tipoOtro: marcados(f, "tipos").indexOf("otro") !== -1 ? $("oTipoOtro").value.trim() : "",
       personeria: $("oPersoneria").value,
       personeriaDetalle: $("oPersoneriaDetalleCampo").hidden ? "" : $("oPersoneriaDetalle").value.trim(),
       referente: $("oReferente").value.trim(),
@@ -1002,8 +1018,8 @@
 
   function validarFicha(d) {
     var faltan = [];
-    [["oNombre", d.nombre], ["oTipo", d.tipo], ["oReferente", d.referente], ["oDescripcion", d.descripcion],
-      ["oLocalidad", d.localidad], ["oTelefono", d.telefono]].concat(d.tipo === "otro" ? [["oTipoOtro", d.tipoOtro]] : []).forEach(function (p) {
+    [["oNombre", d.nombre], ["oTipos", d.tipos.length], ["oReferente", d.referente], ["oDescripcion", d.descripcion],
+      ["oLocalidad", d.localidad], ["oTelefono", d.telefono]].concat(d.tipos.indexOf("otro") !== -1 ? [["oTipoOtro", d.tipoOtro]] : []).forEach(function (p) {
       if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
       else $(p[0]).removeAttribute("aria-invalid");
     });
@@ -1056,20 +1072,20 @@
 
   /* ---------------- solicitar acceso (visitantes) ---------------- */
   function initAcceso() {
-    $("aTipo").innerHTML = $("oTipo").innerHTML;
     $("aLocalidad").innerHTML = $("oLocalidad").innerHTML;
     $("formAcceso").addEventListener("input", function (e) {
-      if (e.target.getAttribute("aria-invalid")) e.target.removeAttribute("aria-invalid");
+      var marcado = e.target.closest("[aria-invalid]");   // en los grupos de chips la marca está en el contenedor
+      if (marcado) marcado.removeAttribute("aria-invalid");
     });
     $("formAcceso").addEventListener("submit", function (e) {
       e.preventDefault();
       var d = {
-        nombre: $("aNombre").value.trim(), tipo: $("aTipo").value, localidad: $("aLocalidad").value,
+        nombre: $("aNombre").value.trim(), tipos: marcados(this, "aTipos"), localidad: $("aLocalidad").value,
         referente: $("aReferente").value.trim(), email: $("aEmail").value.trim().toLowerCase(),
         mensaje: $("aMensaje").value.trim(),
       };
       var faltan = [];
-      [["aNombre", d.nombre], ["aTipo", d.tipo], ["aLocalidad", d.localidad], ["aReferente", d.referente],
+      [["aNombre", d.nombre], ["aTipos", d.tipos.length], ["aLocalidad", d.localidad], ["aReferente", d.referente],
         ["aEmail", emailValido(d.email)]].forEach(function (p) {
         if (!p[1]) { $(p[0]).setAttribute("aria-invalid", "true"); faltan.push(p[0]); }
         else $(p[0]).removeAttribute("aria-invalid");
@@ -1089,7 +1105,7 @@
       }
       solicitudes.push({
         id: "sol-" + Date.now(), email: d.email, mensaje: d.mensaje, fecha: HOY,
-        datos: { nombre: d.nombre, tipo: d.tipo, localidad: d.localidad, provincia: LOCALIDADES[d.localidad].prov,
+        datos: { nombre: d.nombre, tipos: d.tipos, localidad: d.localidad, provincia: LOCALIDADES[d.localidad].prov,
           referente: d.referente, descripcion: "" },
       });
       ultimoPedido = d.nombre;

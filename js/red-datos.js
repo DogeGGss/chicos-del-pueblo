@@ -133,7 +133,7 @@
     return { ninxs: ninxs, jovenes: total - ninxs, adultxs: adultxs };
   }
   function cuestionario(o, n) {
-    var tipo = o.tipo;
+    var tipo = o.tipo || o.tipos[0];
     var acts = (ACT_POR_TIPO[tipo] || []).slice();
     var extra = ["generos", "consumo", "comunicacion", "habitat", "medica", "deportivas"][n % 6];
     if (n % 3 === 0 && acts.indexOf(extra) === -1) acts.push(extra);
@@ -193,6 +193,8 @@
     }, cuestionario(o, n), o);
     if (typeof o.redes === "string") base.redes = cuestionario(o, n).redes;
     delete base.chicos; delete base.edades;
+    base.tipos = o.tipos || [o.tipo];   // una organización puede ser de varios tipos
+    delete base.tipo;
     return base;
   }
 
@@ -203,7 +205,7 @@
       horarios: "Lunes a viernes de 8 a 18", redes: "@casasemillitas",
       descripcion: "Casa del niño con desayuno, almuerzo y merienda. Apoyo escolar a la tarde y taller de huerta los sábados.",
       direccion: "Pasaje Los Aromos 245", ubicacionRed: "exacta" }),
-    org({ nombre: "Merendero Los Gurises", tipo: "comedor", localidad: "José C. Paz",
+    org({ nombre: "Merendero Los Gurises", tipos: ["comedor", "centrodia"], localidad: "José C. Paz",
       referente: "Graciela Ortiz", edades: "2 a 12 años", chicos: 60,
       horarios: "Lunes, miércoles y viernes de 16 a 19", redes: "@merendero.losgurises",
       descripcion: "Merendero barrial que funciona en la casa de una vecina. Leche, pan casero y juegos después de la escuela."}),
@@ -277,7 +279,7 @@
       referente: "Estela Pérez", edades: "3 a 12 años", chicos: 65,
       horarios: "Lunes a viernes de 8 a 16",
       descripcion: "Casa de día con desayuno, almuerzo y talleres de arte." }),
-    org({ nombre: "Centro Cultural Acequia", tipo: "radio", localidad: "Mendoza",
+    org({ nombre: "Centro Cultural Acequia", tipos: ["radio", "cultural"], localidad: "Mendoza",
       referente: "Tomás Videla", edades: "10 a 18 años", chicos: 55,
       horarios: "Martes a viernes de 16 a 20",
       descripcion: "Folclore, audiovisual y radio comunitaria." }),

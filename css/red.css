@@ -202,6 +202,8 @@
   border:1.5px solid var(--line-strong); background:var(--paper);
 }
 .check-chips input:focus-visible + span{ outline:3px solid var(--focus); outline-offset:2px; }
+.check-chips input:disabled + span{ opacity:.45; cursor:not-allowed; }
+.check-chips[aria-invalid="true"] span{ border-color:var(--danger); }
 .check-chips input:checked + span::before{ content:"✓ "; }
 .ficha-acciones{ display:flex; justify-content:flex-end; gap:.6rem; flex-wrap:wrap; align-items:center; }
 .form-error{ margin:0 auto 0 0; color:var(--danger); font-weight:600; font-size:.88rem; }

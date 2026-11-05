@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapa de la red · Chicxs del Pueblo</title>
 <meta name="description" content="Prototipo: directorio y mapa de las organizaciones de lxs Chicxs del Pueblo, con una agenda de convocatorias entre ellas.">
-<script src="js/tema.js?v=21"></script>
+<script src="js/tema.js?v=22"></script>
 <link rel="icon" href="img/logo-chicxs.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Permanent+Marker&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="vendor/markercluster/MarkerCluster.css">
-<link rel="stylesheet" href="css/marca.css?v=21">
-<link rel="stylesheet" href="css/red.css?v=21">
+<link rel="stylesheet" href="css/marca.css?v=22">
+<link rel="stylesheet" href="css/red.css?v=22">
 </head>
 <body data-app>
 
@@ -184,10 +184,10 @@
               <span class="field-label">Nombre de la organización *</span>
               <input id="oNombre" class="field-control" required maxlength="80">
             </label>
-            <label class="field">
-              <span class="field-label">Tipo de organización *</span>
-              <select id="oTipo" class="field-control" required></select>
-            </label>
+            <div class="field col-2">
+              <span class="field-label">Tipo de organización * <small>(marcá todas las que correspondan)</small></span>
+              <div class="check-chips" id="oTipos" tabindex="-1"></div>
+            </div>
             <label class="field" id="oTipoOtroCampo" hidden>
               <span class="field-label">¿Qué tipo? *</span>
               <input id="oTipoOtro" class="field-control" maxlength="40" placeholder="Ej.: Merendero">
@@ -430,10 +430,10 @@
               <span class="field-label">Organización *</span>
               <input id="aNombre" class="field-control" maxlength="80" required>
             </label>
-            <label class="field">
-              <span class="field-label">Tipo *</span>
-              <select id="aTipo" class="field-control" required></select>
-            </label>
+            <div class="field">
+              <span class="field-label">Tipo * <small>(marcá todas las que correspondan)</small></span>
+              <div class="check-chips" id="aTipos" tabindex="-1"></div>
+            </div>
             <label class="field">
               <span class="field-label">Localidad *</span>
               <select id="aLocalidad" class="field-control" required></select>
@@ -511,8 +511,8 @@
 
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/markercluster/leaflet.markercluster.js"></script>
-<script src="js/sesion.js?v=21"></script>
-<script src="js/red-datos.js?v=21"></script>
-<script src="js/red.js?v=21"></script>
+<script src="js/sesion.js?v=22"></script>
+<script src="js/red-datos.js?v=22"></script>
+<script src="js/red.js?v=22"></script>
 </body>
 </html>
