@@ -67,6 +67,7 @@
     border:1px solid var(--line); background:transparent; color:var(--ink-soft);
     cursor:pointer; text-decoration:none; display:inline-block;
   }
+  .chip--intro{ background:var(--celeste); color:var(--on-celeste); border-color:var(--celeste); }
   .chip[aria-current="true"]{
     background:var(--solid); color:var(--on-solid); border-color:var(--solid);
   }
@@ -173,6 +174,15 @@
     font-style:italic; color:var(--ink-soft);
   }
   .era-quote.open{ display:block; }
+
+/* ---------- introduccion ---------- */
+  #introduccion{
+    background:var(--celeste-50); border:2px solid var(--celeste-700);
+    border-radius:.6rem;
+    padding:1.6rem; margin:1.2rem 0 2.6rem;
+  }
+  #introduccion .section-head .eyebrow{ color:var(--celeste-700); }
+  #introduccion .etapa-lead{ color:var(--ink); margin:-.9rem 0 0; }
 
   /* ---------- dos partes: contexto (antes de 1987) y movimiento (desde 1987) ---------- */
   .etapa-lead{ max-width:62ch; color:var(--ink-soft); margin:-.9rem 0 1.4rem; }
@@ -350,6 +360,7 @@
     <div class="topbar-inner">
       <button class="nav-arrow" id="navPrev" aria-label="Etapas anteriores" type="button">‹</button>
       <nav class="chipnav" aria-label="Navegar por etapas">
+        <a class="chip chip--intro" data-nav href="#introduccion">Introducción</a>
         <span class="chip-group">Antecedentes</span>
         <a class="chip" data-nav href="#era-1">Patronato</a>
         <a class="chip" data-nav href="#era-2">Peronismo</a>
@@ -389,6 +400,14 @@
   <div class="manifiesto">
     <p>Durante gran parte del siglo XX, el Estado argentino trató a la niñez pobre como un problema de orden, no de derechos. Casi setenta años después de esa ley, un puñado de educadores del conurbano bonaerense decidió organizarse para cambiar esa idea de raíz.</p>
   </div>
+
+  <section id="introduccion" aria-labelledby="introduccion-titulo">
+    <div class="section-head">
+      <div class="eyebrow">Introducción</div>
+      <h2 id="introduccion-titulo">Una historia colectiva</h2>
+    </div>
+    <p class="etapa-lead">A continuación, dividiremos la historia en dos partes: en la primera, separada en cuatro tramos, se narran los hechos más relevantes con respecto a la infancias pobres antes de la creación del movimiento Chicxs del pueblo; en la segunda, subdividida en diez secciones, abarca desde la creaciòn del movimiento en 1986 hasta la actualidad.</p>
+  </section>
 
   <section id="contexto" class="etapa etapa--contexto">
     <div class="section-head">
@@ -833,6 +852,8 @@
 
     var idx = locate(erasArr, refY).idx;
     var chip = idx >= 0 ? chipMap[erasArr[idx].id] : null;
+    var intro = document.getElementById('introduccion');
+    if (idx === -1 && intro.getBoundingClientRect().top <= refY) chip = chipMap.introduccion;
     chips.forEach(function(c){ c.removeAttribute('aria-current'); });
     if (chip) chip.setAttribute('aria-current','true');
     // keep the current stage visible inside the horizontally scrolling chip bar
