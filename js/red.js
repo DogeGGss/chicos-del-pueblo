@@ -807,7 +807,7 @@
       if (rol === "coord") {
         accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Quitar convocatoria</button>';
       } else if (propio) {
-        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Cerrar convocatoria</button>';
+        accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Borrar convocatoria</button>';
       } else {
         var txt = "Nos sumamos";
         if (rol === "visitante") {
@@ -816,8 +816,10 @@
             '<button type="button" class="btn btn-sm btn-bloqueado" aria-disabled="true" data-responder="' + a.id + '">🔒 ' + txt + "</button>";
         } else {
           var hecho = (a.respondieron || []).indexOf(sesion.orgId) !== -1;
-          accion = '<button type="button" class="btn btn-sm ' + (hecho ? "" : "btn-primary") + '" data-responder="' + a.id + '"' + (hecho ? " disabled" : "") + ">" +
-            (hecho ? "✓ Avisado" : txt) + "</button>";
+          accion = hecho
+            ? '<button type="button" class="btn btn-sm aviso-respuesta-unida" data-responder="' + a.id + '" aria-label="Ya avisado. Activar para bajarse de esta convocatoria.">' +
+              '<span class="aviso-respuesta-ok">✓ Avisado</span><span class="aviso-respuesta-baja" aria-hidden="true">Bajarse</span></button>'
+            : '<button type="button" class="btn btn-sm btn-primary" data-responder="' + a.id + '">' + txt + "</button>";
         }
       }
       return '<li class="aviso aviso--convoca' + (a.nuevo ? " is-new" : "") + '">' +
@@ -874,11 +876,18 @@
       if (rol !== "org") { toast("La coordinación modera la agenda, pero no se suma a las convocatorias."); return; }
       var id = resp.getAttribute("data-responder");
       var a = avisos.filter(function (x) { return x.id === id; })[0];
+      if (!a) return;
       var o = orgById(a.orgId);
-      a.respondieron = (a.respondieron || []).concat(sesion.orgId);
+      var respondieron = a.respondieron || [];
+      var seBaja = respondieron.indexOf(sesion.orgId) !== -1;
+      a.respondieron = seBaja
+        ? respondieron.filter(function (idOrg) { return idOrg !== sesion.orgId; })
+        : respondieron.concat(sesion.orgId);
       renderAvisos();
       var quien = miOrg().nombre;
-      toast("Le avisamos a " + (o ? o.nombre : "la organización") + " que " + quien + " se suma.");
+      toast(seBaja
+        ? quien + " se bajó de la convocatoria."
+        : "Le avisamos a " + (o ? o.nombre : "la organización") + " que " + quien + " se suma.");
     });
     $("formAviso").addEventListener("submit", function (e) {
       e.preventDefault();
