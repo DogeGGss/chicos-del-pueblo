@@ -711,15 +711,17 @@
   }
 
   // al revés: lo que escribieron mueve el punto; si no se encuentra, la dirección es inválida.
-  // La búsqueda prefiere la zona del punto actual (o de la organización que publica).
+  // La búsqueda prefiere la zona del punto actual (o de la organización que publica);
+  // la coordinación puede no tener ninguna de las dos, y entonces se busca en todo el país.
   function validarDireccion() {
     var texto = $("avDireccion").value.trim();
     var turno = ++busquedaDireccion;
     if (!texto) { marcarDireccion(""); return; }
     marcarDireccion("buscando", "Buscando esa dirección…");
     var c = avisoPos || miOrg();
-    fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ar&accept-language=es&viewbox=" +
-      [c.lng - 1, c.lat + 1, c.lng + 1, c.lat - 1].join(",") + "&q=" + encodeURIComponent(texto))
+    var zona = c ? "&viewbox=" + [c.lng - 1, c.lat + 1, c.lng + 1, c.lat - 1].join(",") : "";
+    fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ar&accept-language=es" +
+      zona + "&q=" + encodeURIComponent(texto))
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (lista) {
         if (turno !== busquedaDireccion) return;
