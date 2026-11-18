@@ -91,7 +91,7 @@
   function tipoLabel(o) {
     return (o.tipos || []).map(function (k) { return k === "otro" && o.tipoOtro ? o.tipoOtro : (TIPOS[k] || TIPOS.otro).label; }).join(", ");
   }
-  function tipoIcono(o) { return (TIPOS[(o.tipos || [])[0]] || TIPOS.otro).icono; }
+  function tipoIcono(o) { return o ? (TIPOS[(o.tipos || [])[0]] || TIPOS.otro).icono : "📍"; }
   function totalPersonas(p) { p = p || {}; return (+p.ninxs || 0) + (+p.jovenes || 0) + (+p.adultxs || 0); }
   // los datos internos del cuestionario los ve toda cuenta de la red que ingresó (organizaciones y coordinación), nunca los visitantes
   function veDatosRed() { return rol !== "visitante"; }
@@ -228,8 +228,16 @@
     $("tab-ficha").hidden = rol !== "org";
     $("tab-acceso").hidden = rol !== "visitante";
     $("tab-coord").hidden = rol !== "coord";
-    $("publicarBloqueado").hidden = rol === "org";
-    $("formAviso").hidden = rol !== "org";
+    var puedePublicar = rol === "org" || rol === "coord";
+    $("publicarBloqueado").hidden = puedePublicar;
+    $("formAviso").hidden = !puedePublicar;
+    if (rol === "coord") {
+      $("publicarBloqueado").innerHTML = "La coordinación puede publicar convocatorias generales para toda la red.";
+    } else if (rol === "org") {
+      $("publicarBloqueado").innerHTML = "Solo las organizaciones y la coordinación de la red pueden publicar.";
+    } else {
+      $("publicarBloqueado").innerHTML = "Solo las organizaciones y la coordinación de la red pueden publicar. Si sos parte de una, tocá <strong>“Ingresar”</strong> arriba a la derecha con tu cuenta habilitada.";
+    }
     renderSesion();
     if (rol === "org") cargarFicha();
     else limpiarPinAviso();
@@ -636,7 +644,7 @@
   function linkGoogleMaps(a) { return "https://www.google.com/maps/search/?api=1&query=" + a.lat + "," + a.lng; }
 
   function initMapaAviso() {
-    if (typeof L === "undefined" || rol !== "org") return;
+    if (typeof L === "undefined" || (rol !== "org" && rol !== "coord")) return;
     if (!mapaAviso) {
       mapaAviso = L.map("mapaAviso", { scrollWheelZoom: false });
       L.tileLayer(TILE_URL, { attribution: TILE_ATTR, minZoom: 3, maxZoom: 18 }).addTo(mapaAviso);
@@ -651,6 +659,7 @@
       var yo = miOrg();
       if (avisoPos) mapaAviso.setView([avisoPos.lat, avisoPos.lng], 13);
       else if (yo) mapaAviso.setView([yo.lat, yo.lng], 12);
+      else mapaAviso.setView([-35.5, -63.5], 4);
     }, 0);
   }
 
@@ -772,10 +781,16 @@
   function renderAvisos() {
     var ul = $("avisosList");
     var esOrg = rol === "org";
-    $("avisosFiltros").hidden = !esOrg;
-    if (!esOrg && avisoFiltro === "mias") marcarFiltroAviso("");
-    if (esOrg) $("cuentaMias").textContent = avisos.filter(function (a) { return a.orgId === sesion.orgId; }).length || "";
-    var lista = avisos.filter(function (a) { return avisoFiltro !== "mias" || a.orgId === sesion.orgId; });
+    var puedePublicar = rol === "org" || rol === "coord";
+    $("avisosFiltros").hidden = !puedePublicar;
+    if (!puedePublicar && avisoFiltro === "mias") marcarFiltroAviso("");
+    function esPublicacionMia(a) {
+      return rol === "coord" ? a.orgId === "coord" : (rol === "org" && a.orgId === sesion.orgId);
+    }
+    if (puedePublicar) {
+      $("cuentaMias").textContent = avisos.filter(esPublicacionMia).length || "";
+    }
+    var lista = avisos.filter(function (a) { return avisoFiltro !== "mias" || esPublicacionMia(a); });
     function porFecha(a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; }
     // una organización ve primero las convocatorias de las casas más cercanas (los propios, al final)
     var yo = esOrg ? miOrg() : null;
@@ -802,7 +817,7 @@
     }
     ul.innerHTML = lista.map(function (a) {
       var o = orgById(a.orgId);
-      var propio = rol === "org" && a.orgId === sesion.orgId;
+      var propio = esPublicacionMia(a);
       var accion;
       if (rol === "coord") {
         accion = '<button type="button" class="btn btn-sm" data-cerrar-aviso="' + a.id + '">Quitar convocatoria</button>';
@@ -836,7 +851,8 @@
         (a.detalle ? "<p>" + esc(a.detalle) + "</p>" : "") +
         respuestasHtml(a) +
         '<div class="aviso-foot"><span class="aviso-org">' +
-        (o ? '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button> · " + esc(o.localidad) : "") +
+        (o ? '<button type="button" data-ver="' + o.id + '">' + esc(o.nombre) + "</button> · " + esc(o.localidad)
+          : (a.orgId === "coord" ? '<strong>Coordinación de la red</strong>' : "")) +
         '</span><span class="aviso-actions">' + accion + "</span></div>" +
         "</li>";
     }).join("");
@@ -905,7 +921,7 @@
       if (estadoDireccion === "buscando") { toast("Esperá un momento: estamos comprobando la dirección."); return; }
       if (estadoDireccion === "invalida") { $("avDireccion").focus(); return; }
       var aviso = {
-        id: "av-" + Date.now(), orgId: sesion.orgId, clase: $("avClase").value,
+        id: "av-" + Date.now(), orgId: rol === "coord" ? "coord" : sesion.orgId, clase: $("avClase").value,
         fecha: HOY, cuando: cuando, lat: avisoPos.lat, lng: avisoPos.lng, direccion: $("avDireccion").value.trim(), titulo: titulo, detalle: $("avDetalle").value.trim(), respondieron: [], nuevo: true,
       };
       avisos.push(aviso);
