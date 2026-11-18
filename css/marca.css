@@ -243,15 +243,15 @@ textarea.field-control{ resize:vertical; min-height:4.5rem; }
   background:var(--footer-bg); color:#E8ECEE; margin-top:3rem;
 }
 .site-footer-inner{
-  max-width:var(--wrap); margin:0 auto; padding:2.2rem 1.5rem 2.6rem;
-  display:flex; gap:1.5rem 2.5rem; flex-wrap:wrap; align-items:flex-start;
+  max-width:1600px; margin:0 auto; padding:1.1rem 2rem 1.2rem;
+  display:flex; gap:.8rem 1.6rem; flex-wrap:wrap; align-items:center;
 }
-.site-footer img{ width:110px; height:auto; background:#fff; border-radius:var(--radius); padding:.5rem; }
+.site-footer img{ width:64px; height:auto; background:#fff; border-radius:var(--radius); padding:.3rem; }
 .site-footer-inner > div{ flex:1 1 30rem; min-width:0; }
-.site-footer p{ font-size:.85rem; margin:.2rem 0; max-width:none; color:#C9D1D5; }
+.site-footer p{ font-size:.78rem; line-height:1.45; margin:.1rem 0; max-width:none; color:#C9D1D5; }
 .site-footer strong{ color:#fff; }
 .site-footer a{ color:var(--celeste); }
-.site-footer .hand{ color:var(--celeste); font-size:1.15rem; }
+.site-footer .hand{ color:var(--celeste); font-size:1rem; }
 
 @media (max-width:640px){
   .header-inner{ padding:0 1rem; gap:.6rem; }
@@ -268,5 +268,5 @@ textarea.field-control{ resize:vertical; min-height:4.5rem; }
   .sesion-quien, .g-texto{ display:none; }
   .site-nav .nav-sesion button, .site-nav .nav-sesion .btn-ingresar{ padding:.32rem; }
   .site-nav .nav-sesion .btn-salir{ padding:.32rem .6rem; }
-  .site-footer-inner{ padding:1.8rem 1rem 2.2rem; }
+  .site-footer-inner{ padding:1rem 1rem 1.2rem; }
 }
