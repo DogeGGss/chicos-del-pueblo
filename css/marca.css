@@ -247,7 +247,8 @@ textarea.field-control{ resize:vertical; min-height:4.5rem; }
   display:flex; gap:1.5rem 2.5rem; flex-wrap:wrap; align-items:flex-start;
 }
 .site-footer img{ width:110px; height:auto; background:#fff; border-radius:var(--radius); padding:.5rem; }
-.site-footer p{ font-size:.85rem; margin:.2rem 0; max-width:64ch; color:#C9D1D5; }
+.site-footer-inner > div{ flex:1 1 30rem; min-width:0; }
+.site-footer p{ font-size:.85rem; margin:.2rem 0; max-width:none; color:#C9D1D5; }
 .site-footer strong{ color:#fff; }
 .site-footer a{ color:var(--celeste); }
 .site-footer .hand{ color:var(--celeste); font-size:1.15rem; }
